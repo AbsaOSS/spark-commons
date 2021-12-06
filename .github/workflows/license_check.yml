@@ -12,36 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# use glob syntax.
-syntax: glob
-*.ser
-*.class
-*~
-*.bak
-#*.off
-*.old
-# eclipse conf file
-.settings
-.classpath
-.project
-.manager
-.scala_dependencies
-.scalastyle
 
-# idea
-.idea
-*.iml
+name: License Check
 
-# vs code
-.vscode
+on:
+  push:
+    branches: [ main, develop, master ]
+  pull_request:
+      branches: [ master ]
+      types: [ assigned, opened, synchronize, reopened, labeled ]
 
-# building
-target
-build
-null
-tmp*
-temp*
-dist
-test-output
-build.log
-.bsp
+jobs:
+  license-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: "adopt@1.8"
+      - run: sbt headerCheck
