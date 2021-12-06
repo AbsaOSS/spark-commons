@@ -15,10 +15,18 @@
 
 ThisBuild / name := "spark-commons"
 ThisBuild / organization := "za.co.absa"
-ThisBuild / scalaVersion := "2.12.12"
+
+lazy val scala211 = "2.11.12"
+lazy val scala212 = "2.12.12"
+
+ThisBuild / scalaVersion := scala211
+ThisBuild / crossScalaVersions := Seq(scala211, scala212)
+ThisBuild / publish := {}
+
+def sparkVersion: String = sys.props.getOrElse("SPARK_VERSION", "2.4.7")
 
 libraryDependencies ++=  List(
-  "org.apache.spark" %% "spark-core" % "2.4.7" % "provided",
-  "org.apache.spark" %% "spark-sql" % "2.4.7" % "provided",
+  "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
+  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
   "org.scalatest"    %% "scalatest" % "3.0.5" % Test
 )
