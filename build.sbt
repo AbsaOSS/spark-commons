@@ -15,7 +15,6 @@
 
 ThisBuild / name := "spark-commons"
 ThisBuild / organization := "za.co.absa"
-ThisBuild / version := "0.0.1-SNAPSHOT"
 ThisBuild / scalaVersion := "2.12.12"
 
 libraryDependencies ++=  List(
