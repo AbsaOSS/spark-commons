@@ -26,7 +26,12 @@ ThisBuild / publish := {}
 def sparkVersion: String = sys.props.getOrElse("SPARK_VERSION", "2.4.7")
 
 libraryDependencies ++=  List(
-  "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
-  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
-  "org.scalatest"    %% "scalatest" % "3.0.5" % Test
+  "org.apache.spark"  %% "spark-core" % sparkVersion % "provided",
+  "org.apache.spark"  %% "spark-sql" % sparkVersion % "provided",
+  "za.co.absa.commons"%% "commons" % "0.0.27" % "provided",
+  "za.co.absa"        %% "spark-hofs" % "0.4.0",
+  "org.scala-lang"    % "scala-reflect" % scala211 % "provided",
+  "org.scalatest"     %% "scalatest" % "3.1.0" % Test,
+  "org.scalatest"     %% "scalatest-flatspec" % "3.2.0" % Test,
+  "org.scalatestplus" %%"mockito-1-10" % "3.1.0.0" % Test
 )
