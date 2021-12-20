@@ -20,6 +20,7 @@ import org.apache.spark.sql.AnalysisException
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import za.co.absa.spark.commons.test.SparkTestBase
 
 class SchemaUtilsSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll with SparkTestBase {
   import spark.implicits._

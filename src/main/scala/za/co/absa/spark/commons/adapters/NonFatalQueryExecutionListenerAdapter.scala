@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons
+package za.co.absa.spark.commons.adapters
 
 import org.apache.spark.sql.execution.QueryExecution
 import org.apache.spark.sql.util.QueryExecutionListener

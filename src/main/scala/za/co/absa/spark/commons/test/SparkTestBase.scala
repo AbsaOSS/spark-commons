@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons
+package za.co.absa.spark.commons.test
 
 import org.apache.spark.sql.SparkSession
 

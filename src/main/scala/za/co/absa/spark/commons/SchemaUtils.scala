@@ -19,6 +19,7 @@ package za.co.absa.spark.commons
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
 import org.apache.spark.sql.{Column, DataFrame}
+import za.co.absa.spark.commons.adapters.HofsAdapter
 
 object SchemaUtils extends HofsAdapter {
   /**

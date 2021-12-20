@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons
+package za.co.absa.spark.commons.adapters
 
 import org.apache.spark.SPARK_VERSION
 import org.apache.spark.sql.Column
+import org.apache.spark.sql.catalyst.ScalaReflection.universe.Quasiquote
 import za.co.absa.commons.reflect.ReflectionUtils
 import za.co.absa.commons.version.Version
 import za.co.absa.commons.version.Version.VersionStringInterpolator
-
-import scala.reflect.runtime.universe._
 
 trait HofsAdapter {
 
