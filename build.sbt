@@ -33,5 +33,5 @@ libraryDependencies ++=  List(
   "org.scala-lang"    % "scala-compiler" % scalaVersion.value,
   "org.scalatest"     %% "scalatest" % "3.1.0" % Test,
   "org.scalatest"     %% "scalatest-flatspec" % "3.2.0" % Test,
-  "org.scalatestplus" %%"mockito-1-10" % "3.1.0.0" % Test
+  "org.scalatestplus" %% "mockito-1-10" % "3.1.0.0" % Test
 )
