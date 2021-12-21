@@ -21,7 +21,6 @@ lazy val scala212 = "2.12.12"
 
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
-ThisBuild / publish := {}
 
 def sparkVersion: String = sys.props.getOrElse("SPARK_VERSION", "2.4.7")
 
@@ -35,3 +34,5 @@ libraryDependencies ++=  List(
   "org.scalatest"      %% "scalatest-flatspec" % "3.2.0" % Test,
   "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0" % Test
 )
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
