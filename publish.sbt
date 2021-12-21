@@ -24,7 +24,32 @@ ThisBuild / scmInfo := Some(
   )
 )
 
-ThisBuild / developers := List()
+ThisBuild / developers := List(
+  Developer(
+    id    = "Zejnilovic",
+    name  = "Sasa Zejnilovic",
+    email = "sasa.zejnilovic@absa.africa",
+    url   = url("https://github.com/Zejnilovic")
+  ),
+  Developer(
+    id    = "benedeki",
+    name  = "David Benedeki",
+    email = "david.benedeki@absa.africa",
+    url   = url("https://github.com/benedeki")
+  ),
+  Developer(
+    id    = "dk1844",
+    name  = "Daniel Kavan",
+    email = "daniel.kavan@absa.africa",
+    url   = url("https://github.com/dk1844")
+  ),
+  Developer(
+    id    = "AdrianOlosutean",
+    name  = "Adrian Olosutean",
+    email = "adrian.olosutean@absa.africa",
+    url   = url("https://github.com/AdrianOlosutean")
+  )
+)
 
 ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/spark-commomns"))
 ThisBuild / description := "Spark Common Utilities for ABSA"
