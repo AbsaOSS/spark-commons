@@ -28,6 +28,8 @@ libraryDependencies ++=  List(
   "org.apache.spark"   %% "spark-core" % sparkVersion % "provided",
   "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided",
   "za.co.absa.commons" %% "commons" % "1.0.0",
+  "com.typesafe"        % "config" % "1.4.1",
+  "za.co.absa"         %% "spark-hats"  % "0.2.2",
   "za.co.absa"         %% "spark-hofs" % "0.4.0",
   "org.scala-lang"     % "scala-compiler" % scalaVersion.value,
   "org.scalatest"      %% "scalatest" % "3.1.0" % Test,
