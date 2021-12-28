@@ -313,6 +313,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
   }
 
   test("Test deconstruct()") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val sample = """{"id":1,"leg":{"legid":100,"conditions":[{"check":"a","action":"b"},{"check":"c","action":"d"},{"check":"e","action":"f"}]}}""" ::
       """{"id":2,"leg":{"legid":200,"conditions":[{"check":"g","action":"h"},{"check":"i","action":"j"},{"check":"k","action":"l"}]}}""" ::
       """{"id":3,"leg":{"legid":300,"conditions":[]}}""" ::
@@ -381,6 +382,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
   }
 
   test ("Test multiple nesting of arrays and structs") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val sample = """{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}]}""" ::
       """{"id":2,"legs":[{"legid":200,"conditions":[{"checks":[{"checkNums":["8","9","10b","11","12c","13"]}],"amount":200}]}]}""" ::
       """{"id":3,"legs":[{"legid":300,"conditions":[{"checks":[],"amount": 300}]}]}""" ::
@@ -523,6 +525,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
   }
 
   test ("Test exploding a nested array that is the only element of a struct") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val sample = """{"id":1,"leg":{"conditions":[{"check":"a","action":"b"},{"check":"c","action":"d"},{"check":"e","action":"f"}]}}""" ::
       """{"id":2,"leg":{"conditions":[{"check":"g","action":"h"},{"check":"i","action":"j"},{"check":"k","action":"l"}]}}""" ::
       """{"id":3,"leg":{"conditions":[]}}""" ::
@@ -604,6 +607,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
   }
 
   test ("Test explosion of an array field inside a struct") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val sample = """{"id":1,"leg":{"legid":100,"conditions":[{"check":"a","action":"b"},{"check":"c","action":"d"},{"check":"e","action":"f"}]}}""" ::
       """{"id":2,"leg":{"legid":200,"conditions":[{"check":"g","action":"h"},{"check":"i","action":"j"},{"check":"k","action":"l"}]}}""" ::
       """{"id":3,"leg":{"legid":300,"conditions":[]}}""" ::
@@ -643,6 +647,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
   }
 
   test ("Test explosion with an error column") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val sample = """{"id":1,"errors":["Error 1","Error 2"],"leg":{"legid":100,"conditions":[{"check":"1","action":"b"},{"check":"2","action":"d"},{"check":"3","action":"f"}]}}""" ::
       """{"id":2,"errors":[],"leg":{"legid":200,"conditions":[{"check":"0","action":"b"}]}}""" ::
       """{"id":3,"errors":[],"leg":{"legid":300}}""" :: Nil
@@ -687,6 +692,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
   }
 
   test ("Test empty struct inside an array") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val sample = """{"order":1,"a":[{"b":"H1","c":[{"d":1,"toDrop": "drop me"}]}],"myFlag":true}""" ::
       """{"order":2,"a":[{"b":"H2","c":[]}],"myFlag":true}""" ::
       """{"order":3,"a":[{"b":"H3"}],"myFlag":true}""" ::
@@ -736,6 +742,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
   }
 
   test ("Test empty struct inside an array with the only array field") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val sample = """{"order":1,"a":[{"c":[{"d":1}]}],"myFlag":true}""" ::
       """{"order":2,"a":[{"c":[]}],"myFlag":true}""" ::
       """{"order":3,"a":[{}],"myFlag":true}""" ::
