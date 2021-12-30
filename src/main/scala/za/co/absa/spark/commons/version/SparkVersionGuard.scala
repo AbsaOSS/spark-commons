@@ -18,15 +18,33 @@ package za.co.absa.spark.commons.version
 
 import org.slf4j.{Logger, LoggerFactory}
 import za.co.absa.commons.version.Version
+import za.co.absa.commons.version.Version.VersionStringInterpolator
 import za.co.absa.commons.version.impl.SemVer20Impl.SemanticVersion
 
 object SparkVersionGuard {
+  val minSpark2XVersionIncluded: SemanticVersion = semver"2.4.2"
+  val maxSpark2XVersionExcluded: SemanticVersion = semver"2.4.8"
+
+  val minSpark3XVersionIncluded: SemanticVersion = semver"3.0.0"
+  val maxSpark3XVersionExcluded: SemanticVersion = semver"3.2.0"
 
   /**
-   * Populates the version guard with the defaults from [[SparkCompatibility]]
+   * Populates the version guard with the defaults
    */
   def fromDefaultSparkCompatibilitySettings: SparkVersionGuard =
-    SparkVersionGuard(SparkCompatibility.minSparkVersionIncluded, SparkCompatibility.maxSparkVersionExcluded)
+    SparkVersionGuard(minSpark2XVersionIncluded, Some(maxSpark3XVersionExcluded))
+
+  /**
+   * Populates the version guard with the defaults for Spark 2.X
+   */
+  def fromSpark2XCompatibilitySettings: SparkVersionGuard =
+    SparkVersionGuard(minSpark2XVersionIncluded, Some(maxSpark2XVersionExcluded))
+
+  /**
+   * Populates the version guard with the defaults for Spark 3.X
+   */
+  def fromSpark3XCompatibilitySettings: SparkVersionGuard =
+    SparkVersionGuard(minSpark3XVersionIncluded, Some(maxSpark3XVersionExcluded))
 
 }
 
