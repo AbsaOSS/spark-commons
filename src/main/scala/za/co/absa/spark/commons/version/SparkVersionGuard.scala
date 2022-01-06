@@ -23,10 +23,10 @@ import za.co.absa.commons.version.impl.SemVer20Impl.SemanticVersion
 
 object SparkVersionGuard {
   val minSpark2XVersionIncluded: SemanticVersion = semver"2.4.2"
-  val maxSpark2XVersionExcluded: SemanticVersion = semver"2.4.8"
+  val maxSpark2XVersionExcluded: SemanticVersion = semver"3.0.0"
 
   val minSpark3XVersionIncluded: SemanticVersion = semver"3.0.0"
-  val maxSpark3XVersionExcluded: SemanticVersion = semver"3.2.0"
+  val maxSpark3XVersionExcluded: SemanticVersion = semver"4.0.0"
 
   /**
    * Populates the version guard with the defaults
