@@ -16,10 +16,8 @@
 
 package za.co.absa.spark.commons.time
 
-import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.log4j.{LogManager, Logger}
 import org.apache.spark.sql.SparkSession
-
 import java.util.TimeZone
 
 /**
@@ -27,10 +25,7 @@ import java.util.TimeZone
  */
 object TimeZoneNormalizer {
   private val log: Logger = LogManager.getLogger(this.getClass)
-  private val generalConfig: Config = ConfigFactory.load()
-  val timeZone: String = if (generalConfig.hasPath("timezone")){
-    generalConfig.getString("timezone")
-  } else {
+  val timeZone: String = {
     val default = "UTC"
     log.warn(s"No time zone (timezone) setting found. Setting to default, which is $default.")
     default
