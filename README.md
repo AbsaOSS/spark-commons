@@ -50,4 +50,32 @@ select to order and positionally filter columns of a DataFrame
 
     ```scala
       SchemaUtils.alignSchema(dataFrameToBeAligned, modelSchema)
+   ```
+5. Getting a column with a unique name in case a schema is provided
+
+    ```scala
+      SchemaUtils.getUniqueName(prefix, modelSchema)
     ```
+
+### DataFrameImplicits
+_DataFrameImplicits_ provides methods for transformations on Dataframes  
+
+1. Getting the string of the shown data of a dataframe
+
+    ```scala
+          df.dataAsString() 
+      
+          df.dataAsString(truncate)
+      
+          df.dataAsString(numRows, truncate)
+   
+          df.dataAsString(numRows, truncateNumber)
+      
+          df.dataAsString(numRows, truncate, vertical)
+    ```
+    
+2. Adds a column to a dataframe if it does not exist. If it exists, it will add an error in the error column
+    
+   ```scala
+      df.withColumnIfDoesNotExist(colName, colExpression)
+   ```

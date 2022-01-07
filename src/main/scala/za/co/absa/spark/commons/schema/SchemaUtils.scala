@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons
+package za.co.absa.spark.commons.schema
 
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.adapters.HofsAdapter
+
+import scala.util.Random
 
 object SchemaUtils extends HofsAdapter {
   /**
@@ -229,5 +231,27 @@ object SchemaUtils extends HofsAdapter {
 
   private def getMapOfFields(schema: StructType): Map[String, StructField] = {
     schema.map(field => field.name.toLowerCase() -> field).toMap
+  }
+
+  /**
+   * Generate a unique column name
+   *
+   * @param prefix A prefix to use for the column name
+   * @param schema An optional schema to validate if the column already exists (a very low probability)
+   * @return A name that can be used as a unique column name
+   */
+  def getUniqueName(prefix: String, schema: Option[StructType]): String = {
+    schema match {
+      case None =>
+        s"${prefix}_${Random.nextLong().abs}"
+      case Some(sch) =>
+        var exists = true
+        var columnName = ""
+        while (exists) {
+          columnName = s"${prefix}_${Random.nextLong().abs}"
+          exists = sch.fields.exists(_.name.compareToIgnoreCase(columnName) == 0)
+        }
+        columnName
+    }
   }
 }
