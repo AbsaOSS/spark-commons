@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.version
+package za.co.absa.spark.commons
 
 import org.slf4j.{Logger, LoggerFactory}
 import za.co.absa.commons.version.Version
