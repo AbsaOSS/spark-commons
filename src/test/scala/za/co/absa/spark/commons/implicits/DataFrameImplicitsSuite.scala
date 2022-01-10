@@ -20,7 +20,6 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.lit
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
-import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
 
 class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
   import spark.implicits._
@@ -189,7 +188,8 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
     assert(actualOutput == expectedOutput)
   }
 
-  test("Test withColumnIfNotExist() when the column exists") {
+  test("Test withColumnIfNotExist() when the column exists, Spark 2.X") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val expectedOutput =
       """+-----+----------------------------------------------------------------------------+
         ||value|errCol                                                                      |
@@ -212,7 +212,8 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
     assert(actualOutput == expectedOutput)
   }
 
-  test("Test withColumnIfNotExist() when the column exists, but has a different case") {
+  test("Test withColumnIfNotExist() when the column exists, but has a different case, Spark 2.X") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
     val expectedOutput =
       """+-----+----------------------------------------------------------------------------+
         ||vAlUe|errCol                                                                      |
@@ -221,6 +222,54 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
         ||1    |[]                                                                          |
         ||1    |[]                                                                          |
         ||1    |[[overWriteError, E000OW, Special column value has changed, vAlUe, [2], []]]|
+        ||1    |[]                                                                          |
+        |+-----+----------------------------------------------------------------------------+
+        |
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val dfIn = getDummyDataFrame
+    val dfOut = dfIn.withColumnIfDoesNotExist("vAlUe", lit(1))
+    val actualOutput = dfOut.dataAsString(truncate = false)
+
+    assert(dfIn.schema.length == 1)
+    assert(dfIn.schema.head.name == "value")
+    assert(actualOutput == expectedOutput)
+  }
+
+  test("Test withColumnIfNotExist() when the column exists, , Spark 3.X") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("2."))
+    val expectedOutput =
+      """+-----+----------------------------------------------------------------------------+
+        ||value|errCol                                                                      |
+        |+-----+----------------------------------------------------------------------------+
+        ||1    |[]                                                                          |
+        ||1    |[]                                                                          |
+        ||1    |[]                                                                          |
+        ||1    |[{overWriteError, E000OW, Special column value has changed, value, [2], []}]|
+        ||1    |[]                                                                          |
+        |+-----+----------------------------------------------------------------------------+
+        |
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val dfIn = getDummyDataFrame
+    val dfOut = dfIn.withColumnIfDoesNotExist("value", lit(1))
+    val actualOutput = dfOut.dataAsString(truncate = false)
+
+    assert(dfIn.schema.length == 1)
+    assert(dfIn.schema.head.name == "value")
+    assert(actualOutput == expectedOutput)
+  }
+
+  test("Test withColumnIfNotExist() when the column exists, but has a different case, Spark 3.X") {
+    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("2."))
+    val expectedOutput =
+      """+-----+----------------------------------------------------------------------------+
+        ||vAlUe|errCol                                                                      |
+        |+-----+----------------------------------------------------------------------------+
+        ||1    |[]                                                                          |
+        ||1    |[]                                                                          |
+        ||1    |[]                                                                          |
+        ||1    |[{overWriteError, E000OW, Special column value has changed, vAlUe, [2], []}]|
         ||1    |[]                                                                          |
         |+-----+----------------------------------------------------------------------------+
         |
