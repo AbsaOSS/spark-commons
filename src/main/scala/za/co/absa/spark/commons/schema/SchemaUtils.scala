@@ -14,14 +14,44 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons
+package za.co.absa.spark.commons.schema
 
 import org.apache.spark.sql.functions.{col, struct}
-import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.adapters.HofsAdapter
 
+import scala.annotation.tailrec
+
 object SchemaUtils extends HofsAdapter {
+
+  /**
+   * Returns the parent path of a field. Returns an empty string if a root level field name is provided.
+   *
+   * @param columnName A fully qualified column name
+   * @return The parent column name or an empty string if the input column is a root level column
+   */
+  def getParentPath(columnName: String): String = {
+    val index = columnName.lastIndexOf('.')
+    if (index > 0) {
+      columnName.substring(0, index)
+    } else {
+      ""
+    }
+  }
+
+  /**
+   * Converts a fully qualified field name (including its path, e.g. containing fields) to a unique field name without
+   * dot notation
+   *
+   * @param path the fully qualified field name
+   * @return unique top level field name
+   */
+  def unpath(path: String): String = {
+    path.replace("_", "__")
+      .replace('.', '_')
+  }
+
   /**
    * Compares 2 array fields of a dataframe schema.
    *
@@ -87,6 +117,40 @@ object SchemaUtils extends HofsAdapter {
           case _ => false
         }
       case _ => type1 == type2
+    }
+  }
+
+  /**
+   * Determine if a datatype is a primitive one
+   */
+  def isPrimitive(dt: DataType): Boolean = dt match {
+    case _: BinaryType
+         | _: BooleanType
+         | _: ByteType
+         | _: DateType
+         | _: DecimalType
+         | _: DoubleType
+         | _: FloatType
+         | _: IntegerType
+         | _: LongType
+         | _: NullType
+         | _: ShortType
+         | _: StringType
+         | _: TimestampType => true
+    case _ => false
+  }
+
+  /**
+   * For an array of arrays of arrays, ... get the final element type at the bottom of the array
+   *
+   * @param arrayType An array data type from a Spark dataframe schema
+   * @return A non-array data type at the bottom of array nesting
+   */
+  @tailrec
+  final def getDeepestArrayType(arrayType: ArrayType): DataType = {
+    arrayType.elementType match {
+      case a: ArrayType => getDeepestArrayType(a)
+      case b => b
     }
   }
 
@@ -229,5 +293,80 @@ object SchemaUtils extends HofsAdapter {
 
   private def getMapOfFields(schema: StructType): Map[String, StructField] = {
     schema.map(field => field.name.toLowerCase() -> field).toMap
+  }
+
+  /**
+   * Get paths for all array subfields of this given datatype
+   */
+  def getAllArraySubPaths(path: String, name: String, dt: DataType): Seq[String] = {
+    val currPath = appendPath(path, name)
+    dt match {
+      case s: StructType => s.fields.flatMap(f => getAllArraySubPaths(currPath, f.name, f.dataType))
+      case _@ArrayType(elType, _) => getAllArraySubPaths(path, name, elType) :+ currPath
+      case _ => Seq()
+    }
+  }
+
+  /**
+   * For a given list of field paths determines if any path pair is a subset of one another.
+   *
+   * For instance,
+   *  - 'a.b', 'a.b.c', 'a.b.c.d' have this property.
+   *  - 'a.b', 'a.b.c', 'a.x.y' does NOT have it, since 'a.b.c' and 'a.x.y' have diverging subpaths.
+   *
+   * @param paths A list of paths to be analyzed
+   * @return true if for all pathe the above property holds
+   */
+  def isCommonSubPath(paths: String*): Boolean = {
+    def sliceRoot(paths: Seq[Seq[String]]): Seq[Seq[String]] = {
+      paths.map(path => path.drop(1)).filter(_.nonEmpty)
+    }
+
+    var isParentCommon = true // For Seq() the property holds by [my] convention
+    var restOfPaths: Seq[Seq[String]] = paths.map(_.split('.').toSeq).filter(_.nonEmpty)
+    while (isParentCommon && restOfPaths.nonEmpty) {
+      val parent = restOfPaths.head.head
+      isParentCommon = restOfPaths.forall(path => path.head == parent)
+      restOfPaths = sliceRoot(restOfPaths)
+    }
+    isParentCommon
+  }
+
+  /**
+   * Append a new attribute to path or empty string.
+   *
+   * @param path      The dot-separated existing path
+   * @param fieldName Name of the field to be appended to the path
+   * @return The path with the new field appended or the field itself if path is empty
+   */
+  def appendPath(path: String, fieldName: String): String = {
+    if (path.isEmpty) {
+      fieldName
+    } else if (fieldName.isEmpty) {
+      path
+    } else {
+      s"$path.$fieldName"
+    }
+  }
+
+
+  /**
+   * Checks if a casting between types always succeeds
+   *
+   * @param sourceType A type to be casted
+   * @param targetType A type to be casted to
+   * @return true if casting never fails
+   */
+  def isCastAlwaysSucceeds(sourceType: DataType, targetType: DataType): Boolean = {
+    (sourceType, targetType) match {
+      case (_: StructType, _) | (_: ArrayType, _) => false
+      case (a, b) if a == b => true
+      case (_, _: StringType) => true
+      case (_: ByteType, _: ShortType | _: IntegerType | _: LongType) => true
+      case (_: ShortType, _: IntegerType | _: LongType) => true
+      case (_: IntegerType, _: LongType) => true
+      case (_: DateType, _: TimestampType) => true
+      case _ => false
+    }
   }
 }
