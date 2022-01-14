@@ -38,6 +38,7 @@ class StructFieldImplicitsTest extends AnyFunSuite {
     assertResult(None)(fieldWith("\"\"").getMetadataChar("a"))
     assertResult(None)(fieldWith("123").getMetadataChar("a"))
     assertResult(Some('g'))(fieldWith("\"g\"").getMetadataChar("a"))
+    assertResult(None)(fieldWith("\"abc\"").getMetadataChar("a"))
     assertResult(None)(fieldWith("null").getMetadataChar("a"))
   }
 
@@ -51,7 +52,7 @@ class StructFieldImplicitsTest extends AnyFunSuite {
     assertResult(None)(fieldWith("null").getMetadataStringAsBoolean("a"))
   }
 
-  test("hastMetadataKKey") {
+  test("hastMetadataKey") {
     assertResult(true)(fieldWith("\"\"").hasMetadataKey("a"))
     assertResult(false)(fieldWith("123").hasMetadataKey("b"))
     assertResult(true)(fieldWith("\"hvh\"").hasMetadataKey("a"))
