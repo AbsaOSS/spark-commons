@@ -79,30 +79,31 @@ _Column_ provides implicit methods for transforming Spark Columns
 ### StructFieldImplicits
 
 _StructFieldImplicits_ provides implicit methods for working with StructField objects.  
+Of them, metadata methods are:
 
 1. Gets the metadata String value given a key
 
     ```scala
-      structField.getMetadataString(key)
+      structField.metadata.getOptString(key)
     ```
    
 2. Gets the metadata Char value given a key if the value is a single character String, it returns the char,
  otherwise None
 
     ```scala
-      structField.getMetadataChar(key)
+      structField.metadata.getOptChar(key)
     ```
   
 3. Gets the metadata boolean value of a given key, given that it can be transformed into boolean
 
     ```scala
-      structField.getMetadataStringAsBoolean(key)
+      structField.metadata.getStringAsBoolean(key)
     ```
 
 4. Checks the structfield if it has the provided key, returns a boolean
 
     ```scala
-      structField.hasMetadataKey(key)
+      structField.metadata.hasKey(key)
     ```
 
 # Spark Version Guard

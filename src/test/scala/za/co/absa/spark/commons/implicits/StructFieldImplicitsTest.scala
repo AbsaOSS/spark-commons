@@ -18,7 +18,7 @@ package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.types.{Metadata, StringType, StructField}
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
+import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetadataEnhancement
 
 class StructFieldImplicitsTest extends AnyFunSuite {
 
@@ -28,35 +28,35 @@ class StructFieldImplicitsTest extends AnyFunSuite {
   }
 
   test("getMetadataString") {
-    assertResult(Some(""))(fieldWith("\"\"").getMetadataString("a"))
-    assertResult(None)(fieldWith("123").getMetadataString("a"))
-    assertResult(Some("ffbfg"))(fieldWith("\"ffbfg\"").getMetadataString("a"))
-    assertResult(Some(null))(fieldWith("null").getMetadataString("a"))
+    assertResult(Some(""))(fieldWith("\"\"").metadata.getOptString("a"))
+    assertResult(None)(fieldWith("123").metadata.getOptString("a"))
+    assertResult(Some("ffbfg"))(fieldWith("\"ffbfg\"").metadata.getOptString("a"))
+    assertResult(Some(null))(fieldWith("null").metadata.getOptString("a"))
   }
 
-  test("getMetadataChar") {
-    assertResult(None)(fieldWith("\"\"").getMetadataChar("a"))
-    assertResult(None)(fieldWith("123").getMetadataChar("a"))
-    assertResult(Some('g'))(fieldWith("\"g\"").getMetadataChar("a"))
-    assertResult(None)(fieldWith("\"abc\"").getMetadataChar("a"))
-    assertResult(None)(fieldWith("null").getMetadataChar("a"))
+  test("getOptChar") {
+    assertResult(None)(fieldWith("\"\"").metadata.getOptChar("a"))
+    assertResult(None)(fieldWith("123").metadata.getOptChar("a"))
+    assertResult(Some('g'))(fieldWith("\"g\"").metadata.getOptChar("a"))
+    assertResult(None)(fieldWith("\"abc\"").metadata.getOptChar("a"))
+    assertResult(None)(fieldWith("null").metadata.getOptChar("a"))
   }
 
-  test("getMetadataStringAsBoolean") {
-    assertResult(None)(fieldWith("\"\"").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("123").getMetadataStringAsBoolean("a"))
-    assertResult(Some(true))(fieldWith("\"true\"").getMetadataStringAsBoolean("a"))
-    assertResult(Some(false))(fieldWith("\"false\"").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("false").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("true").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("null").getMetadataStringAsBoolean("a"))
+  test("getStringAsBoolean") {
+    assertResult(None)(fieldWith("\"\"").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("123").metadata.getOptStringAsBoolean("a"))
+    assertResult(Some(true))(fieldWith("\"true\"").metadata.getOptStringAsBoolean("a"))
+    assertResult(Some(false))(fieldWith("\"false\"").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("false").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("true").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("null").metadata.getOptStringAsBoolean("a"))
   }
 
   test("hastMetadataKey") {
-    assertResult(true)(fieldWith("\"\"").hasMetadataKey("a"))
-    assertResult(false)(fieldWith("123").hasMetadataKey("b"))
-    assertResult(true)(fieldWith("\"hvh\"").hasMetadataKey("a"))
-    assertResult(true)(fieldWith("null").hasMetadataKey("a"))
+    assertResult(true)(fieldWith("\"\"").metadata.hasKey("a"))
+    assertResult(false)(fieldWith("123").metadata.hasKey("b"))
+    assertResult(true)(fieldWith("\"hvh\"").metadata.hasKey("a"))
+    assertResult(true)(fieldWith("null").metadata.hasKey("a"))
   }
 
 }
