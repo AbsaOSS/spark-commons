@@ -16,11 +16,12 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.types.{ArrayType, ByteType, DateType, DecimalType, IntegerType, LongType, MetadataBuilder, ShortType, StringType, StructField, StructType, TimestampType}
+import org.apache.spark.sql.types._
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
+import za.co.absa.spark.commons.test.SparkTestBase
 
-class StructTypeImplicitsTest extends AnyFunSuite {
+class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase{
   // scalastyle:off magic.number
 
   private val schema = StructType(Seq(
@@ -91,7 +92,7 @@ class StructTypeImplicitsTest extends AnyFunSuite {
     assert(!schema.fieldExists("f.g.h.a"))
   }
 
-  test ("Test isColumnArrayOfStruct") {
+  test("Test isColumnArrayOfStruct") {
     assert(!schema.isColumnArrayOfStruct("a"))
     assert(!schema.isColumnArrayOfStruct("b"))
     assert(!schema.isColumnArrayOfStruct("b.c"))
@@ -135,7 +136,7 @@ class StructTypeImplicitsTest extends AnyFunSuite {
     val includeIfPredecessorChanged = true
     val result = schema.getRenamesInSchema(includeIfPredecessorChanged)
     val expected = Map(
-      "a"   -> "x"  ,
+      "a" -> "x",
       "a.d" -> "x.o",
       "a.e" -> "x.e",
       "a.f" -> "x.f",
@@ -161,7 +162,7 @@ class StructTypeImplicitsTest extends AnyFunSuite {
     val includeIfPredecessorChanged = false
     val result = schema.getRenamesInSchema(includeIfPredecessorChanged)
     val expected = Map(
-      "a"   -> "x",
+      "a" -> "x",
       "a.d" -> "x.o",
       "b.d" -> "b.o",
       "c.d" -> "c.o"
@@ -188,7 +189,7 @@ class StructTypeImplicitsTest extends AnyFunSuite {
     val expected = Map(
       "array1.renamed" -> "array1.rename source",
       "array2.renamed" -> "array2.rename source",
-      "array3"   -> "array source"
+      "array3" -> "array source"
     )
 
     assert(result == expected)
@@ -209,7 +210,7 @@ class StructTypeImplicitsTest extends AnyFunSuite {
     val expected = Map(
       "a.x" -> "a.src",
       "a.y" -> "a.src",
-      "b"   -> "src"
+      "b" -> "src"
     )
 
     assert(result == expected)
@@ -244,7 +245,7 @@ class StructTypeImplicitsTest extends AnyFunSuite {
           StructField("b", StringType))
         ))))
 
-    assert (schema.getDeepestCommonArrayPath(Seq("a", "a.b")).isEmpty)
+    assert(schema.getDeepestCommonArrayPath(Seq("a", "a.b")).isEmpty)
   }
 
   test("Test getDeepestCommonArrayPath() for a path with a single array at top level") {
@@ -255,8 +256,8 @@ class StructTypeImplicitsTest extends AnyFunSuite {
 
     val deepestPath = schema.getDeepestCommonArrayPath(Seq("a", "a.b"))
 
-    assert (deepestPath.nonEmpty)
-    assert (deepestPath.get == "a")
+    assert(deepestPath.nonEmpty)
+    assert(deepestPath.get == "a")
   }
 
   test("Test getDeepestCommonArrayPath() for a path with a single array at nested level") {
@@ -267,8 +268,8 @@ class StructTypeImplicitsTest extends AnyFunSuite {
 
     val deepestPath = schema.getDeepestCommonArrayPath(Seq("a", "a.b"))
 
-    assert (deepestPath.nonEmpty)
-    assert (deepestPath.get == "a.b")
+    assert(deepestPath.nonEmpty)
+    assert(deepestPath.get == "a.b")
   }
 
   test("Test getDeepestCommonArrayPath() for a path with several nested arrays of struct") {
@@ -285,8 +286,8 @@ class StructTypeImplicitsTest extends AnyFunSuite {
 
     val deepestPath = schema.getDeepestCommonArrayPath(Seq("a", "a.b", "a.b.c.d.e", "a.b.c.d"))
 
-    assert (deepestPath.nonEmpty)
-    assert (deepestPath.get == "a.b.c")
+    assert(deepestPath.nonEmpty)
+    assert(deepestPath.get == "a.b.c")
   }
 
   test("Test getDeepestArrayPath() for a path without an array") {
@@ -296,7 +297,7 @@ class StructTypeImplicitsTest extends AnyFunSuite {
           StructField("b", StringType))
         ))))
 
-    assert (schema.getDeepestArrayPath("a.b").isEmpty)
+    assert(schema.getDeepestArrayPath("a.b").isEmpty)
   }
 
   test("Test getDeepestArrayPath() for a path with a single array at top level") {
@@ -307,8 +308,8 @@ class StructTypeImplicitsTest extends AnyFunSuite {
 
     val deepestPath = schema.getDeepestArrayPath("a.b")
 
-    assert (deepestPath.nonEmpty)
-    assert (deepestPath.get == "a")
+    assert(deepestPath.nonEmpty)
+    assert(deepestPath.get == "a")
   }
 
   test("Test getDeepestArrayPath() for a path with a single array at nested level") {
@@ -320,9 +321,9 @@ class StructTypeImplicitsTest extends AnyFunSuite {
     val deepestPath = schema.getDeepestArrayPath("a.b")
     val deepestPath2 = schema.getDeepestArrayPath("a")
 
-    assert (deepestPath.nonEmpty)
-    assert (deepestPath.get == "a.b")
-    assert (deepestPath2.isEmpty)
+    assert(deepestPath.nonEmpty)
+    assert(deepestPath.get == "a.b")
+    assert(deepestPath2.isEmpty)
   }
 
   test("Test getDeepestArrayPath() for a path with several nested arrays of struct") {
@@ -339,8 +340,8 @@ class StructTypeImplicitsTest extends AnyFunSuite {
 
     val deepestPath = schema.getDeepestArrayPath("a.b.c.d.e")
 
-    assert (deepestPath.nonEmpty)
-    assert (deepestPath.get == "a.b.c")
+    assert(deepestPath.nonEmpty)
+    assert(deepestPath.get == "a.b.c")
   }
 
   test("Test isOnlyField()") {
@@ -357,14 +358,14 @@ class StructTypeImplicitsTest extends AnyFunSuite {
 
     assert(!schema.isOnlyField("a"))
     assert(!schema.isOnlyField("b.e"))
-    assert(!schema.isOnlyField( "b.f"))
+    assert(!schema.isOnlyField("b.f"))
     assert(schema.isOnlyField("c.d"))
   }
 
   test("Test getStructField on array of arrays") {
-    assert(arrayOfArraysSchema.getField("a").contains(StructField("a",ArrayType(ArrayType(IntegerType)),nullable = false)))
-    assert(arrayOfArraysSchema.getField("b").contains(StructField("b",ArrayType(ArrayType(StructType(Seq(StructField("c",StringType,nullable = false))))), nullable = true)))
-    assert(arrayOfArraysSchema.getField("b.c").contains(StructField("c",StringType,nullable = false)))
+    assert(arrayOfArraysSchema.getField("a").contains(StructField("a", ArrayType(ArrayType(IntegerType)), nullable = false)))
+    assert(arrayOfArraysSchema.getField("b").contains(StructField("b", ArrayType(ArrayType(StructType(Seq(StructField("c", StringType, nullable = false))))), nullable = true)))
+    assert(arrayOfArraysSchema.getField("b.c").contains(StructField("c", StringType, nullable = false)))
     assert(arrayOfArraysSchema.getField("b.d").isEmpty)
   }
 
@@ -385,6 +386,51 @@ class StructTypeImplicitsTest extends AnyFunSuite {
     assert(arrayOfArraysSchema.fieldExists("b"))
     assert(arrayOfArraysSchema.fieldExists("b.c"))
     assert(!arrayOfArraysSchema.fieldExists("b.d"))
+  }
+
+  test("Test getClosestUniqueName() is working properly") {
+    val schema = StructType(Seq[StructField](
+      StructField("value", StringType),
+      StructField("value_1", StringType),
+      StructField("value_2", StringType)
+    ))
+
+    // A column name that does not exist
+    val name1 = schema.getClosestUniqueName("v")
+    // A column that exists
+    val name2 = schema.getClosestUniqueName("value")
+
+    assert(name1 == "v")
+    assert(name2 == "value_3")
+  }
+
+  val sample =
+    """{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}]}""" ::
+      """{"id":2,"legs":[{"legid":200,"conditions":[{"checks":[{"checkNums":["8","9","10b","11","12c","13"]}],"amount":200}]}]}""" ::
+      """{"id":3,"legs":[{"legid":300,"conditions":[{"checks":[],"amount": 300}]}]}""" ::
+      """{"id":4,"legs":[{"legid":400,"conditions":[{"checks":null,"amount": 400}]}]}""" ::
+      """{"id":5,"legs":[{"legid":500,"conditions":[]}]}""" ::
+      """{"id":6,"legs":[]}""" ::
+      """{"id":7}""" :: Nil
+  import spark.implicits._
+  val df = spark.read.json(sample.toDS)
+
+  test("Test isNonNestedArray") {
+    assert(df.schema.isNonNestedArray("legs"))
+    assert(!df.schema.isNonNestedArray("legs.conditions"))
+    assert(!df.schema.isNonNestedArray("legs.conditions.checks"))
+    assert(!df.schema.isNonNestedArray("legs.conditions.checks.checkNums"))
+    assert(!df.schema.isNonNestedArray("id"))
+    assert(!df.schema.isNonNestedArray("legs.legid"))
+  }
+
+  test("Test isNonArray") {
+    assert(df.schema.isArray("legs"))
+    assert(df.schema.isArray("legs.conditions"))
+    assert(df.schema.isArray("legs.conditions.checks"))
+    assert(df.schema.isArray("legs.conditions.checks.checkNums"))
+    assert(!df.schema.isArray("id"))
+    assert(!df.schema.isArray("legs.legid"))
   }
 
 }
