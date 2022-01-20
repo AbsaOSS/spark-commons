@@ -57,6 +57,25 @@ select to order and positionally filter columns of a DataFrame
       SchemaUtils.getUniqueName(prefix, modelSchema)
     ```
 
+# Spark Version Guard
+
+A class which checks if the Spark job version is compatible with the Spark Versions supported by the library
+
+Default mode checking
+```scala
+SparkVersionGuard.fromDefaultSparkCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
+```
+
+Checking for 2.X versions
+```scala
+SparkVersionGuard.fromSpark2XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
+```
+
+Checking for 3.X versions
+```scala
+SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
+```
+
 ### DataFrameImplicits
 _DataFrameImplicits_ provides methods for transformations on Dataframes  
 
