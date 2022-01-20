@@ -54,7 +54,7 @@ select to order and positionally filter columns of a DataFrame
    
 ### ColumnImplicits
 
-_Column_ provides implicit methods for transforming Spark Columns
+_ColumnImplicits_ provide implicit methods for transforming Spark Columns
 
 1. Transforms the column into a booleaan column, checking if values are negative or positive infinity
 
@@ -81,7 +81,7 @@ _Column_ provides implicit methods for transforming Spark Columns
 _StructFieldImplicits_ provides implicit methods for working with StructField objects.  
 Of them, metadata methods are:
 
-1. Gets the metadata String value given a key
+1. Gets the metadata Option[String] value given a key
 
     ```scala
       structField.metadata.getOptString(key)

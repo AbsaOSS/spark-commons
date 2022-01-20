@@ -23,11 +23,11 @@ import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetada
 class StructFieldImplicitsTest extends AnyFunSuite {
 
   def fieldWith(value123: String) = {
-    val value1 = s"""{ \"a\" : ${value123} }"""
+    val value1 = s"""{ "a" : ${value123} }"""
     StructField("uu", StringType, true, Metadata.fromJson(value1))
   }
 
-  test("getMetadataString") {
+  test("getOptString") {
     assertResult(Some(""))(fieldWith("\"\"").metadata.getOptString("a"))
     assertResult(None)(fieldWith("123").metadata.getOptString("a"))
     assertResult(Some("ffbfg"))(fieldWith("\"ffbfg\"").metadata.getOptString("a"))
@@ -42,7 +42,7 @@ class StructFieldImplicitsTest extends AnyFunSuite {
     assertResult(None)(fieldWith("null").metadata.getOptChar("a"))
   }
 
-  test("getStringAsBoolean") {
+  test("getOptStringAsBoolean") {
     assertResult(None)(fieldWith("\"\"").metadata.getOptStringAsBoolean("a"))
     assertResult(None)(fieldWith("123").metadata.getOptStringAsBoolean("a"))
     assertResult(Some(true))(fieldWith("\"true\"").metadata.getOptStringAsBoolean("a"))
@@ -52,7 +52,7 @@ class StructFieldImplicitsTest extends AnyFunSuite {
     assertResult(None)(fieldWith("null").metadata.getOptStringAsBoolean("a"))
   }
 
-  test("hastMetadataKey") {
+  test("hasKey") {
     assertResult(true)(fieldWith("\"\"").metadata.hasKey("a"))
     assertResult(false)(fieldWith("123").metadata.hasKey("b"))
     assertResult(true)(fieldWith("\"hvh\"").metadata.hasKey("a"))
