@@ -51,12 +51,6 @@ select to order and positionally filter columns of a DataFrame
     ```scala
       SchemaUtils.alignSchema(dataFrameToBeAligned, modelSchema)
    ```
-5. Getting a column with a unique name in case a schema is provided
-
-    ```scala
-      SchemaUtils.getUniqueName(prefix, modelSchema)
-    ```
-
 # Spark Version Guard
 
 A class which checks if the Spark job version is compatible with the Spark Versions supported by the library
@@ -79,7 +73,7 @@ SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibili
 ### DataFrameImplicits
 _DataFrameImplicits_ provides methods for transformations on Dataframes  
 
-1. Getting the string of the shown data of a dataframe
+1. Getting the string of the data of the dataframe in similar fashion as the `show` function present them.
 
     ```scala
           df.dataAsString() 
@@ -93,8 +87,8 @@ _DataFrameImplicits_ provides methods for transformations on Dataframes
           df.dataAsString(numRows, truncate, vertical)
     ```
     
-2. Adds a column to a dataframe if it does not exist. If it exists, it will add an error in the error column
+2. Adds a column to a dataframe if it does not exist. If it exists, it will apply the provided function
     
    ```scala
-      df.withColumnIfDoesNotExist(colName, colExpression)
+      df.withColumnIfDoesNotExist((df: DataFrame, _) => df)(colName, colExpression)
    ```

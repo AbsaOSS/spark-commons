@@ -18,22 +18,9 @@ package za.co.absa.spark.commons.implicits
 
 import java.io.ByteArrayOutputStream
 
-import org.apache.log4j.{LogManager, Logger}
-import org.apache.spark.sql.functions.{array, callUDF, col, lit, when}
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import za.co.absa.spark.commons.error.ErrorMessage
-import za.co.absa.spark.commons.schema.SchemaUtils
-import za.co.absa.spark.hats.transformations.NestedArrayTransformations
-
-import scala.collection.mutable
+import org.apache.spark.sql.{Column, DataFrame}
 
 object DataFrameImplicits {
-
-  private val log: Logger = LogManager.getLogger(this.getClass)
-
-  private val overWriteErrorFunction = "overWriteErr"
-  private val overWriteErrorType = "overWriteError"
-  private val overWriteErrorCode = "E000OW"
 
   implicit class DataFrameEnhancements(val df: DataFrame) {
 
@@ -75,69 +62,17 @@ object DataFrameImplicits {
       * Adds a column to a dataframe if it does not exist
       *
       * @param colName     A column to add if it does not exist already
+      * @param ifExists    A function to apply when the column already exists
       * @param colExpr     An expression for the column to add
       * @return a new dataframe with the new column
       */
-    def withColumnIfDoesNotExist(colName: String, colExpr: Column): DataFrame = {
+    def withColumnIfDoesNotExist(ifExists: (DataFrame, String) => DataFrame)(colName: String, colExpr: Column): DataFrame = {
       if (df.schema.exists(field => field.name.equalsIgnoreCase(colName))) {
-        log.warn(s"Column '$colName' already exists. The content of the column will be overwritten.")
-        overwriteWithErrorColumn(df, colName, colExpr)
+        ifExists(df, colName)
       } else {
         df.withColumn(colName, colExpr)
       }
     }
-
-    /**
-     * Overwrites a column with a value provided by an expression.
-     * If the value in the column does not match the one provided by the expression, an error will be
-     * added to the error column.
-     *
-     * @param df      A dataframe
-     * @param colName A column to be overwritten
-     * @param colExpr An expression for the value to write
-     * @return a new dataframe with the value of the column being overwritten
-     */
-    private def overwriteWithErrorColumn(df: DataFrame, colName: String, colExpr: Column): DataFrame = {
-      implicit val spark: SparkSession = df.sparkSession
-      spark.udf.register(overWriteErrorFunction, { (errCol: String, rawValue: String) =>
-        ErrorMessage(
-          errType = overWriteErrorType,
-          errCode = overWriteErrorCode,
-          errMsg = "Special column value has changed",
-          errCol = errCol,
-          rawValues = Seq(rawValue))
-      })
-      spark.udf.register("arrayDistinctErrors", // this UDF is registered for _spark-hats_ library sake
-        (arr: mutable.WrappedArray[ErrorMessage]) =>
-          if (arr != null) {
-            arr.distinct.filter((a: AnyRef) => a != null)
-          } else {
-            Seq[ErrorMessage]()
-          }
-      )
-
-      val tmpColumn = SchemaUtils.getUniqueName("tmpColumn", Some(df.schema))
-      val tmpErrColumn = SchemaUtils.getUniqueName("tmpErrColumn", Some(df.schema))
-      val litErrUdfCall = callUDF(overWriteErrorFunction, lit(colName), col(tmpColumn))
-
-      // Rename the original column to a temporary name. We need it for comparison.
-      val dfWithColRenamed = df.withColumnRenamed(colName, tmpColumn)
-
-      // Add new column with the intended value
-      val dfWithIntendedColumn = dfWithColRenamed.withColumn(colName, colExpr)
-
-      // Add a temporary error column containing errors if the original value does not match the intended one
-      val dfWithErrorColumn = dfWithIntendedColumn
-        .withColumn(tmpErrColumn, array(when(col(tmpColumn) =!= colExpr, litErrUdfCall).otherwise(null))) // scalastyle:ignore null
-
-      // Gather all errors in errCol
-      val dfWithAggregatedErrColumn = NestedArrayTransformations
-        .gatherErrors(dfWithErrorColumn, tmpErrColumn, ErrorMessage.errorColumnName)
-
-      // Drop the temporary column
-      dfWithAggregatedErrColumn.drop(tmpColumn)
-    }
-
   }
 
 }

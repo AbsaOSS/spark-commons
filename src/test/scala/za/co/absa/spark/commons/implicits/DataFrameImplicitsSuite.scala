@@ -179,7 +179,7 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
         |""".stripMargin.replace("\r\n", "\n")
 
     val dfIn = getDummyDataFrame
-    val dfOut = dfIn.withColumnIfDoesNotExist("foo", lit(1))
+    val dfOut = dfIn.withColumnIfDoesNotExist((df: DataFrame, _) => df)("foo", lit(1))
     val actualOutput = dfOut.dataAsString(truncate = false)
 
     assert(dfOut.schema.length == 2)
@@ -188,23 +188,22 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
     assert(actualOutput == expectedOutput)
   }
 
-  test("Test withColumnIfNotExist() when the column exists, Spark 2.X") {
-    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
+  test("Test withColumnIfNotExist() when the column exists") {
     val expectedOutput =
-      """+-----+----------------------------------------------------------------------------+
-        ||value|errCol                                                                      |
-        |+-----+----------------------------------------------------------------------------+
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[[overWriteError, E000OW, Special column value has changed, value, [2], []]]|
-        ||1    |[]                                                                          |
-        |+-----+----------------------------------------------------------------------------+
+      """+-----+
+        ||value|
+        |+-----+
+        ||1    |
+        ||1    |
+        ||1    |
+        ||2    |
+        ||1    |
+        |+-----+
         |
         |""".stripMargin.replace("\r\n", "\n")
 
     val dfIn = getDummyDataFrame
-    val dfOut = dfIn.withColumnIfDoesNotExist("value", lit(1))
+    val dfOut = dfIn.withColumnIfDoesNotExist((df: DataFrame, _) => df)("value", lit(1))
     val actualOutput = dfOut.dataAsString(truncate = false)
 
     assert(dfIn.schema.length == 1)
@@ -212,71 +211,23 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
     assert(actualOutput == expectedOutput)
   }
 
-  test("Test withColumnIfNotExist() when the column exists, but has a different case, Spark 2.X") {
-    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("3."))
+  test("Test withColumnIfNotExist() when the column exists, but has a different case") {
     val expectedOutput =
-      """+-----+----------------------------------------------------------------------------+
-        ||vAlUe|errCol                                                                      |
-        |+-----+----------------------------------------------------------------------------+
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[[overWriteError, E000OW, Special column value has changed, vAlUe, [2], []]]|
-        ||1    |[]                                                                          |
-        |+-----+----------------------------------------------------------------------------+
+      """+-----+------+
+        ||value|errCol|
+        |+-----+------+
+        ||1    |[]    |
+        ||1    |[]    |
+        ||1    |[]    |
+        ||2    |[]    |
+        ||1    |[]    |
+        |+-----+------+
         |
         |""".stripMargin.replace("\r\n", "\n")
 
     val dfIn = getDummyDataFrame
-    val dfOut = dfIn.withColumnIfDoesNotExist("vAlUe", lit(1))
-    val actualOutput = dfOut.dataAsString(truncate = false)
-
-    assert(dfIn.schema.length == 1)
-    assert(dfIn.schema.head.name == "value")
-    assert(actualOutput == expectedOutput)
-  }
-
-  test("Test withColumnIfNotExist() when the column exists, , Spark 3.X") {
-    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("2."))
-    val expectedOutput =
-      """+-----+----------------------------------------------------------------------------+
-        ||value|errCol                                                                      |
-        |+-----+----------------------------------------------------------------------------+
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[{overWriteError, E000OW, Special column value has changed, value, [2], []}]|
-        ||1    |[]                                                                          |
-        |+-----+----------------------------------------------------------------------------+
-        |
-        |""".stripMargin.replace("\r\n", "\n")
-
-    val dfIn = getDummyDataFrame
-    val dfOut = dfIn.withColumnIfDoesNotExist("value", lit(1))
-    val actualOutput = dfOut.dataAsString(truncate = false)
-
-    assert(dfIn.schema.length == 1)
-    assert(dfIn.schema.head.name == "value")
-    assert(actualOutput == expectedOutput)
-  }
-
-  test("Test withColumnIfNotExist() when the column exists, but has a different case, Spark 3.X") {
-    assume(!sys.props.getOrElse("SPARK_VERSION", "").startsWith("2."))
-    val expectedOutput =
-      """+-----+----------------------------------------------------------------------------+
-        ||vAlUe|errCol                                                                      |
-        |+-----+----------------------------------------------------------------------------+
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[]                                                                          |
-        ||1    |[{overWriteError, E000OW, Special column value has changed, vAlUe, [2], []}]|
-        ||1    |[]                                                                          |
-        |+-----+----------------------------------------------------------------------------+
-        |
-        |""".stripMargin.replace("\r\n", "\n")
-
-    val dfIn = getDummyDataFrame
-    val dfOut = dfIn.withColumnIfDoesNotExist("vAlUe", lit(1))
+    val function: (DataFrame, String) => DataFrame = (df: DataFrame, _) => df.withColumn("errCol", lit(Array.emptyIntArray))
+    val dfOut = dfIn.withColumnIfDoesNotExist(function)("vAlUe", lit(1))
     val actualOutput = dfOut.dataAsString(truncate = false)
 
     assert(dfIn.schema.length == 1)
