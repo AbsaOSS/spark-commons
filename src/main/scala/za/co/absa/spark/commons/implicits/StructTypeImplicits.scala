@@ -292,30 +292,8 @@ object StructTypeImplicits {
      * @return true if the column is the only column in a struct
      */
     def isOnlyField(column: String): Boolean = {
-      def structHelper(structField: StructType, path: Seq[String]): Boolean = {
-        val currentField = path.head
-        val isLeaf = path.lengthCompare(1) <= 0
-        structField.fields.exists(field =>
-          if (field.name == currentField) {
-            if (isLeaf) {
-              structField.fields.length == 1
-            } else {
-              field.dataType match {
-                case st: StructType =>
-                  structHelper(st, path.tail)
-                case _: ArrayType =>
-                  throw new IllegalArgumentException(
-                    s"SchemaUtils.isOnlyField() does not support checking struct fields inside an array")
-                case _ =>
-                  throw new IllegalArgumentException(
-                    s"Primitive fields cannot have child fields $currentField is a primitive in $column")
-              }
-            }
-          } else false
-        )
-      }
       val path = column.split('.')
-      structHelper(schema, path)
+      structArrayHelper(schema, path, column)(applyArrayHelper = false, field => field.fields.length == 1)
     }
 
     /**
@@ -326,55 +304,7 @@ object StructTypeImplicits {
      */
     def isNonNestedArray(fieldPathName: String): Boolean = {
       val path = fieldPathName.split('.')
-      structHelper(schema, path, fieldPathName)((_,_) => false)
-    }
-
-//    @tailrec
-    private def arrayHelper(fieldPathName: String)(arrayField: ArrayType, path: Seq[String]): Boolean = {
-      val currentField = path.head
-      val isLeaf = path.lengthCompare(1) <= 0
-
-      val applyArrayHelper: (ArrayType, Seq[String]) => Boolean = arrayHelper(fieldPathName)
-
-      arrayField.elementType match {
-        case st: StructType =>
-          structHelper(st, path.tail, fieldPathName)(applyArrayHelper)
-        case ar: ArrayType => applyArrayHelper(ar, path)
-        case _ =>
-          if (!isLeaf) {
-            throw new IllegalArgumentException(
-              s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
-          }
-          false
-      }
-    }
-
-    private def structHelper(structField: StructType, path: Seq[String], fieldPathName: String)
-                    (leafArrFnc: (ArrayType, Seq[String]) => Boolean): Boolean = {
-      val currentField = path.head
-      val isLeaf = path.lengthCompare(1) <= 0
-
-      structField.fields.exists(field =>
-        if (field.name == currentField) {
-          field.dataType match {
-            case st: StructType =>
-              if (!isLeaf) {
-                structHelper(st, path.tail, fieldPathName)(leafArrFnc)
-              } else false
-            case ar: ArrayType =>
-              if (isLeaf) {
-                true
-              } else {
-                leafArrFnc(ar, path)
-              }
-            case _ =>
-              if (!isLeaf) {
-                throw new IllegalArgumentException(
-                  s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
-              }
-              false
-          }
-        } else false)
+      structArrayHelper(schema, path, fieldPathName)(applyArrayHelper = false)
     }
 
     /**
@@ -385,7 +315,62 @@ object StructTypeImplicits {
      */
     def isArray(fieldPathName: String): Boolean = {
       val path = fieldPathName.split('.')
-      structHelper(schema, path, fieldPathName)(arrayHelper(fieldPathName))
+      structArrayHelper(schema, path, fieldPathName)(applyArrayHelper = true)
+    }
+
+    @tailrec
+    private def arrayHelper(fieldPathName: String, arrayField: ArrayType, path: Seq[String])
+                           (applyArrayHelper: Boolean, conditionLeafSh: StructType => Boolean): Boolean = {
+      val currentField = path.head
+      val isLeaf = path.lengthCompare(1) <= 0
+
+      arrayField.elementType match {
+        case st: StructType =>
+          structArrayHelper(st, path.tail, fieldPathName)(applyArrayHelper, conditionLeafSh)
+        case ar: ArrayType => arrayHelper(fieldPathName, ar, path) (applyArrayHelper, conditionLeafSh)
+        case _ =>
+          if (!isLeaf) {
+            throw new IllegalArgumentException(
+              s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
+          }
+          false
+      }
+    }
+
+    private def structArrayHelper(structField: StructType, path: Seq[String], fieldPathName: String)
+                                 (applyArrayHelper: Boolean,
+                                  conditionLeafSh: StructType => Boolean = _ => false): Boolean = {
+      val currentField = path.head
+      val isLeaf = path.lengthCompare(1) <= 0
+
+      structField.fields.exists(field =>
+        if (field.name == currentField) {
+          if (isLeaf && conditionLeafSh(structField)) {
+            true
+          } else {
+            field.dataType match {
+              case st: StructType =>
+                if (!isLeaf) {
+                  structArrayHelper(st, path.tail, fieldPathName)(applyArrayHelper, conditionLeafSh)
+                } else false
+              case ar: ArrayType =>
+                if (isLeaf) {
+                  true
+                } else if (applyArrayHelper) {
+                  arrayHelper(fieldPathName, ar, path)(applyArrayHelper, conditionLeafSh)
+                } else {
+                  false
+                }
+              case _ =>
+                if (!isLeaf) {
+                  throw new IllegalArgumentException(
+                    s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
+                }
+                false
+            }
+          }
+        } else false
+      )
     }
   }
 

@@ -48,7 +48,6 @@ object StructFieldImplicits {
 
     /**
      * Determine the name of a field
-     * Will override to "sourcecolumn" in the Metadata if it exists
      *
      * @return       Metadata "sourcecolumn" if it exists or field.name
      */
