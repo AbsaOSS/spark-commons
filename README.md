@@ -1,5 +1,34 @@
 # spark-commons
 
+
+[![Build](https://github.com/AbsaOSS/spark-hats/workflows/Build/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions)
+
+sbt
+```scala
+libraryDependencies += "za.co.absa" %% "spark-commons" % "0.1.1"
+```
+
+### Scala 2.11 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11)
+
+Maven
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons_2.11</artifactId>
+   <version>0.1.1</version>
+</dependency>
+```
+
+### Scala 2.12 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.12)
+
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons_2.11</artifactId>
+   <version>0.1.1</version>
+</dependency>
+```
+
 # Spark Utils
 
 ### NonFatalQueryExecutionListenerAdapter
