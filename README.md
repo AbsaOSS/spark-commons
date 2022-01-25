@@ -15,7 +15,7 @@ Maven
 <dependency>
    <groupId>za.co.absa</groupId>
    <artifactId>spark-commons_2.11</artifactId>
-   <version>0.1.1</version>
+   <version>${latest_version}</version>
 </dependency>
 ```
 
@@ -25,7 +25,7 @@ Maven
 <dependency>
    <groupId>za.co.absa</groupId>
    <artifactId>spark-commons_2.12</artifactId>
-   <version>0.1.1</version>
+   <version>${latest_version}</version>
 </dependency>
 ```
 
@@ -47,7 +47,8 @@ spark.listenerManager.register(myListener)
 
 >
 >**Note:**
->Different _Scala_ variants of the _Schema Utils_ are compiled against different _Spark_, _Json4s_ and _Jackson_ versions:
+>Different _Scala_ variants of the _Schema Utils_ are compiled against different _Spark_, _Json4s_ and _Jackson_ versions.
+>2.13 is not yet fully supported:
 >
 >| | Scala 2.11 | Scala 2.12 | Scala 2.13 | 
 >|---|---|---|---|
