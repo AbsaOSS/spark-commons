@@ -24,7 +24,7 @@ Maven
 ```xml
 <dependency>
    <groupId>za.co.absa</groupId>
-   <artifactId>spark-commons_2.11</artifactId>
+   <artifactId>spark-commons_2.12</artifactId>
    <version>0.1.1</version>
 </dependency>
 ```
