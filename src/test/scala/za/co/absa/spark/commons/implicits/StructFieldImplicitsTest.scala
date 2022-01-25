@@ -27,28 +27,11 @@ class StructFieldImplicitsTest extends AnyFunSuite {
     StructField("uu", StringType, true, Metadata.fromJson(value1))
   }
 
-  private val structFieldNoMetadata = StructField("a", IntegerType)
-  private val structFieldWithMetadataNotSourceColumn = StructField("a", IntegerType, nullable = false, new MetadataBuilder().putString("meta", "data").build)
-  private val structFieldWithMetadataSourceColumn = StructField("a", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "override_a").build)
-
   test("getOptString") {
     assertResult(Some(""))(fieldWith("\"\"").metadata.getOptString("a"))
     assertResult(None)(fieldWith("123").metadata.getOptString("a"))
     assertResult(Some("ffbfg"))(fieldWith("\"ffbfg\"").metadata.getOptString("a"))
     assertResult(Some(null))(fieldWith("null").metadata.getOptString("a"))
-  }
-
-  test("Testing getFieldNameOverriddenByMetadata") {
-    assertResult("a")(structFieldNoMetadata.getFieldNameOverriddenByMetadata())
-    assertResult("a")(structFieldWithMetadataNotSourceColumn.getFieldNameOverriddenByMetadata())
-    assertResult("override_a")(structFieldWithMetadataSourceColumn.getFieldNameOverriddenByMetadata())
-  }
-
-  test("getMetadataString") {
-    assertResult(Some(""))(fieldWith("\"\"").getMetadataString("a"))
-    assertResult(None)(fieldWith("123").getMetadataString("a"))
-    assertResult(Some("ffbfg"))(fieldWith("\"ffbfg\"").getMetadataString("a"))
-    assertResult(Some(null))(fieldWith("null").getMetadataString("a"))
   }
 
   test("getOptChar") {

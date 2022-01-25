@@ -17,6 +17,7 @@
 package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
+import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetadataEnhancement
 import za.co.absa.spark.commons.schema.MetadataKeys
 import za.co.absa.spark.commons.schema.SchemaUtils.{appendPath, getAllArraySubPaths, isCommonSubPath}
 
@@ -127,11 +128,11 @@ object StructTypeImplicits {
                                 struct: StructType,
                                 renamesAcc: Map[String, String],
                                 predecessorChanged: Boolean): Map[String, String] = {
-        import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
+        import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetadataEnhancement
 
         struct.fields.foldLeft(renamesAcc) { (renamesSoFar, field) =>
           val fieldFullName = appendPath(path, field.name)
-          val fieldSourceName = field.getMetadataString(MetadataKeys.SourceColumn).getOrElse(field.name)
+          val fieldSourceName = field.metadata.getOptString(MetadataKeys.SourceColumn).getOrElse(field.name)
           val fieldFullSourceName = appendPath(sourcePath, fieldSourceName)
 
           val (renames, renameOnPath) = if ((fieldSourceName != field.name) || (predecessorChanged && includeIfPredecessorChanged)) {
