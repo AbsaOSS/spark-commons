@@ -124,3 +124,26 @@ Checking for 3.X versions
 ```scala
 SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
 ```
+
+### DataFrameImplicits
+_DataFrameImplicits_ provides methods for transformations on Dataframes  
+
+1. Getting the string of the data of the dataframe in similar fashion as the `show` function present them.
+
+    ```scala
+          df.dataAsString() 
+      
+          df.dataAsString(truncate)
+      
+          df.dataAsString(numRows, truncate)
+   
+          df.dataAsString(numRows, truncateNumber)
+      
+          df.dataAsString(numRows, truncate, vertical)
+    ```
+    
+2. Adds a column to a dataframe if it does not exist. If it exists, it will apply the provided function
+    
+   ```scala
+      df.withColumnIfDoesNotExist((df: DataFrame, _) => df)(colName, colExpression)
+   ```

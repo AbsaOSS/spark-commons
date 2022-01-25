@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons
+package za.co.absa.spark.commons.schema
 
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.adapters.HofsAdapter
+
+import scala.util.Random
 
 object SchemaUtils extends HofsAdapter {
   /**
