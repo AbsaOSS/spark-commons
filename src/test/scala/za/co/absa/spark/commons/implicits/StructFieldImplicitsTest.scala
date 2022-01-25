@@ -18,18 +18,25 @@ package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.types.{IntegerType, Metadata, MetadataBuilder, StringType, StructField}
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
+import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetadataEnhancement
 
 class StructFieldImplicitsTest extends AnyFunSuite {
 
   def fieldWith(value123: String) = {
-    val value1 = s"""{ \"a\" : ${value123} }"""
+    val value1 = s"""{ "a" : ${value123} }"""
     StructField("uu", StringType, true, Metadata.fromJson(value1))
   }
 
   private val structFieldNoMetadata = StructField("a", IntegerType)
   private val structFieldWithMetadataNotSourceColumn = StructField("a", IntegerType, nullable = false, new MetadataBuilder().putString("meta", "data").build)
   private val structFieldWithMetadataSourceColumn = StructField("a", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "override_a").build)
+
+  test("getOptString") {
+    assertResult(Some(""))(fieldWith("\"\"").metadata.getOptString("a"))
+    assertResult(None)(fieldWith("123").metadata.getOptString("a"))
+    assertResult(Some("ffbfg"))(fieldWith("\"ffbfg\"").metadata.getOptString("a"))
+    assertResult(Some(null))(fieldWith("null").metadata.getOptString("a"))
+  }
 
   test("Testing getFieldNameOverriddenByMetadata") {
     assertResult("a")(structFieldNoMetadata.getFieldNameOverriddenByMetadata())
@@ -44,27 +51,28 @@ class StructFieldImplicitsTest extends AnyFunSuite {
     assertResult(Some(null))(fieldWith("null").getMetadataString("a"))
   }
 
-  test("getMetadataChar") {
-    assertResult(None)(fieldWith("\"\"").getMetadataChar("a"))
-    assertResult(None)(fieldWith("123").getMetadataChar("a"))
-    assertResult(Some('g'))(fieldWith("\"g\"").getMetadataChar("a"))
-    assertResult(None)(fieldWith("null").getMetadataChar("a"))
+  test("getOptChar") {
+    assertResult(None)(fieldWith("\"\"").metadata.getOptChar("a"))
+    assertResult(None)(fieldWith("123").metadata.getOptChar("a"))
+    assertResult(Some('g'))(fieldWith("\"g\"").metadata.getOptChar("a"))
+    assertResult(None)(fieldWith("\"abc\"").metadata.getOptChar("a"))
+    assertResult(None)(fieldWith("null").metadata.getOptChar("a"))
   }
 
-  test("getMetadataStringAsBoolean") {
-    assertResult(None)(fieldWith("\"\"").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("123").getMetadataStringAsBoolean("a"))
-    assertResult(Some(true))(fieldWith("\"true\"").getMetadataStringAsBoolean("a"))
-    assertResult(Some(false))(fieldWith("\"false\"").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("false").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("true").getMetadataStringAsBoolean("a"))
-    assertResult(None)(fieldWith("null").getMetadataStringAsBoolean("a"))
+  test("getOptStringAsBoolean") {
+    assertResult(None)(fieldWith("\"\"").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("123").metadata.getOptStringAsBoolean("a"))
+    assertResult(Some(true))(fieldWith("\"true\"").metadata.getOptStringAsBoolean("a"))
+    assertResult(Some(false))(fieldWith("\"false\"").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("false").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("true").metadata.getOptStringAsBoolean("a"))
+    assertResult(None)(fieldWith("null").metadata.getOptStringAsBoolean("a"))
   }
 
-  test("hastMetadataKKey") {
-    assertResult(true)(fieldWith("\"\"").hasMetadataKey("a"))
-    assertResult(false)(fieldWith("123").hasMetadataKey("b"))
-    assertResult(true)(fieldWith("\"hvh\"").hasMetadataKey("a"))
-    assertResult(true)(fieldWith("null").hasMetadataKey("a"))
+  test("hasKey") {
+    assertResult(true)(fieldWith("\"\"").metadata.hasKey("a"))
+    assertResult(false)(fieldWith("123").metadata.hasKey("b"))
+    assertResult(true)(fieldWith("\"hvh\"").metadata.hasKey("a"))
+    assertResult(true)(fieldWith("null").metadata.hasKey("a"))
   }
 }

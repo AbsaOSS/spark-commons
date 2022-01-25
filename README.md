@@ -51,29 +51,10 @@ select to order and positionally filter columns of a DataFrame
     ```scala
       SchemaUtils.alignSchema(dataFrameToBeAligned, modelSchema)
     ```
-
-# Spark Version Guard
-
-A class which checks if the Spark job version is compatible with the Spark Versions supported by the library
-
-Default mode checking
-```scala
-SparkVersionGuard.fromDefaultSparkCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
-```
-
-Checking for 2.X versions
-```scala
-SparkVersionGuard.fromSpark2XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
-```
-
-Checking for 3.X versions
-```scala
-SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
-```
    
 ### ColumnImplicits
 
-_Column_ provides implicit methods for transforming Spark Columns
+_ColumnImplicits_ provide implicit methods for transforming Spark Columns
 
 1. Transforms the column into a booleaan column, checking if values are negative or positive infinity
 
@@ -98,28 +79,71 @@ _Column_ provides implicit methods for transforming Spark Columns
 ### StructFieldImplicits
 
 _StructFieldImplicits_ provides implicit methods for working with StructField objects.  
+Of them, metadata methods are:
 
-1. Gets the metadata String value given a key
+1. Gets the metadata Option[String] value given a key
 
     ```scala
-      structField.getMetadataString(key)
+      structField.metadata.getOptString(key)
     ```
    
 2. Gets the metadata Char value given a key if the value is a single character String, it returns the char,
  otherwise None
 
     ```scala
-      structField.getMetadataChar(key)
+      structField.metadata.getOptChar(key)
     ```
   
 3. Gets the metadata boolean value of a given key, given that it can be transformed into boolean
 
     ```scala
-      structField.getMetadataStringAsBoolean(key)
+      structField.metadata.getStringAsBoolean(key)
     ```
 
 4. Checks the structfield if it has the provided key, returns a boolean
 
     ```scala
-      structField.hasMetadataKey(key)
+      structField.metadata.hasKey(key)
     ```
+
+# Spark Version Guard
+
+A class which checks if the Spark job version is compatible with the Spark Versions supported by the library
+
+Default mode checking
+```scala
+SparkVersionGuard.fromDefaultSparkCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
+```
+
+Checking for 2.X versions
+```scala
+SparkVersionGuard.fromSpark2XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
+```
+
+Checking for 3.X versions
+```scala
+SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
+```
+
+### DataFrameImplicits
+_DataFrameImplicits_ provides methods for transformations on Dataframes  
+
+1. Getting the string of the data of the dataframe in similar fashion as the `show` function present them.
+
+    ```scala
+          df.dataAsString() 
+      
+          df.dataAsString(truncate)
+      
+          df.dataAsString(numRows, truncate)
+   
+          df.dataAsString(numRows, truncateNumber)
+      
+          df.dataAsString(numRows, truncate, vertical)
+    ```
+    
+2. Adds a column to a dataframe if it does not exist. If it exists, it will apply the provided function
+    
+   ```scala
+      df.withColumnIfDoesNotExist((df: DataFrame, _) => df)(colName, colExpression)
+   ```

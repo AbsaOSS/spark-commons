@@ -22,13 +22,13 @@ import za.co.absa.spark.commons.schema.MetadataKeys
 import scala.util.Try
 
 object StructFieldImplicits {
-  implicit class StructFieldEnhancements(val structField: StructField) {
-    def getMetadataString(key: String): Option[String] = {
-      Try(structField.metadata.getString(key)).toOption
+  implicit class StructFieldMetadataEnhancement(val metadata: Metadata) {
+    def getOptString(key: String): Option[String] = {
+      Try(metadata.getString(key)).toOption
     }
 
-    def getMetadataChar(key: String): Option[Char] = {
-      val resultString = Try(structField.metadata.getString(key)).toOption
+    def getOptChar(key: String): Option[Char] = {
+      val resultString = Try(metadata.getString(key)).toOption
       resultString.flatMap { s =>
         if (s != null && s.length == 1) {
           Option(s(0))
@@ -38,12 +38,12 @@ object StructFieldImplicits {
       }
     }
 
-    def getMetadataStringAsBoolean(key: String): Option[Boolean] = {
-      Try(structField.metadata.getString(key).toBoolean).toOption
+    def getOptStringAsBoolean(key: String): Option[Boolean] = {
+      Try(metadata.getString(key).toBoolean).toOption
     }
 
-    def hasMetadataKey(key: String): Boolean = {
-      structField.metadata.contains(key)
+    def hasKey(key: String): Boolean = {
+      metadata.contains(key)
     }
 
     /**
