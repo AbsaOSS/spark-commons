@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.types.{IntegerType, Metadata, MetadataBuilder, StringType, StructField}
+import org.apache.spark.sql.types.{Metadata, StringType, StructField}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetadataEnhancement
 

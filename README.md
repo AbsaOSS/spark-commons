@@ -79,6 +79,13 @@ _ColumnImplicits_ provide implicit methods for transforming Spark Columns
 ### StructFieldImplicits
 
 _StructFieldImplicits_ provides implicit methods for working with StructField objects.  
+
+1. Determine the name of a field overriden by metadata
+
+    ```scala
+      structField.getFieldNameOverriddenByMetadata()
+    ```
+
 Of them, metadata methods are:
 
 1. Gets the metadata Option[String] value given a key
@@ -104,6 +111,96 @@ Of them, metadata methods are:
 
     ```scala
       structField.metadata.hasKey(key)
+    ```
+   
+### StructTypeImplicits
+
+_StructTypeImplicits_ provides implicit methods for working with StructType objects.  
+
+
+1. Get a field from a text path
+
+    ```scala
+      structType.getField(path)
+    ```
+2. Get a type of a field from a text path
+
+    ```scala
+      structType.getFieldType(path)
+    ```
+3. Checks if the specified path is an array of structs
+
+    ```scala
+      structType.isColumnArrayOfStruct(path)
+    ```
+
+4. Get nullability of a field from a text path
+
+    ```scala
+      structType.getFieldNullability(path)
+    ```
+
+5. Checks if a field specified by a path exists
+
+    ```scala
+      structType.fieldExists(path)
+    ```
+
+6. Returns all renames in the provided schema
+
+    ```scala
+      structType.getRenamesInSchema(includeIfPredecessorChanged)
+    ```
+7. Get first array column's path out of complete path
+
+    ```scala
+      structType.getFirstArrayPath(path)
+    ```
+8. Get all array columns' paths out of complete path.
+
+    ```scala
+      structType.getAllArraysInPath(path)
+    ```
+
+9. For a given list of field paths determines the deepest common array path
+
+    ```scala
+      structType.getDeepestCommonArrayPath(fieldPaths)
+    ```
+10. For a field path determines the deepest array path
+
+    ```scala
+      structType.getDeepestArrayPath(path)
+    ```
+    
+11. Get paths for all array fields in the schema
+
+    ```scala
+      structType.getAllArrayPaths()
+    ```
+    
+12. Get a closest unique column name
+
+    ```scala
+      structType.getClosestUniqueName(desiredName)
+    ```
+
+13. Checks if a field is the only field in a struct
+
+    ```scala
+      structType.isOnlyField(columnName)
+    ```
+
+14. Checks if a field is an array that is not nested in another array
+
+    ```scala
+      structType.isNonNestedArray(fieldPathName)
+    ```
+
+15. Checks if a field is an array
+
+    ```scala
+      structType.isArray(fieldPathName)
     ```
 
 # Spark Version Guard

@@ -17,6 +17,7 @@
 package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.types._
+import za.co.absa.spark.commons.schema.MetadataKeys
 
 import scala.util.Try
 
@@ -43,6 +44,21 @@ object StructFieldImplicits {
 
     def hasKey(key: String): Boolean = {
       metadata.contains(key)
+    }
+  }
+
+  implicit class StructFieldEnhancement(val structField: StructField) {
+    /**
+     * Determine the name of a field
+     *
+     * @return       Metadata "sourcecolumn" if it exists or field.name
+     */
+    def getFieldNameOverriddenByMetadata(): String = {
+      if (structField.metadata.contains(MetadataKeys.SourceColumn)) {
+        structField.metadata.getString(MetadataKeys.SourceColumn)
+      } else {
+        structField.name
+      }
     }
   }
 }

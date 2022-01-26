@@ -17,7 +17,6 @@
 package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
-import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetadataEnhancement
 import za.co.absa.spark.commons.schema.MetadataKeys
 import za.co.absa.spark.commons.schema.SchemaUtils.{appendPath, getAllArraySubPaths, isCommonSubPath}
 

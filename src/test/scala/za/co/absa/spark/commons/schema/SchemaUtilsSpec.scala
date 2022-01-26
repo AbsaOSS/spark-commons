@@ -17,11 +17,9 @@
 package za.co.absa.spark.commons.schema
 
 import org.apache.spark.sql.AnalysisException
-import org.apache.spark.sql.types.{ArrayType, ByteType, DateType, DecimalType, IntegerType, LongType, MetadataBuilder, ShortType, StringType, StructField, StructType, TimestampType}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import za.co.absa.spark.commons.schema.SchemaUtils
 import za.co.absa.spark.commons.test.SparkTestBase
 
 class SchemaUtilsSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll with SparkTestBase {
