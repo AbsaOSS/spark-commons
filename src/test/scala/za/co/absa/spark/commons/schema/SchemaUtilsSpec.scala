@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons
+package za.co.absa.spark.commons.schema
 
 import org.apache.spark.sql.AnalysisException
 import org.scalatest.BeforeAndAfterAll
