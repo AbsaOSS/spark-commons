@@ -50,7 +50,62 @@ select to order and positionally filter columns of a DataFrame
 
     ```scala
       SchemaUtils.alignSchema(dataFrameToBeAligned, modelSchema)
-   ```
+    ```
+   
+### ColumnImplicits
+
+_ColumnImplicits_ provide implicit methods for transforming Spark Columns
+
+1. Transforms the column into a booleaan column, checking if values are negative or positive infinity
+
+    ```scala
+      column.isInfinite()
+    ```
+2. Returns column with requested substring. It shifts the substring indexation to be in accordance with Scala/ Java. 
+    The provided starting position where to start the substring from, if negative it will be counted from end
+
+    ```scala
+      column.zeroBasedSubstr(startPos)
+    ```
+3. Returns column with requested substring. It shifts the substring indexation to be in accordance with Scala/ Java. 
+   If the provided starting position where to start the substring from is negative, it will be counted from end. 
+   The length of the desired substring, if longer then the rest of the string, all the remaining characters are taken.
+
+
+    ```scala
+      column.zeroBasedSubstr(startPos, length)
+    ```
+
+### StructFieldImplicits
+
+_StructFieldImplicits_ provides implicit methods for working with StructField objects.  
+Of them, metadata methods are:
+
+1. Gets the metadata Option[String] value given a key
+
+    ```scala
+      structField.metadata.getOptString(key)
+    ```
+   
+2. Gets the metadata Char value given a key if the value is a single character String, it returns the char,
+ otherwise None
+
+    ```scala
+      structField.metadata.getOptChar(key)
+    ```
+  
+3. Gets the metadata boolean value of a given key, given that it can be transformed into boolean
+
+    ```scala
+      structField.metadata.getStringAsBoolean(key)
+    ```
+
+4. Checks the structfield if it has the provided key, returns a boolean
+
+    ```scala
+      structField.metadata.hasKey(key)
+    ```
+
 # Spark Version Guard
 
 A class which checks if the Spark job version is compatible with the Spark Versions supported by the library
