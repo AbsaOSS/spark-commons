@@ -293,7 +293,8 @@ object StructTypeImplicits {
      */
     def isOnlyField(column: String): Boolean = {
       val path = column.split('.')
-      evaluateConditionsForField(schema, path, column, applyArrayHelper = false, field => field.fields.length == 1)
+      evaluateConditionsForField(schema, path, column, applyArrayHelper = false, applyLeafCondition = true,
+        field => field.fields.length == 1)
     }
 
     /**
@@ -319,7 +320,7 @@ object StructTypeImplicits {
     }
 
     private def evaluateConditionsForField(structField: StructType, path: Seq[String], fieldPathName: String,
-                                           applyArrayHelper: Boolean,
+                                           applyArrayHelper: Boolean, applyLeafCondition: Boolean = false,
                                            conditionLeafSh: StructType => Boolean = _ => false): Boolean = {
       val currentField = path.head
       val isLeaf = path.lengthCompare(1) <= 0
@@ -328,7 +329,7 @@ object StructTypeImplicits {
       def arrayHelper(fieldPathName: String, arrayField: ArrayType, path: Seq[String]): Boolean = {
         arrayField.elementType match {
           case st: StructType =>
-            evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, conditionLeafSh)
+            evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, applyLeafCondition, conditionLeafSh)
           case ar: ArrayType => arrayHelper(fieldPathName, ar, path)
           case _ =>
             if (!isLeaf) {
@@ -341,12 +342,10 @@ object StructTypeImplicits {
 
       structField.fields.exists(field =>
         if (field.name == currentField) {
-          if (isLeaf && conditionLeafSh(structField)) {
-            true
-          } else
-            (field.dataType, isLeaf) match {
+          (field.dataType, isLeaf) match {
               case (st: StructType, false) =>
-                evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, conditionLeafSh)
+                evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, applyLeafCondition, conditionLeafSh)
+              case (_, true) if applyLeafCondition => conditionLeafSh(structField)
               case (_: ArrayType, true) => true
               case (ar: ArrayType, false) if applyArrayHelper => arrayHelper(fieldPathName, ar, path)
               case (_: ArrayType, false) => false
