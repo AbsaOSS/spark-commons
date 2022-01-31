@@ -5,7 +5,7 @@
 
 sbt
 ```scala
-libraryDependencies += "za.co.absa" %% "spark-commons" % "0.1.1"
+libraryDependencies += "za.co.absa" %% "spark-commons" % "X.Y.Z"
 ```
 
 ### Scala 2.11 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11)
