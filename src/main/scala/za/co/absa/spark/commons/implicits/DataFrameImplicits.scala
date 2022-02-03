@@ -18,7 +18,9 @@ package za.co.absa.spark.commons.implicits
 
 import java.io.ByteArrayOutputStream
 
+import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Column, DataFrame}
+import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
 
 object DataFrameImplicits {
 
@@ -73,6 +75,24 @@ object DataFrameImplicits {
         df.withColumn(colName, colExpr)
       }
     }
+
+    /**
+     * Using schema selector returned from [[StructTypeEnhancements.getDataFrameSelector]] aligns the schema of a DataFrame to the selector
+     * for operations where schema order might be important (e.g. hashing the whole rows and using except)
+     *
+     * @param selector model structType for the alignment of df
+     * @return Returns aligned and filtered schema
+     */
+    def alignSchema(selector: List[Column]): DataFrame = df.select(selector: _*)
+
+    /**
+     * Using schema selector from [[getDataFrameSelector]] aligns the schema of a DataFrame to the selector for operations
+     * where schema order might be important (e.g. hashing the whole rows and using except)
+     *
+     * @param structType model structType for the alignment of df
+     * @return Returns aligned and filtered schema
+     */
+    def alignSchema(structType: StructType): DataFrame = alignSchema(structType.getDataFrameSelector())
   }
 
 }

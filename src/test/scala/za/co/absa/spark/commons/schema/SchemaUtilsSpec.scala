@@ -16,7 +16,6 @@
 
 package za.co.absa.spark.commons.schema
 
-import org.apache.spark.sql.AnalysisException
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -52,27 +51,6 @@ class SchemaUtilsSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll w
     val dfB = spark.read.json(Seq(jsonB).toDS)
 
     SchemaUtils.equivalentSchemas(dfB.schema, dfA.schema) should be(false)
-  }
-
-  behavior of "alignSchema"
-
-  it should "order schemas for equal schemas" in {
-    val dfA = spark.read.json(Seq(jsonA).toDS)
-    val dfC = spark.read.json(Seq(jsonC).toDS).select("legs", "id", "key")
-
-    val dfA2Aligned = SchemaUtils.alignSchema(dfC, dfA.schema)
-
-    dfA.columns.toSeq should equal(dfA2Aligned.columns.toSeq)
-    dfA.select("key").columns.toSeq should equal(dfA2Aligned.select("key").columns.toSeq)
-  }
-
-  it should "throw an error for DataFrames with different schemas" in {
-    val dfA = spark.read.json(Seq(jsonA).toDS)
-    val dfB = spark.read.json(Seq(jsonB).toDS)
-
-    intercept[AnalysisException] {
-      SchemaUtils.alignSchema(dfA, dfB.schema)
-    }
   }
 
   behavior of "diffSchema"

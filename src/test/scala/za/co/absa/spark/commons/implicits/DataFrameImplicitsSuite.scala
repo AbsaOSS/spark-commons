@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{AnalysisException, DataFrame}
 import org.apache.spark.sql.functions.lit
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
@@ -54,6 +54,11 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
     "y",
     "z"
   )
+
+  val jsonA = """[{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}], "key" : {"alfa": "1", "beta": {"beta2": "2"}} }]"""
+  val jsonB = """[{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100,"price":10}]}]}]"""
+  val jsonC = """[{"legs":[{"legid":100,"conditions":[{"amount":100,"checks":[{"checkNums":["1","2","3b","4","5c","6"]}]}]}],"id":1, "key" : {"beta": {"beta2": "2"}, "alfa": "1"} }]"""
+
   private val inputData = inputDataSeq.toDF(columnName)
 
   import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
@@ -233,5 +238,24 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
     assert(dfIn.schema.length == 1)
     assert(dfIn.schema.head.name == "value")
     assert(actualOutput == expectedOutput)
+  }
+
+  test("order schemas for equal schemas") {
+    val dfA = spark.read.json(Seq(jsonA).toDS)
+    val dfC = spark.read.json(Seq(jsonC).toDS).select("legs", "id", "key")
+
+    val dfA2Aligned = dfC.alignSchema(dfA.schema)
+
+    assert(dfA.columns.toSeq == dfA2Aligned.columns.toSeq)
+    assert(dfA.select("key").columns.toSeq == dfA2Aligned.select("key").columns.toSeq)
+  }
+
+  test("throw an error for DataFrames with different schemas") {
+    val dfA = spark.read.json(Seq(jsonA).toDS)
+    val dfB = spark.read.json(Seq(jsonB).toDS)
+
+    assertThrows[AnalysisException]{
+      dfA.alignSchema(dfB.schema)
+    }
   }
 }

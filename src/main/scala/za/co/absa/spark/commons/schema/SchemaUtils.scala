@@ -16,12 +16,9 @@
 
 package za.co.absa.spark.commons.schema
 
-import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.adapters.HofsAdapter
 
-import scala.annotation.tailrec
 
 object SchemaUtils extends HofsAdapter {
 
@@ -38,18 +35,6 @@ object SchemaUtils extends HofsAdapter {
     } else {
       ""
     }
-  }
-
-  /**
-   * Converts a fully qualified field name (including its path, e.g. containing fields) to a unique field name without
-   * dot notation
-   *
-   * @param path the fully qualified field name
-   * @return unique top level field name
-   */
-  def unpath(path: String): String = {
-    path.replace("_", "__")
-      .replace('.', '_')
   }
 
   /**
@@ -141,20 +126,6 @@ object SchemaUtils extends HofsAdapter {
   }
 
   /**
-   * For an array of arrays of arrays, ... get the final element type at the bottom of the array
-   *
-   * @param arrayType An array data type from a Spark dataframe schema
-   * @return A non-array data type at the bottom of array nesting
-   */
-  @tailrec
-  final def getDeepestArrayType(arrayType: ArrayType): DataType = {
-    arrayType.elementType match {
-      case a: ArrayType => getDeepestArrayType(a)
-      case b => b
-    }
-  }
-
-  /**
    * Finds all differences of two StructFields and returns their paths
    *
    * @param field1 The first field to compare
@@ -174,61 +145,6 @@ object SchemaUtils extends HofsAdapter {
         Seq.empty[String]
     }
   }
-
-  /**
-   * Returns data selector that can be used to align schema of a data frame. You can use [[alignSchema]].
-   *
-   * @param schema Schema that serves as the model of column order
-   * @return Sorted DF to conform to schema
-   */
-  def getDataFrameSelector(schema: StructType): List[Column] = {
-
-    def processArray(arrType: ArrayType, column: Column, name: String): Column = {
-      arrType.elementType match {
-        case arrType: ArrayType =>
-          transform(column, x => processArray(arrType, x, name)).as(name)
-        case nestedStructType: StructType =>
-          transform(column, x => struct(processStruct(nestedStructType, Some(x)): _*)).as(name)
-        case _ => column
-      }
-    }
-
-    def processStruct(curSchema: StructType, parent: Option[Column]): List[Column] = {
-      curSchema.foldRight(List.empty[Column])((field, acc) => {
-        val currentCol: Column = parent match {
-          case Some(x) => x.getField(field.name).as(field.name)
-          case None => col(field.name)
-        }
-        field.dataType match {
-          case arrType: ArrayType => processArray(arrType, currentCol, field.name) :: acc
-          case structType: StructType => struct(processStruct(structType, Some(currentCol)): _*).as(field.name) :: acc
-          case _ => currentCol :: acc
-        }
-      })
-    }
-
-    processStruct(schema, None)
-  }
-
-  /**
-   * Using schema selector from [[getDataFrameSelector]] aligns the schema of a DataFrame to the selector for operations
-   * where schema order might be important (e.g. hashing the whole rows and using except)
-   *
-   * @param df         DataFrame to have it's schema aligned/sorted
-   * @param structType model structType for the alignment of df
-   * @return Returns aligned and filtered schema
-   */
-  def alignSchema(df: DataFrame, structType: StructType): DataFrame = df.select(getDataFrameSelector(structType): _*)
-
-  /**
-   * Using schema selector returned from [[getDataFrameSelector]] aligns the schema of a DataFrame to the selector
-   * for operations where schema order might be important (e.g. hashing the whole rows and using except)
-   *
-   * @param df       DataFrame to have it's schema aligned/sorted
-   * @param selector model structType for the alignment of df
-   * @return Returns aligned and filtered schema
-   */
-  def alignSchema(df: DataFrame, selector: List[Column]): DataFrame = df.select(selector: _*)
 
   /**
    * Compares 2 dataframe schemas.
@@ -357,7 +273,7 @@ object SchemaUtils extends HofsAdapter {
    * @param targetType A type to be casted to
    * @return true if casting never fails
    */
-  def isCastAlwaysSucceeds(sourceType: DataType, targetType: DataType): Boolean = {
+  def doesCastAlwaysSucceed(sourceType: DataType, targetType: DataType): Boolean = {
     (sourceType, targetType) match {
       case (_: StructType, _) | (_: ArrayType, _) => false
       case (a, b) if a == b => true

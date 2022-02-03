@@ -194,13 +194,13 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
 14. Checks if a field is an array that is not nested in another array
 
     ```scala
-      structType.isNonNestedArray(fieldPathName)
+      structType.isNonNestedArray(path)
     ```
 
 15. Checks if a field is an array
 
     ```scala
-      structType.isArray(fieldPathName)
+      structType.isArray(path)
     ```
 
 # Spark Version Guard

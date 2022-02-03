@@ -25,47 +25,47 @@ class SchemaUtilSuite extends AnyFunSuite with Matchers {
   // scalastyle:off magic.number
 
 
-  test ("Test isCastAlwaysSucceeds()") {
-    assert(!isCastAlwaysSucceeds(StructType(Seq()), StringType))
-    assert(!isCastAlwaysSucceeds(ArrayType(StringType), StringType))
-    assert(!isCastAlwaysSucceeds(StringType, ByteType))
-    assert(!isCastAlwaysSucceeds(StringType, ShortType))
-    assert(!isCastAlwaysSucceeds(StringType, IntegerType))
-    assert(!isCastAlwaysSucceeds(StringType, LongType))
-    assert(!isCastAlwaysSucceeds(StringType, DecimalType(10,10)))
-    assert(!isCastAlwaysSucceeds(StringType, DateType))
-    assert(!isCastAlwaysSucceeds(StringType, TimestampType))
-    assert(!isCastAlwaysSucceeds(StructType(Seq()), StructType(Seq())))
-    assert(!isCastAlwaysSucceeds(ArrayType(StringType), ArrayType(StringType)))
+  test ("Test doesCastAlwaysSucceed()") {
+    assert(!doesCastAlwaysSucceed(StructType(Seq()), StringType))
+    assert(!doesCastAlwaysSucceed(ArrayType(StringType), StringType))
+    assert(!doesCastAlwaysSucceed(StringType, ByteType))
+    assert(!doesCastAlwaysSucceed(StringType, ShortType))
+    assert(!doesCastAlwaysSucceed(StringType, IntegerType))
+    assert(!doesCastAlwaysSucceed(StringType, LongType))
+    assert(!doesCastAlwaysSucceed(StringType, DecimalType(10,10)))
+    assert(!doesCastAlwaysSucceed(StringType, DateType))
+    assert(!doesCastAlwaysSucceed(StringType, TimestampType))
+    assert(!doesCastAlwaysSucceed(StructType(Seq()), StructType(Seq())))
+    assert(!doesCastAlwaysSucceed(ArrayType(StringType), ArrayType(StringType)))
 
-    assert(!isCastAlwaysSucceeds(ShortType, ByteType))
-    assert(!isCastAlwaysSucceeds(IntegerType, ByteType))
-    assert(!isCastAlwaysSucceeds(IntegerType, ShortType))
-    assert(!isCastAlwaysSucceeds(LongType, ByteType))
-    assert(!isCastAlwaysSucceeds(LongType, ShortType))
-    assert(!isCastAlwaysSucceeds(LongType, IntegerType))
+    assert(!doesCastAlwaysSucceed(ShortType, ByteType))
+    assert(!doesCastAlwaysSucceed(IntegerType, ByteType))
+    assert(!doesCastAlwaysSucceed(IntegerType, ShortType))
+    assert(!doesCastAlwaysSucceed(LongType, ByteType))
+    assert(!doesCastAlwaysSucceed(LongType, ShortType))
+    assert(!doesCastAlwaysSucceed(LongType, IntegerType))
 
-    assert(isCastAlwaysSucceeds(StringType, StringType))
-    assert(isCastAlwaysSucceeds(ByteType, StringType))
-    assert(isCastAlwaysSucceeds(ShortType, StringType))
-    assert(isCastAlwaysSucceeds(IntegerType, StringType))
-    assert(isCastAlwaysSucceeds(LongType, StringType))
-    assert(isCastAlwaysSucceeds(DecimalType(10,10), StringType))
-    assert(isCastAlwaysSucceeds(DateType, StringType))
-    assert(isCastAlwaysSucceeds(TimestampType, StringType))
-    assert(isCastAlwaysSucceeds(StringType, StringType))
+    assert(doesCastAlwaysSucceed(StringType, StringType))
+    assert(doesCastAlwaysSucceed(ByteType, StringType))
+    assert(doesCastAlwaysSucceed(ShortType, StringType))
+    assert(doesCastAlwaysSucceed(IntegerType, StringType))
+    assert(doesCastAlwaysSucceed(LongType, StringType))
+    assert(doesCastAlwaysSucceed(DecimalType(10,10), StringType))
+    assert(doesCastAlwaysSucceed(DateType, StringType))
+    assert(doesCastAlwaysSucceed(TimestampType, StringType))
+    assert(doesCastAlwaysSucceed(StringType, StringType))
 
-    assert(isCastAlwaysSucceeds(ByteType, ByteType))
-    assert(isCastAlwaysSucceeds(ByteType, ShortType))
-    assert(isCastAlwaysSucceeds(ByteType, IntegerType))
-    assert(isCastAlwaysSucceeds(ByteType, LongType))
-    assert(isCastAlwaysSucceeds(ShortType, ShortType))
-    assert(isCastAlwaysSucceeds(ShortType, IntegerType))
-    assert(isCastAlwaysSucceeds(ShortType, LongType))
-    assert(isCastAlwaysSucceeds(IntegerType, IntegerType))
-    assert(isCastAlwaysSucceeds(IntegerType, LongType))
-    assert(isCastAlwaysSucceeds(LongType, LongType))
-    assert(isCastAlwaysSucceeds(DateType, TimestampType))
+    assert(doesCastAlwaysSucceed(ByteType, ByteType))
+    assert(doesCastAlwaysSucceed(ByteType, ShortType))
+    assert(doesCastAlwaysSucceed(ByteType, IntegerType))
+    assert(doesCastAlwaysSucceed(ByteType, LongType))
+    assert(doesCastAlwaysSucceed(ShortType, ShortType))
+    assert(doesCastAlwaysSucceed(ShortType, IntegerType))
+    assert(doesCastAlwaysSucceed(ShortType, LongType))
+    assert(doesCastAlwaysSucceed(IntegerType, IntegerType))
+    assert(doesCastAlwaysSucceed(IntegerType, LongType))
+    assert(doesCastAlwaysSucceed(LongType, LongType))
+    assert(doesCastAlwaysSucceed(DateType, TimestampType))
   }
 
   test("Test isCommonSubPath()") {
@@ -73,23 +73,5 @@ class SchemaUtilSuite extends AnyFunSuite with Matchers {
     assert (isCommonSubPath("a"))
     assert (isCommonSubPath("a.b.c.d.e.f", "a.b.c.d", "a.b.c", "a.b", "a"))
     assert (!isCommonSubPath("a.b.c.d.e.f", "a.b.c.x", "a.b.c", "a.b", "a"))
-  }
-
-  test("unpath - empty string remains empty") {
-    val result = unpath("")
-    val expected = ""
-    assert(result == expected)
-  }
-
-  test("unpath - underscores get doubled") {
-    val result = unpath("one_two__three")
-    val expected = "one__two____three"
-    assert(result == expected)
-  }
-
-  test("unpath - dot notation conversion") {
-    val result = unpath("grand_parent.parent.first_child")
-    val expected = "grand__parent_parent_first__child"
-    assert(result == expected)
   }
 }

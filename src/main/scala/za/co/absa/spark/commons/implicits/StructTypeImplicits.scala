@@ -16,9 +16,10 @@
 
 package za.co.absa.spark.commons.implicits
 
+import org.apache.spark.sql.Column
+import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
-import za.co.absa.spark.commons.schema.MetadataKeys
-import za.co.absa.spark.commons.schema.SchemaUtils.{appendPath, getAllArraySubPaths, isCommonSubPath}
+import za.co.absa.spark.commons.schema.SchemaUtils.{getAllArraySubPaths, isCommonSubPath, transform}
 
 import scala.annotation.tailrec
 import scala.util.Try
@@ -114,54 +115,122 @@ object StructTypeImplicits {
     }
 
     /**
-     * Returns all renames in the provided schema.
-     * @param includeIfPredecessorChanged  if set to true, fields are included even if their name have not changed but
-     *                                     a predecessor's (parent, grandparent etc.) has
-     * @return        the keys of the returned map are the columns' names after renames, the values are the source columns;
-     *                the name are full paths denoted with dot notation
+     * Get paths for all array fields in the schema
+     *
+     * @return Seq of dot separated paths of fields in the schema, which are of type Array
      */
-    def getRenamesInSchema(includeIfPredecessorChanged: Boolean = true): Map[String, String] = {
-
-      def getRenamesRecursively(path: String,
-                                sourcePath: String,
-                                struct: StructType,
-                                renamesAcc: Map[String, String],
-                                predecessorChanged: Boolean): Map[String, String] = {
-        import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldMetadataEnhancement
-
-        struct.fields.foldLeft(renamesAcc) { (renamesSoFar, field) =>
-          val fieldFullName = appendPath(path, field.name)
-          val fieldSourceName = field.metadata.getOptString(MetadataKeys.SourceColumn).getOrElse(field.name)
-          val fieldFullSourceName = appendPath(sourcePath, fieldSourceName)
-
-          val (renames, renameOnPath) = if ((fieldSourceName != field.name) || (predecessorChanged && includeIfPredecessorChanged)) {
-            (renamesSoFar + (fieldFullName -> fieldFullSourceName), true)
-          } else {
-            (renamesSoFar, predecessorChanged)
-          }
-
-          field.dataType match {
-            case st: StructType => getRenamesRecursively(fieldFullName, fieldFullSourceName, st, renames, renameOnPath)
-            case at: ArrayType  => getStructInArray(at.elementType).fold(renames) { item =>
-              getRenamesRecursively(fieldFullName, fieldFullSourceName, item, renames, renameOnPath)
-            }
-            case _              => renames
-          }
-        }
-      }
-
-      @tailrec
-      def getStructInArray(dataType: DataType): Option[StructType] = {
-        dataType match {
-          case st: StructType => Option(st)
-          case at: ArrayType => getStructInArray(at.elementType)
-          case _ => None
-        }
-      }
-
-      getRenamesRecursively("", "", schema, Map.empty, predecessorChanged = false)
+    def getAllArrayPaths(): Seq[String] = {
+      schema.fields.flatMap(f => getAllArraySubPaths("", f.name, f.dataType)).toSeq
     }
 
+    /**
+     * Returns data selector that can be used to align schema of a data frame. You can use [[alignSchema]].
+     *
+     * @return Sorted DF to conform to schema
+     */
+    def getDataFrameSelector(): List[Column] = {
+
+      def processArray(arrType: ArrayType, column: Column, name: String): Column = {
+        arrType.elementType match {
+          case arrType: ArrayType =>
+            transform(column, x => processArray(arrType, x, name)).as(name)
+          case nestedStructType: StructType =>
+            transform(column, x => struct(processStruct(nestedStructType, Some(x)): _*)).as(name)
+          case _ => column
+        }
+      }
+
+      def processStruct(curSchema: StructType, parent: Option[Column]): List[Column] = {
+        curSchema.foldRight(List.empty[Column])((field, acc) => {
+          val currentCol: Column = parent match {
+            case Some(x) => x.getField(field.name).as(field.name)
+            case None => col(field.name)
+          }
+          field.dataType match {
+            case arrType: ArrayType => processArray(arrType, currentCol, field.name) :: acc
+            case structType: StructType => struct(processStruct(structType, Some(currentCol)): _*).as(field.name) :: acc
+            case _ => currentCol :: acc
+          }
+        })
+      }
+
+      processStruct(schema, None)
+    }
+
+    /**
+     * Get a closest unique column name
+     *
+     * @param desiredName A prefix to use for the column name
+     * @return A name that can be used as a unique column name
+     */
+    def getClosestUniqueName(desiredName: String): String = {
+      def fieldExists(name: String): Boolean = schema.fields.exists(_.name.compareToIgnoreCase(name) == 0)
+
+      if (fieldExists(desiredName)) {
+        Iterator.from(1)
+          .map(index => s"${desiredName}_${index}")
+          .dropWhile(fieldExists).next()
+      } else {
+        desiredName
+      }
+    }
+
+    /**
+     * Checks if a field is the only field in a struct
+     *
+     * @param path A column to check
+     * @return true if the column is the only column in a struct
+     */
+    def isOnlyField(path: String): Boolean = {
+      val pathSegments = path.split('.')
+      evaluateConditionsForField(schema, pathSegments, path, applyArrayHelper = false, applyLeafCondition = true,
+        field => field.fields.length == 1)
+    }
+
+    def isOfType[T <: DataType](path: String) = {
+      val fieldType = getFieldType(path).getOrElse(false)
+      fieldType.isInstanceOf[T]
+    }
+
+    protected def evaluateConditionsForField(structField: StructType, path: Seq[String], fieldPathName: String,
+                                           applyArrayHelper: Boolean, applyLeafCondition: Boolean = false,
+                                           conditionLeafSh: StructType => Boolean = _ => false): Boolean = {
+      val currentField = path.head
+      val isLeaf = path.lengthCompare(1) <= 0
+
+      @tailrec
+      def arrayHelper(fieldPathName: String, arrayField: ArrayType, path: Seq[String]): Boolean = {
+        arrayField.elementType match {
+          case st: StructType =>
+            evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, applyLeafCondition, conditionLeafSh)
+          case ar: ArrayType => arrayHelper(fieldPathName, ar, path)
+          case _ =>
+            if (!isLeaf) {
+              throw new IllegalArgumentException(
+                s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
+            }
+            false
+        }
+      }
+
+      structField.fields.exists(field =>
+        if (field.name == currentField) {
+          (field.dataType, isLeaf) match {
+              case (st: StructType, false) =>
+                evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, applyLeafCondition, conditionLeafSh)
+              case (_, true) if applyLeafCondition => conditionLeafSh(structField)
+              case (_: ArrayType, true) => true
+              case (ar: ArrayType, false) if applyArrayHelper => arrayHelper(fieldPathName, ar, path)
+              case (_: ArrayType, false) => false
+              case (_, false) => throw new IllegalArgumentException(s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
+              case (_, _) => false
+            }
+        } else false
+      )
+    }
+  }
+
+  implicit class StructTypeEnhancementsArrays(schema: StructType) extends StructTypeEnhancements(schema) {
     /**
      * Get first array column's path out of complete path.
      *
@@ -227,11 +296,11 @@ object StructTypeImplicits {
      * The purpose of the function is to determine the order of explosions to be made before the dataframe can be
      * joined on a field inside an array.
      *
-     * @param fieldPaths A list of paths to analyze
+     * @param paths A list of paths to analyze
      * @return Returns a common array path if there is one and None if any of the arrays are on diverging paths
      */
-    def getDeepestCommonArrayPath(fieldPaths: Seq[String]): Option[String] = {
-      val arrayPaths = fieldPaths.flatMap(path => getAllArraysInPath(path)).distinct
+    def getDeepestCommonArrayPath(paths: Seq[String]): Option[String] = {
+      val arrayPaths = paths.flatMap(path => getAllArraysInPath(path)).distinct
 
       if (arrayPaths.nonEmpty && isCommonSubPath(arrayPaths: _*)) {
         Some(arrayPaths.maxBy(_.length))
@@ -245,11 +314,11 @@ object StructTypeImplicits {
      *
      * For instance, if given 'a.b.c.d' where b and c are arrays the deepest array is 'a.b.c'.
      *
-     * @param fieldPath A path to analyze
+     * @param path A path to analyze
      * @return Returns a common array path if there is one and None if any of the arrays are on diverging paths
      */
-    def getDeepestArrayPath(fieldPath: String): Option[String] = {
-      val arrayPaths = getAllArraysInPath(fieldPath)
+    def getDeepestArrayPath(path: String): Option[String] = {
+      val arrayPaths = getAllArraysInPath(path)
 
       if (arrayPaths.nonEmpty) {
         Some(arrayPaths.maxBy(_.length))
@@ -259,101 +328,14 @@ object StructTypeImplicits {
     }
 
     /**
-     * Get paths for all array fields in the schema
-     *
-     * @return Seq of dot separated paths of fields in the schema, which are of type Array
-     */
-    def getAllArrayPaths(): Seq[String] = {
-      schema.fields.flatMap(f => getAllArraySubPaths("", f.name, f.dataType)).toSeq
-    }
-
-    /**
-     * Get a closest unique column name
-     *
-     * @param desiredName A prefix to use for the column name
-     * @return A name that can be used as a unique column name
-     */
-    def getClosestUniqueName(desiredName: String): String = {
-      def fieldExists(name: String): Boolean = schema.fields.exists(_.name.compareToIgnoreCase(name) == 0)
-
-      if (fieldExists(desiredName)) {
-        Iterator.from(1)
-          .map(index => s"${desiredName}_${index}")
-          .dropWhile(fieldExists).next()
-      } else {
-        desiredName
-      }
-    }
-
-    /**
-     * Checks if a field is the only field in a struct
-     *
-     * @param column A column to check
-     * @return true if the column is the only column in a struct
-     */
-    def isOnlyField(column: String): Boolean = {
-      val path = column.split('.')
-      evaluateConditionsForField(schema, path, column, applyArrayHelper = false, applyLeafCondition = true,
-        field => field.fields.length == 1)
-    }
-
-    /**
      * Checks if a field is an array that is not nested in another array
      *
-     * @param fieldPathName A field to check
+     * @param path A field to check
      * @return true if a field is an array that is not nested in another array
      */
-    def isNonNestedArray(fieldPathName: String): Boolean = {
-      val path = fieldPathName.split('.')
-      evaluateConditionsForField(schema, path, fieldPathName, applyArrayHelper = false)
-    }
-
-    /**
-     * Checks if a field is an array
-     *
-     * @param fieldPathName A field to check
-     * @return true if the specified field is an array
-     */
-    def isArray(fieldPathName: String): Boolean = {
-      val path = fieldPathName.split('.')
-      evaluateConditionsForField(schema, path, fieldPathName, applyArrayHelper = true)
-    }
-
-    private def evaluateConditionsForField(structField: StructType, path: Seq[String], fieldPathName: String,
-                                           applyArrayHelper: Boolean, applyLeafCondition: Boolean = false,
-                                           conditionLeafSh: StructType => Boolean = _ => false): Boolean = {
-      val currentField = path.head
-      val isLeaf = path.lengthCompare(1) <= 0
-
-      @tailrec
-      def arrayHelper(fieldPathName: String, arrayField: ArrayType, path: Seq[String]): Boolean = {
-        arrayField.elementType match {
-          case st: StructType =>
-            evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, applyLeafCondition, conditionLeafSh)
-          case ar: ArrayType => arrayHelper(fieldPathName, ar, path)
-          case _ =>
-            if (!isLeaf) {
-              throw new IllegalArgumentException(
-                s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
-            }
-            false
-        }
-      }
-
-      structField.fields.exists(field =>
-        if (field.name == currentField) {
-          (field.dataType, isLeaf) match {
-              case (st: StructType, false) =>
-                evaluateConditionsForField(st, path.tail, fieldPathName, applyArrayHelper, applyLeafCondition, conditionLeafSh)
-              case (_, true) if applyLeafCondition => conditionLeafSh(structField)
-              case (_: ArrayType, true) => true
-              case (ar: ArrayType, false) if applyArrayHelper => arrayHelper(fieldPathName, ar, path)
-              case (_: ArrayType, false) => false
-              case (_, false) => throw new IllegalArgumentException(s"Primitive fields cannot have child fields $currentField is a primitive in $fieldPathName")
-              case (_, _) => false
-            }
-        } else false
-      )
+    def isNonNestedArray(path: String): Boolean = {
+      val pathSegments = path.split('.')
+      evaluateConditionsForField(schema, pathSegments, path, applyArrayHelper = false)
     }
   }
 
