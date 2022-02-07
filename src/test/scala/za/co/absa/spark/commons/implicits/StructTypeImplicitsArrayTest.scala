@@ -16,29 +16,15 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, LongType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
 import za.co.absa.spark.commons.test.SparkTestBase
 
-class StructTypeImplicitsArrayTest extends AnyFunSuite with SparkTestBase {
+class StructTypeImplicitsArrayTest extends AnyFunSuite with SparkTestBase with JsonTestData {
 
-  private val schema = StructType(Seq(
-    StructField("a", IntegerType, nullable = false),
-    StructField("b", StructType(Seq(
-      StructField("c", IntegerType),
-      StructField("d", StructType(Seq(
-        StructField("e", IntegerType))), nullable = true)))),
-    StructField("f", StructType(Seq(
-      StructField("g", ArrayType.apply(StructType(Seq(
-        StructField("h", IntegerType))))))))))
-
-  private val nestedSchema = StructType(Seq(
-    StructField("a", IntegerType),
-    StructField("b", ArrayType(StructType(Seq(
-      StructField("c", StructType(Seq(
-        StructField("d", ArrayType(StructType(Seq(
-          StructField("e", IntegerType))))))))))))))
+  import spark.implicits._
+  val df = spark.read.json(sample.toDS)
 
   test("Testing getFirstArrayPath") {
     assertResult("f.g")(schema.getFirstArrayPath("f.g.h"))
@@ -51,17 +37,6 @@ class StructTypeImplicitsArrayTest extends AnyFunSuite with SparkTestBase {
     assertResult(Seq("b", "b.c.d"))(nestedSchema.getAllArraysInPath("b.c.d.e"))
   }
 
-  val sample =
-    """{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}]}""" ::
-      """{"id":2,"legs":[{"legid":200,"conditions":[{"checks":[{"checkNums":["8","9","10b","11","12c","13"]}],"amount":200}]}]}""" ::
-      """{"id":3,"legs":[{"legid":300,"conditions":[{"checks":[],"amount": 300}]}]}""" ::
-      """{"id":4,"legs":[{"legid":400,"conditions":[{"checks":null,"amount": 400}]}]}""" ::
-      """{"id":5,"legs":[{"legid":500,"conditions":[]}]}""" ::
-      """{"id":6,"legs":[]}""" ::
-      """{"id":7}""" :: Nil
-  import spark.implicits._
-  val df = spark.read.json(sample.toDS)
-
   test("Test isNonNestedArray") {
     assert(df.schema.isNonNestedArray("legs"))
     assert(!df.schema.isNonNestedArray("legs.conditions"))
@@ -71,7 +46,7 @@ class StructTypeImplicitsArrayTest extends AnyFunSuite with SparkTestBase {
     assert(!df.schema.isNonNestedArray("legs.legid"))
   }
 
-  test("Test isNonArray") {
+  test("Test isOfType ArrayType") {
     assert(df.schema.isOfType[ArrayType]("legs"))
     assert(df.schema.isOfType[ArrayType]("legs.conditions"))
     assert(df.schema.isOfType[ArrayType]("legs.conditions.checks"))

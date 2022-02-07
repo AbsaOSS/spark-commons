@@ -77,20 +77,20 @@ object DataFrameImplicits {
     }
 
     /**
-     * Using schema selector returned from [[StructTypeEnhancements.getDataFrameSelector]] aligns the schema of a DataFrame to the selector
-     * for operations where schema order might be important (e.g. hashing the whole rows and using except)
+     * Using utils selector returned from [[StructTypeEnhancements.getDataFrameSelector]] aligns the utils of a DataFrame to the selector
+     * for operations where utils order might be important (e.g. hashing the whole rows and using except)
      *
      * @param selector model structType for the alignment of df
-     * @return Returns aligned and filtered schema
+     * @return Returns aligned and filtered utils
      */
     def alignSchema(selector: List[Column]): DataFrame = df.select(selector: _*)
 
     /**
-     * Using schema selector from [[getDataFrameSelector]] aligns the schema of a DataFrame to the selector for operations
-     * where schema order might be important (e.g. hashing the whole rows and using except)
+     * Using utils selector from [[getDataFrameSelector]] aligns the utils of a DataFrame to the selector for operations
+     * where utils order might be important (e.g. hashing the whole rows and using except)
      *
      * @param structType model structType for the alignment of df
-     * @return Returns aligned and filtered schema
+     * @return Returns aligned and filtered utils
      */
     def alignSchema(structType: StructType): DataFrame = alignSchema(structType.getDataFrameSelector())
   }

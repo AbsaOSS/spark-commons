@@ -18,16 +18,19 @@ package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{col, struct}
-import org.apache.spark.sql.types.{ArrayType, DataType, StructField, StructType}
-import za.co.absa.spark.commons.schema.SchemaUtils.{getAllArraySubPaths, isCommonSubPath, transform}
+import org.apache.spark.sql.types.{ArrayType, DataType, NullType, StructField, StructType}
+import za.co.absa.spark.commons.implicits.DataTypeImplicits.DataTypeEnhancements
+import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhamcenets
+import za.co.absa.spark.commons.utils.SchemaUtils.{getAllArraySubPaths, isCommonSubPath, transform}
 
 import scala.annotation.tailrec
+import scala.reflect.runtime.universe._
 import scala.util.Try
 
 object StructTypeImplicits {
   implicit class StructTypeEnhancements(val schema: StructType) {
     /**
-     * Get a field from a text path and a given schema
+     * Get a field from a text path and a given utils
      * @param path   The dot-separated path to the field
      * @return       Some(the requested field) or None if the field does not exist
      */
@@ -65,7 +68,7 @@ object StructTypeImplicits {
     }
 
     /**
-     * Get a type of a field from a text path and a given schema
+     * Get a type of a field from a text path and a given utils
      *
      * @param path   The dot-separated path to the field
      * @return Some(the type of the field) or None if the field does not exist
@@ -96,7 +99,7 @@ object StructTypeImplicits {
     }
 
     /**
-     * Get nullability of a field from a text path and a given schema
+     * Get nullability of a field from a text path and a given utils
      *
      * @param path   The dot-separated path to the field
      * @return Some(nullable) or None if the field does not exist
@@ -106,7 +109,7 @@ object StructTypeImplicits {
     }
 
     /**
-     * Checks if a field specified by a path and a schema exists
+     * Checks if a field specified by a path and a utils exists
      * @param path   The dot-separated path to the field
      * @return       True if the field exists false otherwise
      */
@@ -115,18 +118,18 @@ object StructTypeImplicits {
     }
 
     /**
-     * Get paths for all array fields in the schema
+     * Get paths for all array fields in the utils
      *
-     * @return Seq of dot separated paths of fields in the schema, which are of type Array
+     * @return Seq of dot separated paths of fields in the utils, which are of type Array
      */
     def getAllArrayPaths(): Seq[String] = {
       schema.fields.flatMap(f => getAllArraySubPaths("", f.name, f.dataType)).toSeq
     }
 
     /**
-     * Returns data selector that can be used to align schema of a data frame. You can use [[alignSchema]].
+     * Returns data selector that can be used to align utils of a data frame. You can use [[alignSchema]].
      *
-     * @return Sorted DF to conform to schema
+     * @return Sorted DF to conform to utils
      */
     def getDataFrameSelector(): List[Column] = {
 
@@ -187,9 +190,72 @@ object StructTypeImplicits {
         field => field.fields.length == 1)
     }
 
-    def isOfType[T <: DataType](path: String) = {
-      val fieldType = getFieldType(path).getOrElse(false)
-      fieldType.isInstanceOf[T]
+    /**
+     * Compares 2 dataframe schemas.
+     *
+     * @param other The second utils to compare
+     * @return true if provided schemas are the same ignoring nullability
+     */
+    def isEquivalent(other: StructType): Boolean = {
+      val currentfields = schema.sortBy(_.name.toLowerCase)
+      val fields2 = other.sortBy(_.name.toLowerCase)
+
+      currentfields.size == fields2.size &&
+        currentfields.zip(fields2).forall {
+          case (f1, f2) =>
+            f1.name.equalsIgnoreCase(f2.name) &&
+              f1.dataType.isEquivalentDataType( f2.dataType)
+        }
+    }
+
+    /**
+     * Returns a list of differences in one utils to the other
+     *
+     * @param other The second utils to compare
+     * @param parent  Parent path. Should be left default by the users first run. This is used for the accumulation of
+     *                differences and their print out.
+     * @return Returns a Seq of paths to differences in schemas
+     */
+    def diffSchema(other: StructType, parent: String = ""): Seq[String] = {
+      val fields1 = getMapOfFields(schema)
+      val fields2 = getMapOfFields(other)
+
+      val diff = fields1.values.foldLeft(Seq.empty[String])((difference, field1) => {
+        val field1NameLc = field1.name.toLowerCase()
+        if (fields2.contains(field1NameLc)) {
+          val field2 = fields2(field1NameLc)
+          difference ++ field1.diffField(field2, parent)
+        } else {
+          difference ++ Seq(s"$parent.${field1.name} cannot be found in both schemas")
+        }
+      })
+
+      diff.map(_.stripPrefix("."))
+    }
+
+    /**
+     * Checks if the originalSchema is a subset of subsetSchema.
+     *
+     * @param originalSchema The utils that needs to have at least all t
+     * @return true if provided schemas are the same ignoring nullability
+     */
+    def isSubset(originalSchema: StructType): Boolean = {
+      val subsetFields = getMapOfFields(schema)
+      val originalFields = getMapOfFields(originalSchema)
+
+      subsetFields.forall(subsetField =>
+        originalFields.contains(subsetField._1) &&
+          subsetField._2.dataType.isEquivalentDataType(originalFields(subsetField._1).dataType))
+    }
+
+    private def getMapOfFields(schema: StructType): Map[String, StructField] = {
+      schema.map(field => field.name.toLowerCase() -> field).toMap
+    }
+
+    def isOfType[T <: DataType](path: String)(implicit tag: TypeTag[T]): Boolean = {
+      val fieldType = getFieldType(path).getOrElse(NullType)
+      val classT: Class[_] = runtimeMirror(getClass.getClassLoader).runtimeClass(tag.tpe.typeSymbol.asClass)
+      classT.equals(fieldType.getClass)
     }
 
     protected def evaluateConditionsForField(structField: StructType, path: Seq[String], fieldPathName: String,

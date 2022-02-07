@@ -30,13 +30,13 @@ _Spark Schema Utils_ provides methods for working with schemas, its comparison a
 1. Schema comparison returning true/false. Ignores the order of columns
 
     ```scala
-      SchemaUtils.equivalentSchemas(schema1, schema2)
+      SchemaUtils.equivalentSchemas(schema1, other)
     ```
 
 2. Schema comparison returning difference. Ignores the order of columns
 
     ```scala
-      SchemaUtils.diff(schema1, schema2)
+      SchemaUtils.diff(schema1, other)
     ```
 
 3. Schema selector generator which provides a List of columns to be used in a 
@@ -67,10 +67,10 @@ _ColumnImplicits_ provide implicit methods for transforming Spark Columns
     ```scala
       column.zeroBasedSubstr(startPos)
     ```
+   
 3. Returns column with requested substring. It shifts the substring indexation to be in accordance with Scala/ Java. 
    If the provided starting position where to start the substring from is negative, it will be counted from end. 
    The length of the desired substring, if longer then the rest of the string, all the remaining characters are taken.
-
 
     ```scala
       column.zeroBasedSubstr(startPos, length)
@@ -79,12 +79,6 @@ _ColumnImplicits_ provide implicit methods for transforming Spark Columns
 ### StructFieldImplicits
 
 _StructFieldImplicits_ provides implicit methods for working with StructField objects.  
-
-1. Determine the name of a field overriden by metadata
-
-    ```scala
-      structField.getFieldNameOverriddenByMetadata()
-    ```
 
 Of them, metadata methods are:
 
@@ -111,6 +105,45 @@ Of them, metadata methods are:
 
     ```scala
       structField.metadata.hasKey(key)
+    ```
+   
+### ArrayTypeImplicits
+
+_ArrayTypeImplicits_ provides implicit methods for working with ArrayType objects.  
+
+
+1. Get a field from a text path
+
+    ```scala
+      arrayType.isEquivalentArrayType(otherArrayType)
+    ```   
+
+2. For an array of arrays, get the final element type at the bottom of the array
+
+    ```scala
+      arrayType.getDeepestArrayType()
+    ```   
+   
+### DataTypeImplicits
+
+_DataTypeImplicits_ provides implicit methods for working with DataType objects.  
+
+
+1. Get a field from a text path
+
+    ```scala
+      dataType.isEquivalentDataType(otherDt)
+    ```   
+
+2. Checks if a casting between types always succeeds
+
+    ```scala
+      dataType.doesCastAlwaysSucceed(otherDt)
+    ```   
+3. Checks if type is primitive
+
+    ```scala
+      dataType.isPrimitive()
     ```
    
 ### StructTypeImplicits
@@ -145,62 +178,83 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
     ```scala
       structType.fieldExists(path)
     ```
-
-6. Returns all renames in the provided schema
-
-    ```scala
-      structType.getRenamesInSchema(includeIfPredecessorChanged)
-    ```
-7. Get first array column's path out of complete path
-
-    ```scala
-      structType.getFirstArrayPath(path)
-    ```
-8. Get all array columns' paths out of complete path.
-
-    ```scala
-      structType.getAllArraysInPath(path)
-    ```
-
-9. For a given list of field paths determines the deepest common array path
-
-    ```scala
-      structType.getDeepestCommonArrayPath(fieldPaths)
-    ```
-10. For a field path determines the deepest array path
-
-    ```scala
-      structType.getDeepestArrayPath(path)
-    ```
     
-11. Get paths for all array fields in the schema
+6. Get paths for all array fields in the schema
 
     ```scala
       structType.getAllArrayPaths()
     ```
     
-12. Get a closest unique column name
+7. Get a closest unique column name
 
     ```scala
       structType.getClosestUniqueName(desiredName)
     ```
 
-13. Checks if a field is the only field in a struct
+8. Checks if a field is the only field in a struct
 
     ```scala
       structType.isOnlyField(columnName)
     ```
+9. Checks if 2 schemas are equivalent
 
-14. Checks if a field is an array that is not nested in another array
+    ```scala
+      structType.isEquivalent(other)
+    ```
+
+10. Returns a list of differences in one utils to the other
+
+    ```scala
+      structType.diffSchema(otherSchema, parent)
+    ```
+
+11. Checks if a field is of the specified type
+
+    ```scala
+      structType.isOfType[ArrayType](path)
+    ```
+12. Checks if a field is  a subset of the specified type
+
+    ```scala
+          structType.isSubset(other)
+     ```
+    
+13. Returns data selector that can be used to align utils of a data frame.
+
+    ```scala
+          structType.getDataFrameSelector()
+    ```
+    
+###StructTypeArrayImplicits
+
+1. Get first array column's path out of complete path
+
+    ```scala
+      structType.getFirstArrayPath(path)
+    ```
+   
+2. Get all array columns' paths out of complete path.
+
+    ```scala
+      structType.getAllArraysInPath(path)
+    ```
+   
+3. For a given list of field paths determines the deepest common array path
+
+    ```scala
+      structType.getDeepestCommonArrayPath(fieldPaths)
+    ```
+
+4. For a field path determines the deepest array path
+
+    ```scala
+      structType.getDeepestArrayPath(path)
+    ```
+   
+5. Checks if a field is an array that is not nested in another array
 
     ```scala
       structType.isNonNestedArray(path)
-    ```
-
-15. Checks if a field is an array
-
-    ```scala
-      structType.isArray(path)
     ```
 
 # Spark Version Guard
@@ -243,4 +297,15 @@ _DataFrameImplicits_ provides methods for transformations on Dataframes
     
    ```scala
       df.withColumnIfDoesNotExist((df: DataFrame, _) => df)(colName, colExpression)
+   ```
+
+3. Aligns the utils of a DataFrame to the selector for operations
+   where utils order might be important (e.g. hashing the whole rows and using except)
+
+   ```scala
+      df.alignSchema(structType)
+   ```
+   
+   ```scala
+      df.alignSchema(listColumns)
    ```

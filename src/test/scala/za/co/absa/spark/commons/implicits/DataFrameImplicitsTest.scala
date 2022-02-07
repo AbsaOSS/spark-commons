@@ -21,7 +21,7 @@ import org.apache.spark.sql.functions.lit
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 
-class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
+class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTestData {
   import spark.implicits._
 
   private val columnName = "data"
@@ -54,10 +54,6 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
     "y",
     "z"
   )
-
-  val jsonA = """[{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}], "key" : {"alfa": "1", "beta": {"beta2": "2"}} }]"""
-  val jsonB = """[{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100,"price":10}]}]}]"""
-  val jsonC = """[{"legs":[{"legid":100,"conditions":[{"amount":100,"checks":[{"checkNums":["1","2","3b","4","5c","6"]}]}]}],"id":1, "key" : {"beta": {"beta2": "2"}, "alfa": "1"} }]"""
 
   private val inputData = inputDataSeq.toDF(columnName)
 
