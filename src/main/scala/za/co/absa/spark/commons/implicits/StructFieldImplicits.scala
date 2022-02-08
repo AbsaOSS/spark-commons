@@ -17,7 +17,8 @@
 package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.types._
-import za.co.absa.spark.commons.schema.MetadataKeys
+import za.co.absa.spark.commons.implicits.ArrayTypeImplicits.ArrayTypeEnhancements
+import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
 
 import scala.util.Try
 
@@ -47,17 +48,25 @@ object StructFieldImplicits {
     }
   }
 
-  implicit class StructFieldEnhancement(val structField: StructField) {
+  implicit class StructFieldEnhamcenets(val structField: StructField) {
+
     /**
-     * Determine the name of a field
+     * Finds all differences of two StructFields and returns their paths
      *
-     * @return       Metadata "sourcecolumn" if it exists or field.name
+     * @param other The second field to compare
+     * @param parent Parent path. This is used for the accumulation of differences and their print out
+     * @return Returns a Seq of found difference paths in scheme in the StructField
      */
-    def getFieldNameOverriddenByMetadata(): String = {
-      if (structField.metadata.contains(MetadataKeys.SourceColumn)) {
-        structField.metadata.getString(MetadataKeys.SourceColumn)
-      } else {
-        structField.name
+    private[implicits] def diffField(other: StructField, parent: String): Seq[String] = {
+      structField.dataType match {
+        case _ if structField.dataType.typeName != other.dataType.typeName =>
+          Seq(s"$parent.${structField.name} data type doesn't match (${structField.dataType.typeName}) vs (${other.dataType.typeName})")
+        case arrayType1: ArrayType =>
+          arrayType1.diffArray(other.dataType.asInstanceOf[ArrayType], s"$parent.${structField.name}")
+        case structType1: StructType =>
+          structType1.diffSchema(other.dataType.asInstanceOf[StructType], s"$parent.${structField.name}")
+        case _ =>
+          Seq.empty[String]
       }
     }
   }

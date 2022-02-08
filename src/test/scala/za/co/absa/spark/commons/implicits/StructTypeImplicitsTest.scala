@@ -21,40 +21,11 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
 import za.co.absa.spark.commons.test.SparkTestBase
 
-class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase{
+class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTestData {
   // scalastyle:off magic.number
 
-  private val schema = StructType(Seq(
-    StructField("a", IntegerType, nullable = false),
-    StructField("b", StructType(Seq(
-      StructField("c", IntegerType),
-      StructField("d", StructType(Seq(
-        StructField("e", IntegerType))), nullable = true)))),
-    StructField("f", StructType(Seq(
-      StructField("g", ArrayType.apply(StructType(Seq(
-        StructField("h", IntegerType))))))))))
-
-  private val nestedSchema = StructType(Seq(
-    StructField("a", IntegerType),
-    StructField("b", ArrayType(StructType(Seq(
-      StructField("c", StructType(Seq(
-        StructField("d", ArrayType(StructType(Seq(
-          StructField("e", IntegerType))))))))))))))
-
-  private val arrayOfArraysSchema = StructType(Seq(
-    StructField("a", ArrayType(ArrayType(IntegerType)), nullable = false),
-    StructField("b", ArrayType(ArrayType(StructType(Seq(
-      StructField("c", StringType, nullable = false)
-    ))
-    )), nullable = true)
-  ))
-
-  private val structFieldNoMetadata = StructField("a", IntegerType)
-
-  private val structFieldWithMetadataNotSourceColumn = StructField("a", IntegerType, nullable = false, new MetadataBuilder().putString("meta", "data").build)
-  private val structFieldWithMetadataSourceColumn = StructField("a", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "override_a").build)
-
   test("Testing getFieldType") {
+    import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
 
     val a = schema.getFieldType("a")
     val b = schema.getFieldType("b")
@@ -106,122 +77,6 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase{
     assert(nestedSchema.isColumnArrayOfStruct("b.c.d"))
   }
 
-  test("getRenamesInSchema - no renames") {
-    val schema = StructType(Seq(
-      structFieldNoMetadata,
-      structFieldWithMetadataNotSourceColumn))
-    val result = schema.getRenamesInSchema()
-    assert(result.isEmpty)
-  }
-
-  test("getRenamesInSchema - simple rename") {
-    val schema = StructType(Seq(structFieldWithMetadataSourceColumn))
-    val result = schema.getRenamesInSchema()
-    assert(result == Map("a" -> "override_a"))
-
-  }
-
-  test("getRenamesInSchema - complex with includeIfPredecessorChanged set") {
-    val sub = StructType(Seq(
-      StructField("d", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "o").build),
-      StructField("e", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "e").build),
-      StructField("f", IntegerType)
-    ))
-    val schema = StructType(Seq(
-      StructField("a", sub, nullable = false, new MetadataBuilder().putString("sourcecolumn", "x").build),
-      StructField("b", sub, nullable = false, new MetadataBuilder().putString("sourcecolumn", "b").build),
-      StructField("c", sub)
-    ))
-
-    val includeIfPredecessorChanged = true
-    val result = schema.getRenamesInSchema(includeIfPredecessorChanged)
-    val expected = Map(
-      "a" -> "x",
-      "a.d" -> "x.o",
-      "a.e" -> "x.e",
-      "a.f" -> "x.f",
-      "b.d" -> "b.o",
-      "c.d" -> "c.o"
-    )
-
-    assert(result == expected)
-  }
-
-  test("getRenamesInSchema - complex with includeIfPredecessorChanged not set") {
-    val sub = StructType(Seq(
-      StructField("d", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "o").build),
-      StructField("e", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "e").build),
-      StructField("f", IntegerType)
-    ))
-    val schema = StructType(Seq(
-      StructField("a", sub, nullable = false, new MetadataBuilder().putString("sourcecolumn", "x").build),
-      StructField("b", sub, nullable = false, new MetadataBuilder().putString("sourcecolumn", "b").build),
-      StructField("c", sub)
-    ))
-
-    val includeIfPredecessorChanged = false
-    val result = schema.getRenamesInSchema(includeIfPredecessorChanged)
-    val expected = Map(
-      "a" -> "x",
-      "a.d" -> "x.o",
-      "b.d" -> "b.o",
-      "c.d" -> "c.o"
-    )
-
-    assert(result == expected)
-  }
-
-
-  test("getRenamesInSchema - array") {
-    val sub = StructType(Seq(
-      StructField("renamed", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "rename source").build),
-      StructField("same", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "same").build),
-      StructField("f", IntegerType)
-    ))
-    val schema = StructType(Seq(
-      StructField("array1", ArrayType(sub)),
-      StructField("array2", ArrayType(ArrayType(ArrayType(sub)))),
-      StructField("array3", ArrayType(IntegerType), nullable = false, new MetadataBuilder().putString("sourcecolumn", "array source").build)
-    ))
-
-    val includeIfPredecessorChanged = false
-    val result = schema.getRenamesInSchema(includeIfPredecessorChanged)
-    val expected = Map(
-      "array1.renamed" -> "array1.rename source",
-      "array2.renamed" -> "array2.rename source",
-      "array3" -> "array source"
-    )
-
-    assert(result == expected)
-  }
-
-
-  test("getRenamesInSchema - source column used multiple times") {
-    val sub = StructType(Seq(
-      StructField("x", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "src").build),
-      StructField("y", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "src").build)
-    ))
-    val schema = StructType(Seq(
-      StructField("a", sub),
-      StructField("b", IntegerType, nullable = false, new MetadataBuilder().putString("sourcecolumn", "src").build)
-    ))
-
-    val result = schema.getRenamesInSchema()
-    val expected = Map(
-      "a.x" -> "a.src",
-      "a.y" -> "a.src",
-      "b" -> "src"
-    )
-
-    assert(result == expected)
-  }
-
-  test("Testing getFirstArrayPath") {
-    assertResult("f.g")(schema.getFirstArrayPath("f.g.h"))
-    assertResult("f.g")(schema.getFirstArrayPath("f.g"))
-    assertResult("")(schema.getFirstArrayPath("z.x.y"))
-    assertResult("")(schema.getFirstArrayPath("b.c.d.e"))
-  }
 
   test("Testing getAllArrayPaths") {
     assertResult(Seq("f.g"))(schema.getAllArrayPaths())
@@ -229,119 +84,9 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase{
     assertResult(Seq())(newSchema.getAllArrayPaths())
   }
 
-  test("Testing getAllArraysInPath") {
-    assertResult(Seq("b", "b.c.d"))(nestedSchema.getAllArraysInPath("b.c.d.e"))
-  }
-
   test("Testing getFieldNullability") {
     assert(schema.getFieldNullability("b.d").get)
     assert(schema.getFieldNullability("x.y.z").isEmpty)
-  }
-
-  test("Test getDeepestCommonArrayPath() for a path without an array") {
-    val schema = StructType(Seq[StructField](
-      StructField("a",
-        StructType(Seq[StructField](
-          StructField("b", StringType))
-        ))))
-
-    assert(schema.getDeepestCommonArrayPath(Seq("a", "a.b")).isEmpty)
-  }
-
-  test("Test getDeepestCommonArrayPath() for a path with a single array at top level") {
-    val schema = StructType(Seq[StructField](
-      StructField("a", ArrayType(StructType(Seq[StructField](
-        StructField("b", StringType)))
-      ))))
-
-    val deepestPath = schema.getDeepestCommonArrayPath(Seq("a", "a.b"))
-
-    assert(deepestPath.nonEmpty)
-    assert(deepestPath.get == "a")
-  }
-
-  test("Test getDeepestCommonArrayPath() for a path with a single array at nested level") {
-    val schema = StructType(Seq[StructField](
-      StructField("a", StructType(Seq[StructField](
-        StructField("b", ArrayType(StringType))))
-      )))
-
-    val deepestPath = schema.getDeepestCommonArrayPath(Seq("a", "a.b"))
-
-    assert(deepestPath.nonEmpty)
-    assert(deepestPath.get == "a.b")
-  }
-
-  test("Test getDeepestCommonArrayPath() for a path with several nested arrays of struct") {
-    val schema = StructType(Seq[StructField](
-      StructField("a", ArrayType(StructType(Seq[StructField](
-        StructField("b", StructType(Seq[StructField](
-          StructField("c", ArrayType(StructType(Seq[StructField](
-            StructField("d", StructType(Seq[StructField](
-              StructField("e", StringType))
-            )))
-          ))))
-        )))
-      )))))
-
-    val deepestPath = schema.getDeepestCommonArrayPath(Seq("a", "a.b", "a.b.c.d.e", "a.b.c.d"))
-
-    assert(deepestPath.nonEmpty)
-    assert(deepestPath.get == "a.b.c")
-  }
-
-  test("Test getDeepestArrayPath() for a path without an array") {
-    val schema = StructType(Seq[StructField](
-      StructField("a",
-        StructType(Seq[StructField](
-          StructField("b", StringType))
-        ))))
-
-    assert(schema.getDeepestArrayPath("a.b").isEmpty)
-  }
-
-  test("Test getDeepestArrayPath() for a path with a single array at top level") {
-    val schema = StructType(Seq[StructField](
-      StructField("a", ArrayType(StructType(Seq[StructField](
-        StructField("b", StringType)))
-      ))))
-
-    val deepestPath = schema.getDeepestArrayPath("a.b")
-
-    assert(deepestPath.nonEmpty)
-    assert(deepestPath.get == "a")
-  }
-
-  test("Test getDeepestArrayPath() for a path with a single array at nested level") {
-    val schema = StructType(Seq[StructField](
-      StructField("a", StructType(Seq[StructField](
-        StructField("b", ArrayType(StringType))))
-      )))
-
-    val deepestPath = schema.getDeepestArrayPath("a.b")
-    val deepestPath2 = schema.getDeepestArrayPath("a")
-
-    assert(deepestPath.nonEmpty)
-    assert(deepestPath.get == "a.b")
-    assert(deepestPath2.isEmpty)
-  }
-
-  test("Test getDeepestArrayPath() for a path with several nested arrays of struct") {
-    val schema = StructType(Seq[StructField](
-      StructField("a", ArrayType(StructType(Seq[StructField](
-        StructField("b", StructType(Seq[StructField](
-          StructField("c", ArrayType(StructType(Seq[StructField](
-            StructField("d", StructType(Seq[StructField](
-              StructField("e", StringType))
-            )))
-          ))))
-        )))
-      )))))
-
-    val deepestPath = schema.getDeepestArrayPath("a.b.c.d.e")
-
-    assert(deepestPath.nonEmpty)
-    assert(deepestPath.get == "a.b.c")
   }
 
   test("Test isOnlyField()") {
@@ -404,33 +149,71 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase{
     assert(name2 == "value_3")
   }
 
-  val sample =
-    """{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}]}""" ::
-      """{"id":2,"legs":[{"legid":200,"conditions":[{"checks":[{"checkNums":["8","9","10b","11","12c","13"]}],"amount":200}]}]}""" ::
-      """{"id":3,"legs":[{"legid":300,"conditions":[{"checks":[],"amount": 300}]}]}""" ::
-      """{"id":4,"legs":[{"legid":400,"conditions":[{"checks":null,"amount": 400}]}]}""" ::
-      """{"id":5,"legs":[{"legid":500,"conditions":[]}]}""" ::
-      """{"id":6,"legs":[]}""" ::
-      """{"id":7}""" :: Nil
   import spark.implicits._
-  val df = spark.read.json(sample.toDS)
 
-  test("Test isNonNestedArray") {
-    assert(df.schema.isNonNestedArray("legs"))
-    assert(!df.schema.isNonNestedArray("legs.conditions"))
-    assert(!df.schema.isNonNestedArray("legs.conditions.checks"))
-    assert(!df.schema.isNonNestedArray("legs.conditions.checks.checkNums"))
-    assert(!df.schema.isNonNestedArray("id"))
-    assert(!df.schema.isNonNestedArray("legs.legid"))
+  test("be true for E in D but not vice versa") {
+    val schemaD = spark.read.json(Seq(jsonD).toDS).schema
+    val schemaE = spark.read.json(Seq(jsonE).toDS).schema
+
+    assert(schemaD.isSubset(schemaE))
+    assert(!schemaE.isSubset(schemaD))
   }
 
-  test("Test isNonArray") {
-    assert(df.schema.isArray("legs"))
-    assert(df.schema.isArray("legs.conditions"))
-    assert(df.schema.isArray("legs.conditions.checks"))
-    assert(df.schema.isArray("legs.conditions.checks.checkNums"))
-    assert(!df.schema.isArray("id"))
-    assert(!df.schema.isArray("legs.legid"))
+  test("be false for A and B in both directions"){
+    val schemaA = spark.read.json(Seq(jsonA).toDS).schema
+    val schemaB = spark.read.json(Seq(jsonA).toDS).schema
+
+    assert(schemaA.isSubset(schemaB))
+    assert(schemaB.isSubset(schemaA))
+  }
+
+  test("say true for the same schemas") {
+    val dfA1 = spark.read.json(Seq(jsonA).toDS)
+    val dfA2 = spark.read.json(Seq(jsonA).toDS)
+
+    assert(dfA1.schema.isEquivalent(dfA2.schema))
+  }
+
+  test("say false when first utils has an extra field") {
+    val dfA = spark.read.json(Seq(jsonA).toDS)
+    val dfB = spark.read.json(Seq(jsonB).toDS)
+
+    assert(!dfA.schema.isEquivalent(dfB.schema))
+  }
+
+  test("say false when second utils has an extra field") {
+    val dfA = spark.read.json(Seq(jsonA).toDS)
+    val dfB = spark.read.json(Seq(jsonB).toDS)
+
+    assert(!dfB.schema.isEquivalent(dfA.schema))
+  }
+
+  test("produce a list of differences with path for schemas with different columns") {
+    val schemaA = spark.read.json(Seq(jsonA).toDS).schema
+    val schemaB = spark.read.json(Seq(jsonB).toDS).schema
+
+    assertResult(schemaA.diffSchema(schemaB))(List("key cannot be found in both schemas"))
+    assertResult(schemaB.diffSchema(schemaA))(List("legs.conditions.price cannot be found in both schemas"))
+  }
+
+  test("produce a list of differences with path for schemas with different column types") {
+    val schemaC = spark.read.json(Seq(jsonC).toDS).schema
+    val schemaD = spark.read.json(Seq(jsonD).toDS).schema
+
+    val result = List(
+      "key.alfa data type doesn't match (string) vs (long)",
+      "key.beta.beta2 data type doesn't match (string) vs (long)"
+    )
+
+    assertResult(schemaC.diffSchema(schemaD))(result)
+  }
+
+  test("produce an empty list for identical schemas") {
+    val schemaA = spark.read.json(Seq(jsonA).toDS).schema
+    val schemaB = spark.read.json(Seq(jsonA).toDS).schema
+
+    assert(schemaA.diffSchema(schemaB).isEmpty)
+    assert(schemaB.diffSchema(schemaA).isEmpty)
   }
 
 }
