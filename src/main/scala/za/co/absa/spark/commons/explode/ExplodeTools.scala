@@ -19,7 +19,7 @@ package za.co.absa.spark.commons.explode
 import org.apache.log4j.LogManager
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.types.{ArrayType, StructType}
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
 import za.co.absa.spark.hats.Extensions._
 
@@ -46,6 +46,7 @@ object ExplodeTools {
   def explodeAllArraysInPath(columnPathName: String,
                              inputDf: DataFrame,
                              explosionContext: ExplosionContext = ExplosionContext()): (DataFrame, ExplosionContext) = {
+    import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
     val arrays = inputDf.schema.getAllArraysInPath(columnPathName)
     arrays.foldLeft(inputDf, explosionContext)(
       (contextPair, arrayColName) => {
@@ -357,10 +358,11 @@ object ExplodeTools {
   }
 
   private def validateArrayField(schema: StructType, fieldName: String): Unit = {
-    if (!schema.isArray(fieldName)) {
+    if (!schema.isOfType[ArrayType](fieldName)) {
       throw new IllegalArgumentException(s"$fieldName is not an array.")
     }
 
+    import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
     if (!schema.isNonNestedArray(fieldName)) {
       throw new IllegalArgumentException(
         s"$fieldName is an array that is nested in other arrays. Need to explode top level array first.")
@@ -371,7 +373,7 @@ object ExplodeTools {
     if (fieldName.contains('.')) {
       throw new IllegalArgumentException(s"An error column $fieldName cannot be nested.")
     }
-    if (!schema.isArray(fieldName)) {
+    if (!schema.isOfType[ArrayType](fieldName)) {
       throw new IllegalArgumentException(s"An error column $fieldName is not an array.")
     }
   }

@@ -20,7 +20,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.scalatest.funsuite.AnyFunSuite
 import org.slf4j.LoggerFactory
-import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
+import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
 import za.co.absa.spark.commons.json.JsonUtils
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.hats.Extensions._
@@ -333,7 +333,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |-- check: string (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedDeconstructedData =
+    val expectedDeconstructedData2x =
       """+---+--------+------------------------+
         ||id |leg     |electron                |
         |+---+--------+------------------------+
@@ -343,6 +343,20 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         ||4  |[0, 400]|null                    |
         |+---+--------+------------------------+
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedDeconstructedData3x =
+      """+---+--------+------------------------+
+        ||id |leg     |electron                |
+        |+---+--------+------------------------+
+        ||1  |{0, 100}|[{b, a}, {d, c}, {f, e}]|
+        ||2  |{0, 200}|[{h, g}, {j, i}, {l, k}]|
+        ||3  |{0, 300}|[]                      |
+        ||4  |{0, 400}|null                    |
+        |+---+--------+------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+      expectedDeconstructedData3x else expectedDeconstructedData2x
 
     val expectedRestoredSchema =
       """root
@@ -355,7 +369,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |-- legid: long (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedRestoredData =
+    val expectedRestoredData2x =
       """+---+-------------------------------+
         ||id |leg                            |
         |+---+-------------------------------+
@@ -366,6 +380,20 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+-------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
+    val expectedRestoredData3x =
+      """+---+-------------------------------+
+        ||id |leg                            |
+        |+---+-------------------------------+
+        ||1  |{[{b, a}, {d, c}, {f, e}], 100}|
+        ||2  |{[{h, g}, {j, i}, {l, k}], 200}|
+        ||3  |{[], 300}                      |
+        ||4  |{null, 400}                    |
+        |+---+-------------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedRestoredData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+      expectedRestoredData3x else expectedRestoredData2x
+
     val d = ExplodeTools.deconstructNestedColumn(df, "leg.conditions")
     val (df2, deconstructedCol, transientCol) = ExplodeTools.DeconstructedNestedField.unapply(d).get
 
@@ -375,7 +403,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
     val actualRestoredResults = showString(df3, 5)
 
     assertSchema(df2.schema.treeString, expectedDeconstructedSchema)
-    assertResults(actualDeconstructedResults, expectedDeconstructedData)
+    assertResults(actualDeconstructedResults, expectedData)
 
     assertSchema(df3.schema.treeString, expectedRestoredSchema)
     assertResults(actualRestoredResults, expectedRestoredData)
@@ -407,7 +435,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |-- legid: long (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedOriginalResults =
+    val expectedOriginalResults2x =
       """+---+----------------------------------------------+
         ||id |legs                                          |
         |+---+----------------------------------------------+
@@ -420,6 +448,23 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         ||7  |null                                          |
         |+---+----------------------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedOriginalResults3x =
+      """+---+----------------------------------------------+
+        ||id |legs                                          |
+        |+---+----------------------------------------------+
+        ||1  |[{[{100, [{[1, 2, 3b, 4, 5c, 6]}]}], 100}]    |
+        ||2  |[{[{200, [{[8, 9, 10b, 11, 12c, 13]}]}], 200}]|
+        ||3  |[{[{300, []}], 300}]                          |
+        ||4  |[{[{400, null}], 400}]                        |
+        ||5  |[{[], 500}]                                   |
+        ||6  |[]                                            |
+        ||7  |null                                          |
+        |+---+----------------------------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedOriginalResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+      expectedOriginalResults3x else expectedOriginalResults2x
 
     val expectedExplodedSchema =
       """root
@@ -445,19 +490,6 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |-- legs_conditions_checks_checkNums_idx: integer (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedExplodedResults =
-      """+------+----------+---------+-----+
-        ||static|value_size|value_idx|value|
-        |+------+----------+---------+-----+
-        ||4     |-1        |null     |null |
-        ||3     |0         |null     |null |
-        ||1     |10        |0        |1    |
-        ||2     |10        |0        |2    |
-        ||1     |10        |1        |2    |
-        |+------+----------+---------+-----+
-        |only showing top 5 rows
-        |""".stripMargin.replace("\r\n", "\n")
-
     val expectedRestoredSchema =
       """root
         | |-- id: long (nullable = true)
@@ -473,7 +505,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |-- legid: long (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedRestoredResults =
+    val expectedRestoredResults2x =
       """+---+----------------------------------------------+
         ||id |legs                                          |
         |+---+----------------------------------------------+
@@ -487,7 +519,22 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+----------------------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
+    val expectedRestoredResults3x =
+      """+---+----------------------------------------------+
+        ||id |legs                                          |
+        |+---+----------------------------------------------+
+        ||1  |[{[{100, [{[1, 2, 3b, 4, 5c, 6]}]}], 100}]    |
+        ||2  |[{[{200, [{[8, 9, 10b, 11, 12c, 13]}]}], 200}]|
+        ||3  |[{[{300, []}], 300}]                          |
+        ||4  |[{[{400, null}], 400}]                        |
+        ||5  |[{[], 500}]                                   |
+        ||6  |[]                                            |
+        ||7  |null                                          |
+        |+---+----------------------------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
 
+    val expectedRestoredResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+      expectedRestoredResults3x else expectedRestoredResults2x
 
     val (explodedDf1, explodeContext1) = ExplodeTools.explodeArray("legs", df)
     val (explodedDf2, explodeContext2) = ExplodeTools.explodeArray("legs.conditions", explodedDf1, explodeContext1)
@@ -541,7 +588,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |    |-- check: string (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedOriginalResults =
+    val expectedOriginalResults2x =
       """+---+--------------------------+
         ||id |leg                       |
         |+---+--------------------------+
@@ -551,6 +598,20 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         ||4  |null                      |
         |+---+--------------------------+
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedOriginalResults3x =
+      """+---+--------------------------+
+        ||id |leg                       |
+        |+---+--------------------------+
+        ||1  |{[{b, a}, {d, c}, {f, e}]}|
+        ||2  |{[{h, g}, {j, i}, {l, k}]}|
+        ||3  |{[]}                      |
+        ||4  |null                      |
+        |+---+--------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedOriginalResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+      expectedOriginalResults3x else expectedOriginalResults2x
 
     val expectedExplodedSchema =
       """root
@@ -575,7 +636,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |    |-- check: string (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedRestoredResults =
+    val expectedRestoredResults2x =
       """+---+--------------------------+
         ||id |leg                       |
         |+---+--------------------------+
@@ -586,6 +647,19 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+--------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
+    val expectedRestoredResults3x =
+      """+---+--------------------------+
+        ||id |leg                       |
+        |+---+--------------------------+
+        ||1  |{[{b, a}, {d, c}, {f, e}]}|
+        ||2  |{[{h, g}, {j, i}, {l, k}]}|
+        ||3  |{[]}                      |
+        ||4  |{null}                    |
+        |+---+--------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedRestoredResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+      expectedRestoredResults3x else expectedRestoredResults2x
 
     val (explodedDf, explodeContext) = ExplodeTools.explodeArray("leg.conditions", df)
     val restoredDf = ExplodeTools.revertAllExplosions(explodedDf, explodeContext)
@@ -626,7 +700,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |-- legid: long (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData =
+    val expectedData2x =
       """+---+-------------------------------+
         ||id |leg                            |
         |+---+-------------------------------+
@@ -636,6 +710,19 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         ||4  |[, 400]                        |
         |+---+-------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData3x =
+      """+---+-------------------------------+
+        ||id |leg                            |
+        |+---+-------------------------------+
+        ||1  |{[{b, a}, {d, c}, {f, e}], 100}|
+        ||2  |{[{h, g}, {j, i}, {l, k}], 200}|
+        ||3  |{[], 300}                      |
+        ||4  |{null, 400}                    |
+        |+---+-------------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 5)
 
@@ -659,7 +746,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
     val restoredDf = ExplodeTools.revertAllExplosions(changedDf, explodeContext, Some("errors"))
 
     val expectedSchema =
-      """root
+      s"""root
         | |-- id: long (nullable = true)
         | |-- leg: struct (nullable = false)
         | |    |-- conditions: array (nullable = true)
@@ -667,11 +754,11 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |    |-- action: string (nullable = true)
         | |    |    |    |-- check: string (nullable = true)
         | |    |-- legid: long (nullable = true)
-        | |-- errors: array (nullable = true)
+        | |-- errors: array (nullable = ${sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("2.")})
         | |    |-- element: string (containsNull = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData =
+    val expectedData2x =
       """+---+-------------------------------+---------------------------+
         ||id |leg                            |errors                     |
         |+---+-------------------------------+---------------------------+
@@ -680,6 +767,18 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         ||3  |[, 300]                        |[]                         |
         |+---+-------------------------------+---------------------------+
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData3x =
+      """+---+-------------------------------+---------------------------+
+        ||id |leg                            |errors                     |
+        |+---+-------------------------------+---------------------------+
+        ||1  |{[{b, 1}, {d, 2}, {f, 3}], 100}|[Error 1, Error 2, 1, 2, 3]|
+        ||2  |{[{b, 0}], 200}                |[0]                        |
+        ||3  |{null, 300}                    |[null]                     |
+        |+---+-------------------------------+---------------------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 5)
 
@@ -717,7 +816,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |    |    |-- d: long (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData =
+    val expectedData2x =
       """+------+-----+-------------+
         ||myFlag|order|a            |
         |+------+-----+-------------+
@@ -729,6 +828,21 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         ||true  |6    |null         |
         |+------+-----+-------------+
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData3x =
+      """+------+-----+--------------+
+        ||myFlag|order|a             |
+        |+------+-----+--------------+
+        ||true  |1    |[{H1, [{1}]}] |
+        ||true  |2    |[{H2, []}]    |
+        ||true  |3    |[{H3, null}]  |
+        ||true  |4    |[{null, null}]|
+        ||true  |5    |[]            |
+        ||true  |6    |null          |
+        |+------+-----+--------------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 10)
 
@@ -762,7 +876,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |    |    |    |    |-- d: long (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData =
+    val expectedData2x =
       """+------+-----+---------+
         ||myFlag|order|a        |
         |+------+-----+---------+
@@ -773,6 +887,20 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         ||true  |5    |null     |
         |+------+-----+---------+
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData3x =
+      """+------+-----+---------+
+        ||myFlag|order|a        |
+        |+------+-----+---------+
+        ||true  |1    |[{[{1}]}]|
+        ||true  |2    |[{[]}]   |
+        ||true  |3    |[{null}] |
+        ||true  |4    |[]       |
+        ||true  |5    |null     |
+        |+------+-----+---------+
+        |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 10)
 
