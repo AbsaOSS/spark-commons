@@ -16,49 +16,22 @@
 
 package za.co.absa.spark.commons.test
 
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.SparkConf
+import java.util.concurrent.ConcurrentHashMap
+
 import org.apache.spark.sql.SparkSession
-import za.co.absa.spark.commons.time.TimeZoneNormalizer
 
-import scala.collection.JavaConversions._
+trait SparkTestBase {
+  implicit def sparkType: String
 
-trait SparkTestBase {self =>
-  TimeZoneNormalizer.normalizeJVMTimeZone()
-
-  val sparkMaster: String = "Master"
-
-  val sparkBuilder: SparkSession.Builder = SparkSession.builder()
-    .master(sparkMaster)
-    .appName(s"Enceladus test - ${self.getClass.getName}")
-    .config("spark.ui.enabled", "false")
-    .config("spark.debug.maxToStringFields", 100) // scalastyle:ignore magic.number
-  // ^- default value is insufficient for some tests, 100 is a compromise between resource consumption and expected need
-
-  implicit val spark: SparkSession = if (sparkMaster == "yarn") {
-    //TODO to be established how to pass this
-    val conf = SparkTestConfig.getConfig("","", Map())
-
-    sparkBuilder.config(new SparkConf().setAll(conf.allConfigs))
-      .config("spark.yarn.jars", conf.dependencies)
-      .config("spark.deploy.mode", "client")
-      .getOrCreate()
-  } else {
-    sparkBuilder
-      .master("local[*]")
-      .appName(s"Commons unit testing SchemaUtils")
-      .config("spark.ui.enabled", "false")
-      .config("spark.debug.maxToStringFields", 100)
-      .config("spark.driver.bindAddress", "127.0.0.1")
-      .config("spark.driver.host", "127.0.0.1")
-      .config("spark.sql.hive.convertMetastoreParquet", false)
-      .config("fs.defaultFS", "file:/")
-      .getOrCreate()
+  lazy val spark: SparkSession = initSpark()
+  private def initSpark(): SparkSession = {
+    SparkTestBase.getOrCreateSparkSession(sparkType)
   }
-  TimeZoneNormalizer.normalizeSessionTimeZone(spark)
+}
 
-  // Do not display INFO entries for tests
-  Logger.getLogger("org").setLevel(Level.WARN)
-  Logger.getLogger("akka").setLevel(Level.WARN)
-
+object SparkTestBase {
+  var cache: ConcurrentHashMap[SparkTestConfig, SparkSession] = null
+  def getOrCreateSparkSession(sparkType: String): SparkSession = {
+    cache.getOrDefault(sparkType, DefaultSparkConfiguration.sparkSession)
+  }
 }

@@ -23,6 +23,9 @@ import org.scalatest.matchers.should.Matchers
 import za.co.absa.spark.commons.test.SparkTestBase
 
 class SchemaUtilsSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAll with SparkTestBase {
+
+  override implicit def sparkType: String = "local"
+
   import spark.implicits._
 
   val jsonA = """[{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}], "key" : {"alfa": "1", "beta": {"beta2": "2"}} }]"""
