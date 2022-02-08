@@ -31,6 +31,4 @@ object DefaultSparkConfiguration extends SparkTestConfig {
     .config("spark.sql.hive.convertMetastoreParquet", false)
     .config("fs.defaultFS", "file:/")
     .getOrCreate()
-  def timezone: TimeZone = TimeZone.getDefault
-  def appName: String = s"Commons unit testing"
 }

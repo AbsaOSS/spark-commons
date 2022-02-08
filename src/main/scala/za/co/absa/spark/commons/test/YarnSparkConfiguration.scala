@@ -17,6 +17,8 @@
 package za.co.absa.spark.commons.test
 
 import java.io.File
+import java.time.ZoneId
+import java.util.TimeZone
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
@@ -25,7 +27,9 @@ import org.apache.spark.sql.SparkSession
 
 import scala.collection.JavaConversions.iterableAsScalaIterable
 
-class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends SparkTestConfig{
+class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends SparkTestConfig {
+
+  override def appName: String = "Yarn Testing"
 
   override def sparkSession = SparkSession.builder().config(new SparkConf().setAll(getHadoopConfigurationForSpark(confDir)))
     .config("spark.yarn.jars", getDependencies())

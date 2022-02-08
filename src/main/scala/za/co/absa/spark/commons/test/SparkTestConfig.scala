@@ -16,8 +16,12 @@
 
 package za.co.absa.spark.commons.test
 
+import java.util.TimeZone
+
 import org.apache.spark.sql.SparkSession
 
 trait SparkTestConfig {
   def sparkSession: SparkSession
+  def timezone: TimeZone = TimeZone.getDefault
+  def appName: String = s"Commons unit testing"
 }
