@@ -30,13 +30,13 @@ _Spark Schema Utils_ provides methods for working with schemas, its comparison a
 1. Schema comparison returning true/false. Ignores the order of columns
 
     ```scala
-      SchemaUtils.equivalentSchemas(schema1, other)
+      SchemaUtils.equivalentSchemas(other)
     ```
 
 2. Schema comparison returning difference. Ignores the order of columns
 
     ```scala
-      SchemaUtils.diff(schema1, other)
+      SchemaUtils.diff(other)
     ```
 
 3. Schema selector generator which provides a List of columns to be used in a 
