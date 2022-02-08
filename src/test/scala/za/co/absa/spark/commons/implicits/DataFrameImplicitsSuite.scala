@@ -22,7 +22,6 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 
 class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
-  override implicit def sparkType: String = "local"
 
   import spark.implicits._
 

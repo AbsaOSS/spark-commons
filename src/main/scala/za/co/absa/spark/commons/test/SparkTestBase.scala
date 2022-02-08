@@ -21,17 +21,17 @@ import java.util.concurrent.ConcurrentHashMap
 import org.apache.spark.sql.SparkSession
 
 trait SparkTestBase {
-  implicit def sparkType: String
+  implicit def sparkConfig: SparkTestConfig = DefaultSparkConfiguration
 
   lazy val spark: SparkSession = initSpark()
   private def initSpark(): SparkSession = {
-    SparkTestBase.getOrCreateSparkSession(sparkType)
+    SparkTestBase.getOrCreateSparkSession(sparkConfig)
   }
 }
 
 object SparkTestBase {
-  var cache: ConcurrentHashMap[SparkTestConfig, SparkSession] = null
-  def getOrCreateSparkSession(sparkType: String): SparkSession = {
-    cache.getOrDefault(sparkType, DefaultSparkConfiguration.sparkSession)
+  var cache: ConcurrentHashMap[SparkTestConfig, SparkSession] = new ConcurrentHashMap[SparkTestConfig, SparkSession]()
+  def getOrCreateSparkSession(sparkTestConfig: SparkTestConfig): SparkSession = {
+    cache.getOrDefault(sparkTestConfig, DefaultSparkConfiguration.sparkSession)
   }
 }
