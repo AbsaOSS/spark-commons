@@ -16,8 +16,8 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.{AnalysisException, DataFrame}
 import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.{AnalysisException, DataFrame}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 

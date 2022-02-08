@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.types.{ArrayType, LongType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
 import za.co.absa.spark.commons.test.SparkTestBase

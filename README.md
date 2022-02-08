@@ -14,7 +14,7 @@ val myListener = new MyQueryExecutionListener with NonFatalQueryExecutionListene
 spark.listenerManager.register(myListener)
 ```
 
-### Spark Schema Utils
+### Schema Utils
 
 >
 >**Note:**
@@ -25,31 +25,30 @@ spark.listenerManager.register(myListener)
 >|Spark| 2.4 | 3.1 | 3.2 |
 >|Json4s| 3.5 | 3.7 | 3.7 |
 >|Jackson| 2.6 | 2.10 | 2.12 |
-_Spark Schema Utils_ provides methods for working with schemas, its comparison and alignment.  
+_Schema Utils_ provides methods for working with schemas, its comparison and alignment.  
 
-1. Schema comparison returning true/false. Ignores the order of columns
+1. Returns the parent path of a field. Returns an empty string if a root level field name is provided.
 
     ```scala
-      SchemaUtils.equivalentSchemas(other)
+      SchemaUtils.getParentPath(columnName)
     ```
 
-2. Schema comparison returning difference. Ignores the order of columns
+2. Get paths for all array subfields of this given datatype
 
     ```scala
-      SchemaUtils.diff(other)
+      SchemaUtils.getAllArraySubPaths(other)
     ```
 
-3. Schema selector generator which provides a List of columns to be used in a 
-select to order and positionally filter columns of a DataFrame
+3. For a given list of field paths determines if any path pair is a subset of one another.
 
     ```scala
-      SchemaUtils.getDataFrameSelector(schema)
+      SchemaUtils.isCommonSubPath(paths)
     ```
 
-4. Dataframe alignment method using the `getDataFrameSelector` method.
+4. Append a new attribute to path or empty string.
 
     ```scala
-      SchemaUtils.alignSchema(dataFrameToBeAligned, modelSchema)
+      SchemaUtils.appendPath(path, fieldName)
     ```
    
 ### ColumnImplicits

@@ -18,7 +18,7 @@ package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{col, struct}
-import org.apache.spark.sql.types.{ArrayType, DataType, NullType, StructField, StructType}
+import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.implicits.DataTypeImplicits.DataTypeEnhancements
 import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhamcenets
 import za.co.absa.spark.commons.utils.SchemaUtils.{getAllArraySubPaths, isCommonSubPath, transform}

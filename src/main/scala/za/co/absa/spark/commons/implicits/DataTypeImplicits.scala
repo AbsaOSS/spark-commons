@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.types.{ArrayType, BinaryType, BooleanType, ByteType, DataType, DateType, DecimalType, DoubleType, FloatType, IntegerType, LongType, NullType, ShortType, StringType, StructType, TimestampType}
+import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.implicits.ArrayTypeImplicits.ArrayTypeEnhancements
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
 

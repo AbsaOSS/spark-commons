@@ -16,12 +16,10 @@
 
 package za.co.absa.spark.commons
 
-import org.apache.spark.sql.functions.col
 import org.slf4j.{Logger, LoggerFactory}
 import za.co.absa.commons.version.Version
 import za.co.absa.commons.version.Version.VersionStringInterpolator
 import za.co.absa.commons.version.impl.SemVer20Impl.SemanticVersion
-import za.co.absa.spark.commons.implicits._
 
 object SparkVersionGuard {
   val minSpark2XVersionIncluded: SemanticVersion = semver"2.4.2"

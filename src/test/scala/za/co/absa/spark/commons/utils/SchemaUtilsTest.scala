@@ -16,12 +16,11 @@
 
 package za.co.absa.spark.commons.utils
 
-import org.apache.spark.sql.types.{ArrayType, IntegerType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import za.co.absa.spark.commons.utils.SchemaUtils._
 
-class SchemaUtilTest extends AnyFunSuite with Matchers {
+class SchemaUtilsTest extends AnyFunSuite with Matchers {
   // scalastyle:off magic.number
 
   test("Test isCommonSubPath()") {
