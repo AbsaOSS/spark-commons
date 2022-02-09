@@ -21,7 +21,7 @@ import org.apache.spark.sql.functions.lit
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 
-class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase  {
+class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase {
 
   import spark.implicits._
 

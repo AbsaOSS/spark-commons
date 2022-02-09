@@ -16,22 +16,10 @@
 
 package za.co.absa.spark.commons.test
 
-import java.util.concurrent.ConcurrentHashMap
-
 import org.apache.spark.sql.SparkSession
 
 trait SparkTestBase {
-  implicit def sparkConfig: SparkTestConfig = DefaultSparkConfiguration
+  def sparkConfig: SparkTestConfig = DefaultSparkConfiguration
 
-  lazy val spark: SparkSession = initSpark()
-  private def initSpark(): SparkSession = {
-    SparkTestBase.getOrCreateSparkSession(sparkConfig)
-  }
-}
-
-object SparkTestBase {
-  var cache: ConcurrentHashMap[SparkTestConfig, SparkSession] = new ConcurrentHashMap[SparkTestConfig, SparkSession]()
-  def getOrCreateSparkSession(sparkTestConfig: SparkTestConfig): SparkSession = {
-    cache.getOrDefault(sparkTestConfig, DefaultSparkConfiguration.sparkSession)
-  }
+  final val spark: SparkSession = sparkConfig.sparkSession
 }

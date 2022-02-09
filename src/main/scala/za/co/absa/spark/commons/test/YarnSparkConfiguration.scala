@@ -29,6 +29,8 @@ import scala.collection.JavaConversions.iterableAsScalaIterable
 
 class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends SparkTestConfig {
 
+  override protected def master: String = "yarn"
+
   override def appName: String = "Yarn Testing"
 
   override def sparkSession = SparkSession.builder().config(new SparkConf().setAll(getHadoopConfigurationForSpark(confDir)))
