@@ -141,7 +141,7 @@ Of them, metadata methods are:
 _ArrayTypeImplicits_ provides implicit methods for working with ArrayType objects.  
 
 
-1. Get a field from a text path
+1. Checks if the arraytype is equivalent to another
 
     ```scala
       arrayType.isEquivalentArrayType(otherArrayType)
@@ -158,7 +158,7 @@ _ArrayTypeImplicits_ provides implicit methods for working with ArrayType object
 _DataTypeImplicits_ provides implicit methods for working with DataType objects.  
 
 
-1. Get a field from a text path
+1. Checks if the datatype is equivalent to another
 
     ```scala
       dataType.isEquivalentDataType(otherDt)
@@ -225,7 +225,7 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
     ```scala
       structType.isOnlyField(columnName)
     ```
-9. Checks if 2 schemas are equivalent
+9. Checks if 2 structtypes are equivalent
 
     ```scala
       structType.isEquivalent(other)
