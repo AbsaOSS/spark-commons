@@ -18,8 +18,18 @@ package za.co.absa.spark.commons.test
 
 import org.apache.spark.sql.SparkSession
 
-trait SparkTestBase {
-  implicit final val spark: SparkSession = initSpark()
+object DefaultSparkConfiguration extends SparkTestConfig {
+  override protected def appName: String = super.appName + " - local"
 
-  private def initSpark(implicit sparkConfig: SparkTestConfig = DefaultSparkConfiguration) = sparkConfig.sparkSession
+  override protected def master: String = "local[*]"
+
+  override protected def builder: SparkSession.Builder = {
+    super.builder
+      .config("spark.ui.enabled", "false")
+      .config("spark.debug.maxToStringFields", 100)
+      .config("spark.driver.bindAddress", "127.0.0.1")
+      .config("spark.driver.host", "127.0.0.1")
+      .config("spark.sql.hive.convertMetastoreParquet", value = false)
+      .config("fs.defaultFS", "file:/")
+  }
 }
