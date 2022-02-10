@@ -22,7 +22,9 @@ import org.apache.spark.sql.SparkSession
 
 trait SparkTestConfig {
   protected def master: String
+
   protected def appName: String = s"Commons unit testing"
+
   protected def timezone: Option[TimeZone] = None
 
   protected def builder: SparkSession.Builder = {
@@ -30,6 +32,7 @@ trait SparkTestConfig {
       .master(master)
       .appName(appName)
   }
+
   def sparkSession: SparkSession = {
     val result = builder.getOrCreate()
     timezone.foreach(tz => result.conf.set("spark.sql.session.timeZone", tz.getID))
