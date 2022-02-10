@@ -17,13 +17,12 @@
 package za.co.absa.spark.commons.test
 
 import java.io.File
-import java.time.ZoneId
-import java.util.TimeZone
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import za.co.absa.spark.commons.test.YarnSparkConfiguration._
 
 import scala.collection.JavaConversions.iterableAsScalaIterable
 
@@ -31,14 +30,16 @@ class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends Spark
 
   override protected def master: String = "yarn"
 
-  override def appName: String = "Yarn Testing"
+  override protected def appName: String = super.appName + " - Yarn"
 
-  override def sparkSession = SparkSession.builder().config(new SparkConf().setAll(getHadoopConfigurationForSpark(confDir)))
-    .config("spark.yarn.jars", getDependencies())
-    .config("spark.deploy.mode", "client")
-    .getOrCreate()
+  override protected def builder: SparkSession.Builder = {
+    super.builder
+      .config(new SparkConf().setAll(getHadoopConfigurationForSpark(confDir)))
+      .config("spark.yarn.jars", getDependencies())
+      .config("spark.deploy.mode", "client")
+  }
 
-  def getDependencies(): String = {
+  protected def getDependencies(): String = {
     //get a list of all dist jars
     val distJars = FileSystem.get(getHadoopConfiguration(confDir))
       .listStatus(new Path(distJarsDir)).map(_.getPath)
@@ -46,6 +47,10 @@ class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends Spark
     val currentJars = getCurrentProjectJars
     (distJars ++ localJars ++currentJars).mkString(",")
   }
+
+}
+
+object YarnSparkConfiguration {
 
   /**
    * Gets a Hadoop configuration object from the specified hadoopConfDir parameter

@@ -19,7 +19,10 @@ package za.co.absa.spark.commons.test
 import org.apache.spark.sql.SparkSession
 
 object DefaultSparkConfiguration extends SparkTestConfig {
+  override protected def appName: String = super.appName + " - local"
+
   override protected def master: String = "local[*]"
+
   override protected def builder: SparkSession.Builder = {
     super.builder
       .config("spark.ui.enabled", "false")

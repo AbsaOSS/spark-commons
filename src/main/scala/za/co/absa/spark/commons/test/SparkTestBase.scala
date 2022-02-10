@@ -19,7 +19,7 @@ package za.co.absa.spark.commons.test
 import org.apache.spark.sql.SparkSession
 
 trait SparkTestBase {
-  def sparkConfig: SparkTestConfig = DefaultSparkConfiguration
+  implicit final val spark: SparkSession = initSpark()
 
-  final val spark: SparkSession = sparkConfig.sparkSession
+  private def initSpark(implicit sparkConfig: SparkTestConfig = DefaultSparkConfiguration) = sparkConfig.sparkSession
 }
