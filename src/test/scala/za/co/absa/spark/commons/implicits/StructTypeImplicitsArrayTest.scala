@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, DataType, LongType, NumericType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
 import za.co.absa.spark.commons.test.SparkTestBase
@@ -25,6 +25,9 @@ class StructTypeImplicitsArrayTest extends AnyFunSuite with SparkTestBase with J
 
   import spark.implicits._
   val df = spark.read.json(sample.toDS)
+
+  val dfA = spark.read.json(sampleA.toDS)
+  val dfE = spark.read.json(sampleE.toDS)
 
   test("Testing getFirstArrayPath") {
     assertResult("f.g")(schema.getFirstArrayPath("f.g.h"))
@@ -51,8 +54,38 @@ class StructTypeImplicitsArrayTest extends AnyFunSuite with SparkTestBase with J
     assert(df.schema.isOfType[ArrayType]("legs.conditions"))
     assert(df.schema.isOfType[ArrayType]("legs.conditions.checks"))
     assert(df.schema.isOfType[ArrayType]("legs.conditions.checks.checkNums"))
+
     assert(!df.schema.isOfType[ArrayType]("id"))
     assert(!df.schema.isOfType[ArrayType]("legs.legid"))
+  }
+
+  test("Test isOfType LongType") {
+    assert(dfA.schema.isOfType[LongType]("legs.legid"))
+    assert(dfA.schema.isOfType[LongType]("id"))
+    assert(!dfA.schema.isOfType[StringType]("id"))
+    assert(dfA.schema.isOfType[NumericType]("id"))
+    assert(dfA.schema.isOfType[DataType]("id"))
+  }
+
+  test("Test isOfType StructType") {
+    assert(!dfE.schema.isOfType[StructType]("id"))
+    assert(dfE.schema.isOfType[StructType]("key"))
+    assert(!dfE.schema.isOfType[StructType]("key.alfa"))
+    assert(dfE.schema.isOfType[StructType]("key.beta"))
+    assert(!dfE.schema.isOfType[StructType]("key.beta.beta2"))
+    assert(!dfE.schema.isOfType[StructType]("extra"))
+  }
+
+  test("Test isOfType StringType") {
+    assert(!dfA.schema.isOfType[StringType]("id"))
+    assert(!dfA.schema.isOfType[StringType]("key"))
+    assert(dfA.schema.isOfType[StringType]("key.alfa"))
+    assert(!dfA.schema.isOfType[StringType]("key.beta"))
+    assert(dfA.schema.isOfType[StringType]("key.beta.beta2"))
+    assert(!dfA.schema.isOfType[StringType]("extra"))
+
+    assert(!dfE.schema.isOfType[StringType]("key.alfa"))
+    assert(dfE.schema.isOfType[StringType]("extra"))
   }
 
   test("Test getDeepestCommonArrayPath() for a path without an array") {

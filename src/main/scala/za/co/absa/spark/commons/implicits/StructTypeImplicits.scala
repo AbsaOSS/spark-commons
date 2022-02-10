@@ -24,7 +24,7 @@ import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhamc
 import za.co.absa.spark.commons.utils.SchemaUtils.{getAllArraySubPaths, isCommonSubPath, transform}
 
 import scala.annotation.tailrec
-import scala.reflect.runtime.universe._
+import scala.reflect.ClassTag
 import scala.util.Try
 
 object StructTypeImplicits {
@@ -252,11 +252,15 @@ object StructTypeImplicits {
       schema.map(field => field.name.toLowerCase() -> field).toMap
     }
 
-    def isOfType[T <: DataType](path: String)(implicit tag: TypeTag[T]): Boolean = {
+    def isOfType[T <: DataType](path: String)(implicit ev: ClassTag[T]): Boolean = {
       val fieldType = getFieldType(path).getOrElse(NullType)
-      val classT: Class[_] = runtimeMirror(getClass.getClassLoader).runtimeClass(tag.tpe.typeSymbol.asClass)
-      classT.equals(fieldType.getClass)
+
+      fieldType match {
+        case _: T => true
+        case _ => false
+      }
     }
+
 
     protected def evaluateConditionsForField(structField: StructType, path: Seq[String], fieldPathName: String,
                                            applyArrayHelper: Boolean, applyLeafCondition: Boolean = false,
