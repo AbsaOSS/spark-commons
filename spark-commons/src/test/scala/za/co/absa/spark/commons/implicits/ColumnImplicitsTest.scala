@@ -21,7 +21,7 @@ import org.apache.spark.sql.functions.lit
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.ColumnImplicits.ColumnEnhancements
 
-class ColumnImplicitsTest extends AnyFunSuite{
+class ColumnImplicitsTest extends AnyFunSuite {
 
   private val column: Column = lit("abcdefgh")
 

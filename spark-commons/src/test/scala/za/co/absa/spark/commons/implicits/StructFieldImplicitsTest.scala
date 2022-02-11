@@ -58,5 +58,4 @@ class StructFieldImplicitsTest extends AnyFunSuite {
     assertResult(true)(fieldWith("\"hvh\"").metadata.hasKey("a"))
     assertResult(true)(fieldWith("null").metadata.hasKey("a"))
   }
-
 }

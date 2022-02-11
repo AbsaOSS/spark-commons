@@ -49,7 +49,7 @@ lazy val sparkCommons = (project in file("spark-commons"))
 lazy val sparkCommonsTest = (project in file("spark-commons-test"))
   .settings(
     name := "spark-commons-test",
-    libraryDependencies ++= sparkCommonsTestDependencies(scalaVersion.value),
+    libraryDependencies ++= sparkCommonsTestDependencies(),
     Test / parallelExecution := false, // Atum Control framework could attempt to double-initialize and fail
     (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
   )

@@ -24,13 +24,14 @@ object Dependencies {
     "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided",
     "za.co.absa.commons" %% "commons" % "1.0.0",
     "za.co.absa"         %% "spark-hofs" % "0.4.0",
+    "za.co.absa"         %% "spark-hats" % "0.2.2",
     "org.scala-lang"     % "scala-compiler" % scalaVersion,
     "org.scalatest"      %% "scalatest" % "3.1.0" % Test,
     "org.scalatest"      %% "scalatest-flatspec" % "3.2.0" % Test,
     "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0" % Test
   )
 
-  def sparkCommonsTestDependencies(scalaVersion: String): Seq[ModuleID] = Seq(
+  def sparkCommonsTestDependencies(): Seq[ModuleID] = Seq(
     "org.apache.spark"   %% "spark-core" % sparkVersion % "provided",
     "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided"
   )
