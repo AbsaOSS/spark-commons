@@ -35,6 +35,9 @@ trait JsonTestData {
       """{"id":6,"legs":[]}""" ::
       """{"id":7}""" :: Nil
 
+  protected val sampleA: Seq[String] = sample :+ """{"id":1,"legs":[{"legid":100,"conditions":[{"checks":[{"checkNums":["1","2","3b","4","5c","6"]}],"amount":100}]}], "key" : {"alfa": "1", "beta": {"beta2": "2"}}}"""
+  protected val sampleE: Seq[String] = sample :+ """{"legs":[{"legid":100,"conditions":[{"amount":100,"checks":[{"checkNums":["1","2","3b","4","5c","6"]}]}]}],"id":1, "key" : {"beta": {"beta2": 2}, "alfa": 1}, "extra" : "a"}"""
+
   protected val schema = StructType(Seq(
     StructField("a", IntegerType, nullable = false),
     StructField("b", StructType(Seq(

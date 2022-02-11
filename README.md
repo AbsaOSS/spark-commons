@@ -1,5 +1,34 @@
 # spark-commons
 
+
+[![Build](https://github.com/AbsaOSS/spark-hats/workflows/Build/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions)
+
+sbt
+```scala
+libraryDependencies += "za.co.absa" %% "spark-commons" % "X.Y.Z"
+```
+
+### Scala 2.11 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11)
+
+Maven
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons_2.11</artifactId>
+   <version>${latest_version}</version>
+</dependency>
+```
+
+### Scala 2.12 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.12)
+
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons_2.12</artifactId>
+   <version>${latest_version}</version>
+</dependency>
+```
+
 # Spark Utils
 
 ### NonFatalQueryExecutionListenerAdapter
@@ -18,7 +47,8 @@ spark.listenerManager.register(myListener)
 
 >
 >**Note:**
->Different _Scala_ variants of the _Schema Utils_ are compiled against different _Spark_, _Json4s_ and _Jackson_ versions:
+>Different _Scala_ variants of the _Schema Utils_ are compiled against different _Spark_, _Json4s_ and _Jackson_ versions.
+>2.13 is not yet fully supported:
 >
 >| | Scala 2.11 | Scala 2.12 | Scala 2.13 | 
 >|---|---|---|---|
@@ -111,7 +141,7 @@ Of them, metadata methods are:
 _ArrayTypeImplicits_ provides implicit methods for working with ArrayType objects.  
 
 
-1. Get a field from a text path
+1. Checks if the arraytype is equivalent to another
 
     ```scala
       arrayType.isEquivalentArrayType(otherArrayType)
@@ -128,7 +158,7 @@ _ArrayTypeImplicits_ provides implicit methods for working with ArrayType object
 _DataTypeImplicits_ provides implicit methods for working with DataType objects.  
 
 
-1. Get a field from a text path
+1. Checks if the datatype is equivalent to another
 
     ```scala
       dataType.isEquivalentDataType(otherDt)
@@ -195,7 +225,7 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
     ```scala
       structType.isOnlyField(columnName)
     ```
-9. Checks if 2 schemas are equivalent
+9. Checks if 2 structtypes are equivalent
 
     ```scala
       structType.isEquivalent(other)
