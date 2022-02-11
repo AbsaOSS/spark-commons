@@ -16,13 +16,12 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.{AnalysisException, DataFrame}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 
-class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase {
-
+class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTestData {
   import spark.implicits._
 
   private val columnName = "data"
@@ -55,6 +54,7 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase {
     "y",
     "z"
   )
+
   private val inputData = inputDataSeq.toDF(columnName)
 
   import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
@@ -234,5 +234,24 @@ class DataFrameImplicitsSuite extends AnyFunSuite with SparkTestBase {
     assert(dfIn.schema.length == 1)
     assert(dfIn.schema.head.name == "value")
     assert(actualOutput == expectedOutput)
+  }
+
+  test("order schemas for equal schemas") {
+    val dfA = spark.read.json(Seq(jsonA).toDS)
+    val dfC = spark.read.json(Seq(jsonC).toDS).select("legs", "id", "key")
+
+    val dfA2Aligned = dfC.alignSchema(dfA.schema)
+
+    assert(dfA.columns.toSeq == dfA2Aligned.columns.toSeq)
+    assert(dfA.select("key").columns.toSeq == dfA2Aligned.select("key").columns.toSeq)
+  }
+
+  test("throw an error for DataFrames with different schemas") {
+    val dfA = spark.read.json(Seq(jsonA).toDS)
+    val dfB = spark.read.json(Seq(jsonB).toDS)
+
+    assertThrows[AnalysisException]{
+      dfA.alignSchema(dfB.schema)
+    }
   }
 }

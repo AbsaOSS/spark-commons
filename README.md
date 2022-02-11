@@ -43,7 +43,7 @@ val myListener = new MyQueryExecutionListener with NonFatalQueryExecutionListene
 spark.listenerManager.register(myListener)
 ```
 
-### Spark Schema Utils
+### Schema Utils
 
 >
 >**Note:**
@@ -55,31 +55,30 @@ spark.listenerManager.register(myListener)
 >|Spark| 2.4 | 3.1 | 3.2 |
 >|Json4s| 3.5 | 3.7 | 3.7 |
 >|Jackson| 2.6 | 2.10 | 2.12 |
-_Spark Schema Utils_ provides methods for working with schemas, its comparison and alignment.  
+_Schema Utils_ provides methods for working with schemas, its comparison and alignment.  
 
-1. Schema comparison returning true/false. Ignores the order of columns
+1. Returns the parent path of a field. Returns an empty string if a root level field name is provided.
 
     ```scala
-      SchemaUtils.equivalentSchemas(schema1, schema2)
+      SchemaUtils.getParentPath(columnName)
     ```
 
-2. Schema comparison returning difference. Ignores the order of columns
+2. Get paths for all array subfields of this given datatype
 
     ```scala
-      SchemaUtils.diff(schema1, schema2)
+      SchemaUtils.getAllArraySubPaths(other)
     ```
 
-3. Schema selector generator which provides a List of columns to be used in a 
-select to order and positionally filter columns of a DataFrame
+3. For a given list of field paths determines if any path pair is a subset of one another.
 
     ```scala
-      SchemaUtils.getDataFrameSelector(schema)
+      SchemaUtils.isCommonSubPath(paths)
     ```
 
-4. Dataframe alignment method using the `getDataFrameSelector` method.
+4. Append a new attribute to path or empty string.
 
     ```scala
-      SchemaUtils.alignSchema(dataFrameToBeAligned, modelSchema)
+      SchemaUtils.appendPath(path, fieldName)
     ```
    
 ### ColumnImplicits
@@ -97,10 +96,10 @@ _ColumnImplicits_ provide implicit methods for transforming Spark Columns
     ```scala
       column.zeroBasedSubstr(startPos)
     ```
+   
 3. Returns column with requested substring. It shifts the substring indexation to be in accordance with Scala/ Java. 
    If the provided starting position where to start the substring from is negative, it will be counted from end. 
    The length of the desired substring, if longer then the rest of the string, all the remaining characters are taken.
-
 
     ```scala
       column.zeroBasedSubstr(startPos, length)
@@ -109,6 +108,7 @@ _ColumnImplicits_ provide implicit methods for transforming Spark Columns
 ### StructFieldImplicits
 
 _StructFieldImplicits_ provides implicit methods for working with StructField objects.  
+
 Of them, metadata methods are:
 
 1. Gets the metadata Option[String] value given a key
@@ -134,6 +134,156 @@ Of them, metadata methods are:
 
     ```scala
       structField.metadata.hasKey(key)
+    ```
+   
+### ArrayTypeImplicits
+
+_ArrayTypeImplicits_ provides implicit methods for working with ArrayType objects.  
+
+
+1. Checks if the arraytype is equivalent to another
+
+    ```scala
+      arrayType.isEquivalentArrayType(otherArrayType)
+    ```   
+
+2. For an array of arrays, get the final element type at the bottom of the array
+
+    ```scala
+      arrayType.getDeepestArrayType()
+    ```   
+   
+### DataTypeImplicits
+
+_DataTypeImplicits_ provides implicit methods for working with DataType objects.  
+
+
+1. Checks if the datatype is equivalent to another
+
+    ```scala
+      dataType.isEquivalentDataType(otherDt)
+    ```   
+
+2. Checks if a casting between types always succeeds
+
+    ```scala
+      dataType.doesCastAlwaysSucceed(otherDt)
+    ```   
+3. Checks if type is primitive
+
+    ```scala
+      dataType.isPrimitive()
+    ```
+   
+### StructTypeImplicits
+
+_StructTypeImplicits_ provides implicit methods for working with StructType objects.  
+
+
+1. Get a field from a text path
+
+    ```scala
+      structType.getField(path)
+    ```
+2. Get a type of a field from a text path
+
+    ```scala
+      structType.getFieldType(path)
+    ```
+3. Checks if the specified path is an array of structs
+
+    ```scala
+      structType.isColumnArrayOfStruct(path)
+    ```
+
+4. Get nullability of a field from a text path
+
+    ```scala
+      structType.getFieldNullability(path)
+    ```
+
+5. Checks if a field specified by a path exists
+
+    ```scala
+      structType.fieldExists(path)
+    ```
+    
+6. Get paths for all array fields in the schema
+
+    ```scala
+      structType.getAllArrayPaths()
+    ```
+    
+7. Get a closest unique column name
+
+    ```scala
+      structType.getClosestUniqueName(desiredName)
+    ```
+
+8. Checks if a field is the only field in a struct
+
+    ```scala
+      structType.isOnlyField(columnName)
+    ```
+9. Checks if 2 structtypes are equivalent
+
+    ```scala
+      structType.isEquivalent(other)
+    ```
+
+10. Returns a list of differences in one utils to the other
+
+    ```scala
+      structType.diffSchema(otherSchema, parent)
+    ```
+
+11. Checks if a field is of the specified type
+
+    ```scala
+      structType.isOfType[ArrayType](path)
+    ```
+12. Checks if a field is  a subset of the specified type
+
+    ```scala
+          structType.isSubset(other)
+     ```
+    
+13. Returns data selector that can be used to align utils of a data frame.
+
+    ```scala
+          structType.getDataFrameSelector()
+    ```
+    
+###StructTypeArrayImplicits
+
+1. Get first array column's path out of complete path
+
+    ```scala
+      structType.getFirstArrayPath(path)
+    ```
+   
+2. Get all array columns' paths out of complete path.
+
+    ```scala
+      structType.getAllArraysInPath(path)
+    ```
+   
+3. For a given list of field paths determines the deepest common array path
+
+    ```scala
+      structType.getDeepestCommonArrayPath(fieldPaths)
+    ```
+
+4. For a field path determines the deepest array path
+
+    ```scala
+      structType.getDeepestArrayPath(path)
+    ```
+   
+5. Checks if a field is an array that is not nested in another array
+
+    ```scala
+      structType.isNonNestedArray(path)
     ```
 
 # Spark Version Guard
@@ -176,4 +326,15 @@ _DataFrameImplicits_ provides methods for transformations on Dataframes
     
    ```scala
       df.withColumnIfDoesNotExist((df: DataFrame, _) => df)(colName, colExpression)
+   ```
+
+3. Aligns the utils of a DataFrame to the selector for operations
+   where utils order might be important (e.g. hashing the whole rows and using except)
+
+   ```scala
+      df.alignSchema(structType)
+   ```
+   
+   ```scala
+      df.alignSchema(listColumns)
    ```
