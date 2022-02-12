@@ -338,3 +338,45 @@ _DataFrameImplicits_ provides methods for transformations on Dataframes
    ```scala
       df.alignSchema(listColumns)
    ```
+   
+##Spark Commons Test
+
+The separate spark-commons-test module provides classes providing spark sessions to be used for testing
+
+sbt
+```scala
+libraryDependencies += "za.co.absa" %% "spark-commons-test" % "X.Y.Z"
+```
+
+Maven
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons-test_2.11</artifactId>
+   <version>${latest_version}</version>
+</dependency>
+```
+
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons-test_2.12</artifactId>
+   <version>${latest_version}</version>
+</dependency>
+```
+
+Usage:
+
+```scala
+class MyTest extends SparkTestBase {
+}
+```
+
+By default it will instantiate a local Spark.
+There is also the possibility to use it in yarn mode:
+
+```scala
+class MyTest extends SparkTestBase {
+override lazy val spark: SparkSession = initSpark(new YarnSparkConfiguration(confDir, distJarsDir))
+}
+```

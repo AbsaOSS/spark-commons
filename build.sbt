@@ -24,7 +24,7 @@ import Dependencies._
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
-lazy val printSparkScalaVersion = taskKey[Unit]("Print Spark and Scala versions that Atum is being built for.")
+lazy val printSparkScalaVersion = taskKey[Unit]("Print Spark and Scala versions spark-commons is being built for.")
 ThisBuild / printSparkScalaVersion := {
     val log = streams.value.log
     log.info(s"Building with Spark ${sparkVersion}, Scala ${scalaVersion.value}")
@@ -50,7 +50,7 @@ lazy val sparkCommonsTest = (project in file("spark-commons-test"))
   .settings(
     name := "spark-commons-test",
     libraryDependencies ++= sparkCommonsTestDependencies(),
-    Test / parallelExecution := false, // Atum Control framework could attempt to double-initialize and fail
+    Test / parallelExecution := false,
     (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
   )
 
