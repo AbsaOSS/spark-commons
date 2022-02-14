@@ -23,7 +23,7 @@ import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancem
 import scala.util.Try
 
 object StructFieldImplicits {
-  implicit class StructFieldMetadataEnhancement(val metadata: Metadata) {
+  implicit class StructFieldMetadataEnhancements(val metadata: Metadata) {
     def getOptString(key: String): Option[String] = {
       Try(metadata.getString(key)).toOption
     }
@@ -48,7 +48,7 @@ object StructFieldImplicits {
     }
   }
 
-  implicit class StructFieldEnhamcenets(val structField: StructField) {
+  implicit class StructFieldEnhancements(val structField: StructField) {
 
     /**
      * Finds all differences of two StructFields and returns their paths
