@@ -34,7 +34,7 @@ lazy val parent = (project in file("."))
   .aggregate(sparkCommons, sparkCommonsTest)
   .settings(
     name := "spark-commons-parent",
-    libraryDependencies ++= List(),
+    libraryDependencies ++= sparkCommonsDependencies(),
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
     publish / skip := true
   )
@@ -42,14 +42,14 @@ lazy val parent = (project in file("."))
 lazy val sparkCommons = (project in file("spark-commons"))
   .settings(
     name := "spark-commons",
-    libraryDependencies ++= rootDependencies(scalaVersion.value),
+    libraryDependencies ++= sparkCommonslibraryDependencies(scalaVersion.value),
     (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
   ).dependsOn(sparkCommonsTest)
 
 lazy val sparkCommonsTest = (project in file("spark-commons-test"))
   .settings(
     name := "spark-commons-test",
-    libraryDependencies ++= sparkCommonsTestDependencies(),
+    libraryDependencies ++= sparkCommonsDependencies(),
     Test / parallelExecution := false,
     (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
   )

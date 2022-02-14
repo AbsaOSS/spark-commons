@@ -19,9 +19,13 @@ object Dependencies {
 
   def sparkVersion: String = sys.props.getOrElse("SPARK_VERSION", "2.4.7")
 
-  def rootDependencies(scalaVersion: String): Seq[ModuleID] = List(
+  def sparkCommonsDependencies(): Seq[ModuleID] = Seq(
     "org.apache.spark"   %% "spark-core" % sparkVersion % "provided",
-    "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided",
+    "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided"
+  )
+
+  def sparkCommonslibraryDependencies(scalaVersion: String): Seq[ModuleID] =
+    sparkCommonsDependencies() ++ Seq(
     "za.co.absa.commons" %% "commons" % "1.0.0",
     "za.co.absa"         %% "spark-hofs" % "0.4.0",
     "za.co.absa"         %% "spark-hats" % "0.2.2",
@@ -29,10 +33,5 @@ object Dependencies {
     "org.scalatest"      %% "scalatest" % "3.1.0" % Test,
     "org.scalatest"      %% "scalatest-flatspec" % "3.2.0" % Test,
     "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0" % Test
-  )
-
-  def sparkCommonsTestDependencies(): Seq[ModuleID] = Seq(
-    "org.apache.spark"   %% "spark-core" % sparkVersion % "provided",
-    "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided"
   )
 }
