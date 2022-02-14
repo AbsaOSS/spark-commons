@@ -345,7 +345,7 @@ The separate spark-commons-test module provides classes providing spark sessions
 
 sbt
 ```scala
-libraryDependencies += "za.co.absa" %% "spark-commons-test" % "X.Y.Z"
+libraryDependencies += "za.co.absa" %% "spark-commons-test" % "X.Y.Z" % Test
 ```
 
 Maven
