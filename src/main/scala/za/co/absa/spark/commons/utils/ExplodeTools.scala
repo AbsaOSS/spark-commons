@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.explode
+package za.co.absa.spark.commons.utils
 
 import org.apache.log4j.LogManager
-import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, StructType}
+import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
-import za.co.absa.spark.hats.Extensions._
-
+import za.co.absa.spark.commons.utils.explode.{Explosion, ExplosionContext}
+import za.co.absa.spark.hats.Extensions.DataFrameExtension
 
 object ExplodeTools {
 
@@ -30,19 +30,19 @@ object ExplodeTools {
 
   private val log = LogManager.getLogger(this.getClass)
 
-  case class DeconstructedNestedField (df: DataFrame, deconstructedField: String, transientField: Option[String])
+  case class DeconstructedNestedField(df: DataFrame, deconstructedField: String, transientField: Option[String])
 
   /**
-    * Explodes all arrays within the path.
-    * Context can be used to revert all explosions back.
-    *
-    * @param columnPathName   An column to be exploded. It can be nested inside array or several levels of array nesting
-    * @param inputDf          A DataFrame that contains an array
-    * @param explosionContext A context returned by previous explosions. If you do several explosions on the top of
-    *                         each other it is very important to pass the previous context here so all explosions could
-    *                         be reverted
-    * @return A pair containing an exploded DataFrame and an explosion context.
-    */
+   * Explodes all arrays within the path.
+   * Context can be used to revert all explosions back.
+   *
+   * @param columnPathName   An column to be exploded. It can be nested inside array or several levels of array nesting
+   * @param inputDf          A DataFrame that contains an array
+   * @param explosionContext A context returned by previous explosions. If you do several explosions on the top of
+   *                         each other it is very important to pass the previous context here so all explosions could
+   *                         be reverted
+   * @return A pair containing an exploded DataFrame and an explosion context.
+   */
   def explodeAllArraysInPath(columnPathName: String,
                              inputDf: DataFrame,
                              explosionContext: ExplosionContext = ExplosionContext()): (DataFrame, ExplosionContext) = {
@@ -59,17 +59,17 @@ object ExplodeTools {
   }
 
   /**
-    * Explodes a specific array inside a dataframe in context. Returns a new dataframe and a new context.
-    * Context can be used to revert all explosions back.
-    *
-    * @param arrayColPathName An array field name to be exploded. It can be inside a nested struct, but cannot be nested
-    *                         inside another array. If that is the case you need to explode the topmost array first.
-    * @param inputDf          A DataFrame that contains an array
-    * @param explosionContext A context returned by previous explosions. If you do several explosions on the top of
-    *                         each other it is very important to pass the previous context here so all explosions could
-    *                         be reverted
-    * @return A pair containing an exploded DataFrame and an explosion context.
-    */
+   * Explodes a specific array inside a dataframe in context. Returns a new dataframe and a new context.
+   * Context can be used to revert all explosions back.
+   *
+   * @param arrayColPathName An array field name to be exploded. It can be inside a nested struct, but cannot be nested
+   *                         inside another array. If that is the case you need to explode the topmost array first.
+   * @param inputDf          A DataFrame that contains an array
+   * @param explosionContext A context returned by previous explosions. If you do several explosions on the top of
+   *                         each other it is very important to pass the previous context here so all explosions could
+   *                         be reverted
+   * @return A pair containing an exploded DataFrame and an explosion context.
+   */
   def explodeArray(arrayColPathName: String,
                    inputDf: DataFrame,
                    explosionContext: ExplosionContext = ExplosionContext()): (DataFrame, ExplosionContext) = {
@@ -115,14 +115,14 @@ object ExplodeTools {
   }
 
   /**
-    * Reverts all explosions done by explodeArray().
-    * An explosion context should be a context returned by the latest explosion.
-    *
-    * @param inputDf          A DataFrame that contains an exploded array
-    * @param explosionContext A context returned by explodeArray()
-    * @param errorColumn      An optional error column to combine during implosion. It should be a top level array.
-    * @return A dataframe containing restored ('imploded') arrays.
-    */
+   * Reverts all explosions done by explodeArray().
+   * An explosion context should be a context returned by the latest explosion.
+   *
+   * @param inputDf          A DataFrame that contains an exploded array
+   * @param explosionContext A context returned by explodeArray()
+   * @param errorColumn      An optional error column to combine during implosion. It should be a top level array.
+   * @return A dataframe containing restored ('imploded') arrays.
+   */
   def revertAllExplosions(inputDf: DataFrame,
                           explosionContext: ExplosionContext,
                           errorColumn: Option[String] = None): DataFrame = {
@@ -132,14 +132,14 @@ object ExplodeTools {
   }
 
   /**
-    * Reverts aa particular explode made by explodeArray().
-    * If there were several explodes they should be reverted in FILO order
-    *
-    * @param inputDf     A DataFrame that contains an exploded array
-    * @param explosion   An explosion object containing all data necessary to revert the explosion
-    * @param errorColumn An optional error column to combine during implosion. It should be a top level array.
-    * @return A dataframe containing restored ('imploded') arrays.
-    */
+   * Reverts aa particular explode made by explodeArray().
+   * If there were several explodes they should be reverted in FILO order
+   *
+   * @param inputDf     A DataFrame that contains an exploded array
+   * @param explosion   An explosion object containing all data necessary to revert the explosion
+   * @param errorColumn An optional error column to combine during implosion. It should be a top level array.
+   * @return A dataframe containing restored ('imploded') arrays.
+   */
   // scalastyle:off method.length
   def revertSingleExplosion(inputDf: DataFrame,
                             explosion: Explosion,
@@ -212,17 +212,19 @@ object ExplodeTools {
       // remove monotonic id created during explode
       .drop(orderByRecordCol)
   }
+
   // scalastyle:on method.length
 
   /**
-    * Takes a field name nested in a struct and moves it out to the root level as a top level column
-    *
-    * @param inputDf    A dataframe to process
-    * @param columnName A nested column to process
-    * @return A transformed dataframe
-    **/
+   * Takes a field name nested in a struct and moves it out to the root level as a top level column
+   *
+   * @param inputDf    A dataframe to process
+   * @param columnName A nested column to process
+   * @return A transformed dataframe
+   * */
   def deconstructNestedColumn(inputDf: DataFrame, columnName: String): DeconstructedNestedField = {
     var transientColName: Option[String] = None
+
     def processStruct(schema: StructType, path: Seq[String], parentCol: Option[Column]): Seq[Column] = {
       val currentField = path.head
       val isLeaf = path.lengthCompare(1) <= 0
@@ -234,7 +236,7 @@ object ExplodeTools {
             // Removing the field from the struct replacing it with a transient field
             val name = schema.getClosestUniqueName(transientColumnName)
             transientColName = Some(name)
-             Seq(lit(0).as(name))
+            Seq(lit(0).as(name))
           } else {
             field.dataType match {
               case st: StructType =>
@@ -256,16 +258,16 @@ object ExplodeTools {
   }
 
   /**
-    * Renames a column `columnFrom` to `columnTo` replacing the original column and putting the resulting column
-    * under the same struct level of nesting as `columnFrom`.
-    *
-    * @param inputDf    A dataframe to process
-    * @param columnFrom A column name that needs to be put into a nested struct
-    * @param columnTo   A column name that `columnFrom` should have after it is renamed
-    * @param positionColumn A column that should be replaced by contents of columnFrom. It makrs the position of
-    *                       the target column placement.
-    * @return A transformed dataframe
-    **/
+   * Renames a column `columnFrom` to `columnTo` replacing the original column and putting the resulting column
+   * under the same struct level of nesting as `columnFrom`.
+   *
+   * @param inputDf        A dataframe to process
+   * @param columnFrom     A column name that needs to be put into a nested struct
+   * @param columnTo       A column name that `columnFrom` should have after it is renamed
+   * @param positionColumn A column that should be replaced by contents of columnFrom. It makrs the position of
+   *                       the target column placement.
+   * @return A transformed dataframe
+   * */
   def nestedRenameReplace(inputDf: DataFrame,
                           columnFrom: String,
                           columnTo: String,
@@ -290,9 +292,9 @@ object ExplodeTools {
   }
 
   private def putFieldIntoNestedStruct(df: DataFrame,
-                               columnFrom: String,
-                               pathTo: Seq[String],
-                               placementCol: Option[String] = None): DataFrame = {
+                                       columnFrom: String,
+                                       pathTo: Seq[String],
+                                       placementCol: Option[String] = None): DataFrame = {
     def processStruct(schema: StructType, path: Seq[String], parentCol: Option[Column]): Seq[Column] = {
       val currentField = path.head
       val isLeaf = path.lengthCompare(1) <= 0

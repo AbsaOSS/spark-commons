@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-ThisBuild / name := "spark-commons"
 ThisBuild / organization := "za.co.absa"
 
 lazy val scala211 = "2.11.12"
