@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.json
+package za.co.absa.spark.commons.utils
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -22,11 +22,11 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object JsonUtils {
 
   /**
-    * Formats a JSON string so it looks pretty.
-    *
-    * @param jsonIn A JSON string
-    * @return A pretty formatted JSON string
-    */
+   * Formats a JSON string so it looks pretty.
+   *
+   * @param jsonIn A JSON string
+   * @return A pretty formatted JSON string
+   */
   def prettyJSON(jsonIn: String): String = {
     val mapper = new ObjectMapper()
 
@@ -36,12 +36,12 @@ object JsonUtils {
   }
 
   /**
-    * Formats a Spark-generated JSON strings that are returned by
-    * applying `.toJSON.collect()` to a DataFrame.
-    *
-    * @param jsons A list of JSON documents
-    * @return A pretty formatted JSON string
-    */
+   * Formats a Spark-generated JSON strings that are returned by
+   * applying `.toJSON.collect()` to a DataFrame.
+   *
+   * @param jsons A list of JSON documents
+   * @return A pretty formatted JSON string
+   */
   def prettySparkJSON(jsons: Seq[String]): String = {
     //val properJson = "[" + "}\n".r.replaceAllIn(jsonIn, "},\n") + "]"
     val singleJSON = jsons.mkString("[", ",", "]")
@@ -49,11 +49,11 @@ object JsonUtils {
   }
 
   /**
-    * Creates a Spark DataFrame from a JSON document(s).
-    *
-    * @param json A json string to convert to a DataFrame
-    * @return A data frame
-    */
+   * Creates a Spark DataFrame from a JSON document(s).
+   *
+   * @param json A json string to convert to a DataFrame
+   * @return A data frame
+   */
   def getDataFrameFromJson(spark: SparkSession, json: Seq[String]): DataFrame = {
     import spark.implicits._
     spark.read.json(json.toDS)

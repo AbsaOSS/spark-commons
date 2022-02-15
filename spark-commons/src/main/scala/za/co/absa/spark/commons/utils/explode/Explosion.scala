@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.explode
+package za.co.absa.spark.commons.utils.explode
 
 /**
   * Stores all info needed to revert a single array explosion.

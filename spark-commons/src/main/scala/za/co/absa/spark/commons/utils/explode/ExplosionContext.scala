@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.explode
+package za.co.absa.spark.commons.utils.explode
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions._
