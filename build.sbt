@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-ThisBuild / name := "spark-commons"
 ThisBuild / organization := "za.co.absa"
 
 lazy val scala211 = "2.11.12"
@@ -29,6 +28,7 @@ libraryDependencies ++=  List(
   "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided",
   "za.co.absa.commons" %% "commons" % "1.0.0",
   "za.co.absa"         %% "spark-hofs" % "0.4.0",
+  "za.co.absa"         %% "spark-hats" % "0.2.2",
   "org.scala-lang"     % "scala-compiler" % scalaVersion.value,
   "org.scalatest"      %% "scalatest" % "3.1.0" % Test,
   "org.scalatest"      %% "scalatest-flatspec" % "3.2.0" % Test,
