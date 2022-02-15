@@ -14,7 +14,6 @@
  */
 
 ThisBuild / organization := "za.co.absa"
-ThisBuild / name := "spark-commons"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.12"
