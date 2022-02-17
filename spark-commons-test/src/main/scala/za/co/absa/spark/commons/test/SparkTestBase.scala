@@ -16,23 +16,12 @@
 
 package za.co.absa.spark.commons.test
 
-import java.util.TimeZone
-
 import org.apache.spark.sql.SparkSession
 
-trait SparkTestConfig {
-  protected def master: String
-  protected def appName: String = s"Commons unit testing"
-  protected def timezone: Option[TimeZone] = None
+trait SparkTestBase {
+  implicit lazy val spark: SparkSession = initSpark()
 
-  protected def builder: SparkSession.Builder = {
-    SparkSession.builder()
-      .master(master)
-      .appName(appName)
-  }
-  def sparkSession: SparkSession = {
-    val result = builder.getOrCreate()
-    timezone.foreach(tz => result.conf.set("spark.sql.session.timeZone", tz.getID))
-    result
+  protected def initSpark(implicit sparkConfig: SparkTestConfig = DefaultSparkConfiguration): SparkSession = {
+    sparkConfig.sparkSession
   }
 }

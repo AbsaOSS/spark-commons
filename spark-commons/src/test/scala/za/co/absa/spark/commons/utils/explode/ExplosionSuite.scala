@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.utils
+package za.co.absa.spark.commons.utils.explode
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -22,6 +22,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.slf4j.LoggerFactory
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
 import za.co.absa.spark.commons.test.SparkTestBase
+import za.co.absa.spark.commons.utils.{ExplodeTools, JsonUtils}
 import za.co.absa.spark.hats.Extensions._
 
 class ExplosionSuite extends AnyFunSuite with SparkTestBase {

@@ -254,7 +254,7 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
           structType.getDataFrameSelector()
     ```
     
-###StructTypeArrayImplicits
+### StructTypeArrayImplicits
 
 1. Get first array column's path out of complete path
 
@@ -338,3 +338,47 @@ _DataFrameImplicits_ provides methods for transformations on Dataframes
    ```scala
       df.alignSchema(listColumns)
    ```
+   
+##Spark Commons Test
+
+The separate spark-commons-test module provides classes providing spark sessions to be used for testing
+
+sbt
+```scala
+libraryDependencies += "za.co.absa" %% "spark-commons-test" % "X.Y.Z" % Test
+```
+
+Maven
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons-test_2.11</artifactId>
+   <version>${latest_version}</version>
+    <scope>test</scope>
+</dependency>
+```
+
+```xml
+<dependency>
+   <groupId>za.co.absa</groupId>
+   <artifactId>spark-commons-test_2.12</artifactId>
+   <version>${latest_version}</version>
+    <scope>test</scope>
+</dependency>
+```
+
+Usage:
+
+```scala
+class MyTest extends SparkTestBase {
+}
+```
+
+By default it will instantiate a local Spark.
+There is also the possibility to use it in yarn mode:
+
+```scala
+class MyTest extends SparkTestBase {
+override lazy val spark: SparkSession = initSpark(new YarnSparkConfiguration(confDir, distJarsDir))
+}
+```

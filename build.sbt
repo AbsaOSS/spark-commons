@@ -18,21 +18,39 @@ ThisBuild / organization := "za.co.absa"
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.12"
 
+import Dependencies._
+
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
-def sparkVersion: String = sys.props.getOrElse("SPARK_VERSION", "2.4.7")
+lazy val printSparkScalaVersion = taskKey[Unit]("Print Spark and Scala versions spark-commons is being built for.")
+ThisBuild / printSparkScalaVersion := {
+    val log = streams.value.log
+    log.info(s"Building with Spark ${sparkVersion}, Scala ${scalaVersion.value}")
+}
 
-libraryDependencies ++=  List(
-  "org.apache.spark"   %% "spark-core" % sparkVersion % "provided",
-  "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided",
-  "za.co.absa.commons" %% "commons" % "1.0.0",
-  "za.co.absa"         %% "spark-hofs" % "0.4.0",
-  "za.co.absa"         %% "spark-hats" % "0.2.2",
-  "org.scala-lang"     % "scala-compiler" % scalaVersion.value,
-  "org.scalatest"      %% "scalatest" % "3.1.0" % Test,
-  "org.scalatest"      %% "scalatest-flatspec" % "3.2.0" % Test,
-  "org.scalatestplus"  %% "mockito-1-10" % "3.1.0.0" % Test
-)
+lazy val parent = (project in file("."))
+  .aggregate(sparkCommons, sparkCommonsTest)
+  .settings(
+    name := "spark-commons-parent",
+    libraryDependencies ++= sparkCommonsDependencies(),
+    javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
+    publish / skip := true
+  )
+
+lazy val sparkCommons = (project in file("spark-commons"))
+  .settings(
+    name := "spark-commons",
+    libraryDependencies ++= sparkCommonslibraryDependencies(scalaVersion.value),
+    (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
+  ).dependsOn(sparkCommonsTest)
+
+lazy val sparkCommonsTest = (project in file("spark-commons-test"))
+  .settings(
+    name := "spark-commons-test",
+    libraryDependencies ++= sparkCommonsDependencies(),
+    Test / parallelExecution := false,
+    (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
+  )
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
