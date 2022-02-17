@@ -254,7 +254,7 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
           structType.getDataFrameSelector()
     ```
     
-###StructTypeArrayImplicits
+### StructTypeArrayImplicits
 
 1. Get first array column's path out of complete path
 
