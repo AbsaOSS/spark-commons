@@ -354,6 +354,7 @@ Maven
    <groupId>za.co.absa</groupId>
    <artifactId>spark-commons-test_2.11</artifactId>
    <version>${latest_version}</version>
+    <scope>test</scope>
 </dependency>
 ```
 
