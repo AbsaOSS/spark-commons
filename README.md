@@ -286,6 +286,35 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
       structType.isNonNestedArray(path)
     ```
 
+### DataFrameImplicits
+
+1. Changes the fields structure of the DataFrame to adhere to the provided schema or selector. Data types remain intact
+
+ ```scala
+   dataFrame.alignSchema
+ ```
+
+2. Persist this Dataset with the default storage level, avoiding the warning in case the cache has happened already
+   before
+
+ ```scala
+   dataFrame.cacheIfNot()
+ ```
+
+3. Get the string representation of the data in the format as `Dataset.show()`]]` displays them
+
+ ```scala
+   dataFrame.dataAsString()
+ ```
+
+4. Adds a column to a dataframe if it does not exist
+
+ ```scala
+   dataFrame.withColumnIfDoesNotExist(path)
+ ```
+
+
+
 # Spark Version Guard
 
 A class which checks if the Spark job version is compatible with the Spark Versions supported by the library
