@@ -28,21 +28,23 @@ import scala.collection.JavaConversions.iterableAsScalaIterable
 
 class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends SparkTestConfig {
 
-  override protected def master: String = "yarn"
+  override def master: String = "yarn"
 
-  override protected def appName: String = super.appName + " - Yarn"
+  override def appName: String = super.appName + " - Yarn"
 
   override protected def builder: SparkSession.Builder = {
     super.builder
       .config(new SparkConf().setAll(getHadoopConfigurationForSpark(confDir)))
-      .config("spark.yarn.jars", getDependencies())
+      .config("spark.yarn.jars", dependencies)
       .config("spark.deploy.mode", "client")
   }
 
-  protected def getDependencies(): String = {
+  protected def dependencies: String = {
     //get a list of all dist jars
-    val distJars = FileSystem.get(getHadoopConfiguration(confDir))
-      .listStatus(new Path(distJarsDir)).map(_.getPath)
+    val distJars = FileSystem
+      .get(getHadoopConfiguration(confDir))
+      .listStatus(new Path(distJarsDir))
+      .map(_.getPath)
     val localJars = getDepsFromClassPath("absa")
     val currentJars = getCurrentProjectJars
     (distJars ++ localJars ++currentJars).mkString(",")
