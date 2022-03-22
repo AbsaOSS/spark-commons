@@ -29,7 +29,6 @@ object Dependencies {
     "za.co.absa.commons" %% "commons" % "1.0.0",
     "za.co.absa"         %% "spark-hofs" % "0.4.0",
     "za.co.absa"         %% "spark-hats" % "0.2.2",
-    "org.scala-lang"     % "scala-compiler" % scalaVersion,
     "org.scalatest"      %% "scalatest" % "3.1.0" % Test
   )
 }
