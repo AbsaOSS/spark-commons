@@ -17,10 +17,8 @@
 package za.co.absa.spark.commons.utils
 
 import org.apache.spark.sql.types._
-import za.co.absa.spark.commons.adapters.HofsAdapter
 
-
-object SchemaUtils extends HofsAdapter {
+object SchemaUtils {
 
   /**
    * Returns the parent path of a field. Returns an empty string if a root level field name is provided.

@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream
 
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Column, DataFrame}
-import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
+import za.co.absa.spark.commons.implicits.StructTypeImplicits.DataFrameSelector
 
 object DataFrameImplicits {
 
@@ -77,7 +77,7 @@ object DataFrameImplicits {
     }
 
     /**
-     * Using utils selector returned from [[StructTypeEnhancements.getDataFrameSelector]] aligns the utils of a DataFrame to the selector
+     * Using utils selector  aligns the utils of a DataFrame to the selector
      * for operations where utils order might be important (e.g. hashing the whole rows and using except)
      *
      * @param selector model structType for the alignment of df
@@ -86,13 +86,15 @@ object DataFrameImplicits {
     def alignSchema(selector: List[Column]): DataFrame = df.select(selector: _*)
 
     /**
-     * Using utils selector from [[getDataFrameSelector]] aligns the utils of a DataFrame to the selector for operations
+     * Using utils selector from [[DataFrameSelector.getDataFrameSelector]] aligns the utils of a DataFrame to the selector for operations
      * where utils order might be important (e.g. hashing the whole rows and using except)
      *
      * @param structType model structType for the alignment of df
      * @return Returns aligned and filtered utils
      */
-    def alignSchema(structType: StructType): DataFrame = alignSchema(structType.getDataFrameSelector())
+    def alignSchema(structType: StructType): DataFrame = {
+      alignSchema(structType.getDataFrameSelector())
+    }
   }
 
 }
