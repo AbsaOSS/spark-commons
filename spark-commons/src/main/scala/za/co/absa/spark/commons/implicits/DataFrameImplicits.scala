@@ -107,7 +107,7 @@ object DataFrameImplicits {
      * @return the DataFrame itself
      * @since 0.3.0
      */
-    def cacheIfNot(): DataFrame = {
+    def cacheIfNotCachedYet(): DataFrame = {
       val planToCache = df.queryExecution.analyzed
       if (df.sparkSession.sharedState.cacheManager.lookupCachedData(planToCache).isEmpty) {
         df.cache()

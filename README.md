@@ -298,7 +298,7 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
    before
 
  ```scala
-   dataFrame.cacheIfNot()
+   dataFrame.cacheIfNotCachedYet()
  ```
 
 3. Get the string representation of the data in the format as `Dataset.show()`]]` displays them
