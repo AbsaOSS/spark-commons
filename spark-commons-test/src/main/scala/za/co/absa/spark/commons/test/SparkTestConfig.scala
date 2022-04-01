@@ -21,11 +21,11 @@ import java.util.TimeZone
 import org.apache.spark.sql.SparkSession
 
 trait SparkTestConfig {
-  protected def master: String
+  def master: String
 
-  protected def appName: String = s"Commons unit testing"
+  def appName: String = s"Commons unit testing"
 
-  protected def timezone: Option[TimeZone] = None
+  def timezone: Option[TimeZone] = None
 
   protected def builder: SparkSession.Builder = {
     SparkSession.builder()
