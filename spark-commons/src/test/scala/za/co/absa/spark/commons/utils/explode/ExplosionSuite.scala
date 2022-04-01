@@ -16,6 +16,7 @@
 
 package za.co.absa.spark.commons.utils.explode
 
+import org.apache.spark.{SPARK_VERSION, SPARK_VERSION_SHORT}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.scalatest.funsuite.AnyFunSuite
@@ -355,7 +356,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+--------+------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+    val expectedData = if (SPARK_VERSION.startsWith("3."))
       expectedDeconstructedData3x else expectedDeconstructedData2x
 
     val expectedRestoredSchema =
@@ -391,7 +392,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+-------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedRestoredData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+    val expectedRestoredData = if (SPARK_VERSION.startsWith("3."))
       expectedRestoredData3x else expectedRestoredData2x
 
     val d = ExplodeTools.deconstructNestedColumn(df, "leg.conditions")
@@ -463,10 +464,10 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+----------------------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedOriginalResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+    val expectedOriginalResults = if (SPARK_VERSION.startsWith("3."))
       expectedOriginalResults3x else expectedOriginalResults2x
 
-    val expectedExplodedSchema =
+    val expectedExplodedSchemaBefore3_2 =
       """root
         | |-- id: long (nullable = true)
         | |-- legs: struct (nullable = false)
@@ -489,6 +490,10 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |-- legs_conditions_checks_checkNums_size: integer (nullable = false)
         | |-- legs_conditions_checks_checkNums_idx: integer (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedExplodedSchema = if (SPARK_VERSION.startsWith("3.2"))
+      expectedExplodedSchemaBefore3_2.replace("higgs: null", "higgs: void")
+    else expectedExplodedSchemaBefore3_2
 
     val expectedRestoredSchema =
       """root
@@ -533,7 +538,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+----------------------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedRestoredResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+    val expectedRestoredResults = if (SPARK_VERSION.startsWith("3."))
       expectedRestoredResults3x else expectedRestoredResults2x
 
     val (explodedDf1, explodeContext1) = ExplodeTools.explodeArray("legs", df)
@@ -610,10 +615,10 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+--------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedOriginalResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+    val expectedOriginalResults = if (SPARK_VERSION.startsWith("3."))
       expectedOriginalResults3x else expectedOriginalResults2x
 
-    val expectedExplodedSchema =
+    val expectedExplodedSchemaBefore3_2 =
       """root
         | |-- id: long (nullable = true)
         | |-- leg: struct (nullable = false)
@@ -625,6 +630,10 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |-- leg_conditions_size: integer (nullable = false)
         | |-- leg_conditions_idx: integer (nullable = true)
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedExplodedSchema = if (SPARK_VERSION.startsWith("3.2"))
+      expectedExplodedSchemaBefore3_2.replace("higgs: null", "higgs: void")
+    else expectedExplodedSchemaBefore3_2
 
     val expectedRestoredSchema =
       """root
@@ -658,7 +667,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+--------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedRestoredResults = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3."))
+    val expectedRestoredResults = if (SPARK_VERSION.startsWith("3."))
       expectedRestoredResults3x else expectedRestoredResults2x
 
     val (explodedDf, explodeContext) = ExplodeTools.explodeArray("leg.conditions", df)
@@ -722,7 +731,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+-------------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
+    val expectedData = if (SPARK_VERSION.startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 5)
 
@@ -745,7 +754,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
 
     val restoredDf = ExplodeTools.revertAllExplosions(changedDf, explodeContext, Some("errors"))
 
-    val expectedSchema =
+    val expectedSchemaBefore3_2 =
       s"""root
         | |-- id: long (nullable = true)
         | |-- leg: struct (nullable = false)
@@ -757,6 +766,10 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         | |-- errors: array (nullable = ${sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("2.")})
         | |    |-- element: string (containsNull = true)
         |""".stripMargin.replace("\r\n", "\n")
+
+    val expectedSchema = if(SPARK_VERSION.startsWith("3.2")){
+      expectedSchemaBefore3_2.replace("errors: array (nullable = true)", "errors: array (nullable = false)")
+    } else expectedSchemaBefore3_2
 
     val expectedData2x =
       """+---+-------------------------------+---------------------------+
@@ -778,7 +791,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+---+-------------------------------+---------------------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
+    val expectedData = if (SPARK_VERSION.startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 5)
 
@@ -842,7 +855,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+------+-----+--------------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
+    val expectedData = if (SPARK_VERSION.startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 10)
 
@@ -900,7 +913,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
         |+------+-----+---------+
         |""".stripMargin.replace("\r\n", "\n")
 
-    val expectedData = if (sys.props.getOrElse("SPARK_VERSION", "2.4.7").startsWith("3.")) expectedData3x else expectedData2x
+    val expectedData = if (SPARK_VERSION.startsWith("3.")) expectedData3x else expectedData2x
 
     val actualResults = showString(restoredDf, 10)
 
