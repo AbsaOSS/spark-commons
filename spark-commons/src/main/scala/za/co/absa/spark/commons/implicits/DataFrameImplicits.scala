@@ -24,7 +24,7 @@ import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancem
 
 object DataFrameImplicits {
 
-  implicit class DataFrameEnhancements(val df: DataFrame) {
+  implicit class DataFrameEnhancements(val df: DataFrame) extends AnyVal {
 
     private def gatherData(showFnc: () => Unit): String = {
       val outCapture = new ByteArrayOutputStream
@@ -35,6 +35,12 @@ object DataFrameImplicits {
       dfData
     }
 
+    /**
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset.show()]] displays them
+     *
+     * @return  The string representation of the data in the DataFrame
+     * @since 0.2.0
+     */
     def dataAsString(): String = {
       val showFnc: () => Unit = df.show
       gatherData(showFnc)
@@ -93,6 +99,22 @@ object DataFrameImplicits {
      * @return Returns aligned and filtered utils
      */
     def alignSchema(structType: StructType): DataFrame = alignSchema(structType.getDataFrameSelector())
+
+    /**
+     * Persist this Dataset with the default storage level (`MEMORY_AND_DISK`), the same way as
+     * [[org.apache.spark.sql.Dataset.cache]] does. But does not throw a warning if the DataFrame has been cached before.
+     *
+     * @return the DataFrame itself
+     * @since 0.3.0
+     */
+    def cacheIfNotCachedYet(): DataFrame = {
+      val planToCache = df.queryExecution.analyzed
+      if (df.sparkSession.sharedState.cacheManager.lookupCachedData(planToCache).isEmpty) {
+        df.cache()
+      } else {
+        df
+      }
+    }
   }
 
 }

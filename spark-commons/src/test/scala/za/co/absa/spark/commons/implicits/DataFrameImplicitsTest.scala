@@ -110,6 +110,11 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     } + "\n" + line(width) + s"\n$extraLine\n"
   }
 
+  private def isCached(df: DataFrame): Boolean = {
+    val planToCache = df.queryExecution.analyzed
+    df.sparkSession.sharedState.cacheManager.lookupCachedData(planToCache).isDefined
+  }
+
   test("Like show()") {
     val result = inputData.dataAsString()
     val leftAlign = false
@@ -253,5 +258,18 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     assertThrows[AnalysisException]{
       dfA.alignSchema(dfB.schema)
     }
+  }
+
+  test("Check that cacheIfNotCachedYet caches the data") {
+    //Verify  check test procedure
+    val dfA = spark.read.json(Seq(jsonA).toDS)
+    assert(!isCached(dfA))
+    dfA.cache()
+    assert(isCached(dfA))
+    //Do the test
+    val dfB = spark.read.json(Seq(jsonB).toDS)
+    assert(!isCached(dfB))
+    dfB.cacheIfNotCachedYet()
+    assert(isCached(dfB))
   }
 }
