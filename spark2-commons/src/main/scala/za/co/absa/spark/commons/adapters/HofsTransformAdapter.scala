@@ -1,10 +1,9 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -18,13 +17,17 @@ package za.co.absa.spark.commons.adapters
 
 import org.apache.spark.sql.Column
 
-trait TransformAdapter {
+object HofsTransformAdapter {
 
-  /**
-   * For Spark versions prior 3.0.0, delegates to {{{hofs.transform()}}}
-   */
-  val transform: (Column, Column => Column) => Column = {
-    za.co.absa.spark.hofs.transform(_: Column, _: Column => Column)
+  implicit object HofsTransformAdapterImplicit extends TransformAdapter {
+
+    /**
+     * For Spark versions prior 3.0.0, delegates to {{{hofs.transform()}}}
+     */
+    override def transform: (Column, Column => Column) => Column = {
+      za.co.absa.spark.hofs.transform(_: Column, _: Column => Column)
+    }
+
   }
 
 }

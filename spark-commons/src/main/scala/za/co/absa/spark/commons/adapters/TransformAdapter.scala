@@ -1,10 +1,9 @@
 /*
- * Copyright 2021 ABSA Group Limited
+ * Copyright 2022 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -14,13 +13,17 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.implicits
+package za.co.absa.spark.commons.adapters
 
-import org.apache.spark.sql.types._
-import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
-import za.co.absa.spark.commons.test.SparkTestBase
+import org.apache.spark.sql.Column
 
-class StructTypeImplicitsExtraTest extends AnyFunSuite with SparkTestBase with JsonTestData {
+trait TransformAdapter {
+
+  /**
+   * For Spark versions prior 3.0.0, delegates to {{{hofs.transform()}}}
+   */
+  def transform: (Column, Column => Column) => Column = {
+    za.co.absa.spark.hofs.transform(_: Column, _: Column => Column)
+  }
 
 }

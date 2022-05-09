@@ -16,15 +16,15 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.functions.lit
-import org.apache.spark.sql.{AnalysisException, DataFrame}
+import org.apache.spark.sql.AnalysisException
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 
-class DataFrameImplicitsExtraTest extends AnyFunSuite with SparkTestBase with JsonTestData {
+class DataFrameImplicitsTest_WithHofsAdapter extends AnyFunSuite with SparkTestBase with JsonTestData {
   import spark.implicits._
 
-  import za.co.absa.spark.commons.implicits.DataFrameImplicitsExtra.DataFrameEnhancements
+  import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
+  import za.co.absa.spark.commons.adapters.HofsTransformAdapter._
 
   test("order schemas for equal schemas") {
     val dfA = spark.read.json(Seq(jsonA).toDS)

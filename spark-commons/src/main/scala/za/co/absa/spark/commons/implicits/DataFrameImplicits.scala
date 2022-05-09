@@ -16,9 +16,12 @@
 
 package za.co.absa.spark.commons.implicits
 
-import java.io.ByteArrayOutputStream
+import org.apache.spark.sql.types.StructType
 
+import java.io.ByteArrayOutputStream
 import org.apache.spark.sql.{Column, DataFrame}
+import za.co.absa.spark.commons.adapters.TransformAdapter
+import za.co.absa.spark.commons.implicits.StructTypeImplicits.DataFrameSelector
 
 object DataFrameImplicits {
 
@@ -82,6 +85,18 @@ object DataFrameImplicits {
      * @return Returns aligned and filtered utils
      */
     def alignSchema(selector: List[Column]): DataFrame = df.select(selector: _*)
+
+    /**
+     * Using utils selector from [[DataFrameSelector.getDataFrameSelector]] aligns the utils of a DataFrame to the selector for operations
+     * where utils order might be important (e.g. hashing the whole rows and using except)
+     *
+     * @param structType model structType for the alignment of df
+     * @return Returns aligned and filtered utils
+     */
+    def alignSchema(structType: StructType)(implicit transformAdapter: TransformAdapter): DataFrame = {
+      alignSchema(structType.getDataFrameSelector())
+    }
   }
+
 
 }
