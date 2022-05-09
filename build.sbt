@@ -45,6 +45,27 @@ lazy val sparkCommons = (project in file("spark-commons"))
     (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
   ).dependsOn(sparkCommonsTest)
 
+lazy val spark2Commons = (project in file("spark2-commons"))
+  .settings(
+      name := "spark2-commons",
+      libraryDependencies ++= sparkCommonslibraryDependencies(scalaVersion.value),
+      (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
+  ).dependsOn(sparkCommonsTest, sparkCommons)
+
+//lazy val spark2Commons = (project in file("spark-commons"))
+//  .settings(
+//      name := "spark2-commons",
+//      libraryDependencies ++= sparkCommonslibraryDependencies(scalaVersion.value),
+//      (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
+//  ).dependsOn(sparkCommonsTest)
+//
+//lazy val spark3Commons = (project in file("spark-commons"))
+//  .settings(
+//      name := "spark3-commons",
+//      libraryDependencies ++= sparkCommonslibraryDependencies(scalaVersion.value),
+//      (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
+//  ).dependsOn(sparkCommonsTest)
+
 lazy val sparkCommonsTest = (project in file("spark-commons-test"))
   .settings(
     name := "spark-commons-test",
