@@ -50,9 +50,9 @@ spark.listenerManager.register(myListener)
 >Different _Scala_ variants of the _Schema Utils_ are compiled against different _Spark_, _Json4s_ and _Jackson_ versions.
 >2.13 is not yet fully supported:
 >
->| | Scala 2.11 | Scala 2.12 | Scala 2.13 | 
+>| | Scala 2.11 | Scala 2.12 | Scala 2.12 |
 >|---|---|---|---|
->|Spark| 2.4 | 3.1 | 3.2 |
+>|Spark| 2.4.7 | 2.4.7 | 3.2.1 |
 >|Json4s| 3.5 | 3.7 | 3.7 |
 >|Jackson| 2.6 | 2.10 | 2.12 |
 _Schema Utils_ provides methods for working with schemas, its comparison and alignment.  
