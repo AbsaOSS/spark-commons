@@ -19,7 +19,7 @@ package za.co.absa.spark.commons.implicits
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types._
-import za.co.absa.spark.commons.adapters.HofsAdapter
+import za.co.absa.spark.commons.adapters.TransformAdapter
 import za.co.absa.spark.commons.implicits.DataTypeImplicits.DataTypeEnhancements
 import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
 import za.co.absa.spark.commons.utils.SchemaUtils.{getAllArraySubPaths, isCommonSubPath}
@@ -30,7 +30,7 @@ import scala.util.Try
 
 object StructTypeImplicits {
 
-  implicit class DataFrameSelector(schema: StructType) extends HofsAdapter {
+  implicit class DataFrameSelector(schema: StructType) extends TransformAdapter {
     /**
      * Returns data selector that can be used to align utils of a data frame. You can use [[alignSchema]].
      *
