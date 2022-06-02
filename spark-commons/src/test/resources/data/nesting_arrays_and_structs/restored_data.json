@@ -1,0 +1,7 @@
+{"id":1,"legs":[{"conditions":[{"amount":100,"checks":[{"checkNums":["1","2","3b","4","5c","6"]}]}],"legid":100}]}
+{"id":2,"legs":[{"conditions":[{"amount":200,"checks":[{"checkNums":["8","9","10b","11","12c","13"]}]}],"legid":200}]}
+{"id":3,"legs":[{"conditions":[{"amount":300,"checks":[]}],"legid":300}]}
+{"id":4,"legs":[{"conditions":[{"amount":400}],"legid":400}]}
+{"id":5,"legs":[{"conditions":[],"legid":500}]}
+{"id":6,"legs":[]}
+{"id":7}

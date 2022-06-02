@@ -1,0 +1,67 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "leg",
+      "type": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "conditions",
+            "type": {
+              "type": "struct",
+              "fields": [
+                {
+                  "name": "action",
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {}
+                },
+                {
+                  "name": "check",
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {}
+                }
+              ]
+            },
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "higgs",
+            "type": "null",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "leg_conditions_id",
+      "type": "long",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "leg_conditions_size",
+      "type": "integer",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "leg_conditions_idx",
+      "type": "integer",
+      "nullable": true,
+      "metadata": {}
+    }
+  ]
+}
