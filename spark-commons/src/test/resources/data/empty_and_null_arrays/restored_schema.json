@@ -1,0 +1,21 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "static",
+      "type": "long",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "value",
+      "type": {
+        "type": "array",
+        "elementType": "long",
+        "containsNull": true
+      },
+      "nullable": true,
+      "metadata": {}
+    }
+  ]
+}

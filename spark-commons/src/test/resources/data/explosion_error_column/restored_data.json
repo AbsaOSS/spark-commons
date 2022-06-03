@@ -1,0 +1,3 @@
+{"id":1,"leg":{"conditions":[{"action":"b","check":"1"},{"action":"d","check":"2"},{"action":"f","check":"3"}],"legid":100},"errors":["Error 1","Error 2","1","2","3"]}
+{"id":2,"leg":{"conditions":[{"action":"b","check":"0"}],"legid":200},"errors":["0"]}
+{"id":3,"leg":{"legid":300},"errors":[null]}

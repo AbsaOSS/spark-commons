@@ -1,0 +1,4 @@
+{"id":1,"leg":{"quark":0,"legid":100},"electron":[{"action":"b","check":"a"},{"action":"d","check":"c"},{"action":"f","check":"e"}]}
+{"id":2,"leg":{"quark":0,"legid":200},"electron":[{"action":"h","check":"g"},{"action":"j","check":"i"},{"action":"l","check":"k"}]}
+{"id":3,"leg":{"quark":0,"legid":300},"electron":[]}
+{"id":4,"leg":{"quark":0,"legid":400}}

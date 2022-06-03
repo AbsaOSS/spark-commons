@@ -1,0 +1,51 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "myFlag",
+      "type": "boolean",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "order",
+      "type": "long",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "a",
+      "type": {
+        "type": "array",
+        "elementType": {
+          "type": "struct",
+          "fields": [
+            {
+              "name": "c",
+              "type": {
+                "type": "array",
+                "elementType": {
+                  "type": "struct",
+                  "fields": [
+                    {
+                      "name": "d",
+                      "type": "long",
+                      "nullable": true,
+                      "metadata": {}
+                    }
+                  ]
+                },
+                "containsNull": true
+              },
+              "nullable": true,
+              "metadata": {}
+            }
+          ]
+        },
+        "containsNull": true
+      },
+      "nullable": true,
+      "metadata": {}
+    }
+  ]
+}

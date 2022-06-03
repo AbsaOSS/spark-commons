@@ -1,0 +1,47 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "leg",
+      "type": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "conditions",
+            "type": {
+              "type": "array",
+              "elementType": {
+                "type": "struct",
+                "fields": [
+                  {
+                    "name": "action",
+                    "type": "string",
+                    "nullable": true,
+                    "metadata": {}
+                  },
+                  {
+                    "name": "check",
+                    "type": "string",
+                    "nullable": true,
+                    "metadata": {}
+                  }
+                ]
+              },
+              "containsNull": true
+            },
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "nullable": false,
+      "metadata": {}
+    }
+  ]
+}

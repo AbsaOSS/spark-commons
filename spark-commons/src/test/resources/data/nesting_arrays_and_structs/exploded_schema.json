@@ -1,0 +1,137 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "legs",
+      "type": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "conditions",
+            "type": {
+              "type": "struct",
+              "fields": [
+                {
+                  "name": "amount",
+                  "type": "long",
+                  "nullable": true,
+                  "metadata": {}
+                },
+                {
+                  "name": "checks",
+                  "type": {
+                    "type": "struct",
+                    "fields": [
+                      {
+                        "name": "checkNums",
+                        "type": "string",
+                        "nullable": true,
+                        "metadata": {}
+                      },
+                      {
+                        "name": "higgs",
+                        "type": "null",
+                        "nullable": true,
+                        "metadata": {}
+                      }
+                    ]
+                  },
+                  "nullable": false,
+                  "metadata": {}
+                }
+              ]
+            },
+            "nullable": false,
+            "metadata": {}
+          },
+          {
+            "name": "legid",
+            "type": "long",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_id",
+      "type": "long",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_size",
+      "type": "integer",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_idx",
+      "type": "integer",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_id",
+      "type": "long",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_size",
+      "type": "integer",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_idx",
+      "type": "integer",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_checks_id",
+      "type": "long",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_checks_size",
+      "type": "integer",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_checks_idx",
+      "type": "integer",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_checks_checkNums_id",
+      "type": "long",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_checks_checkNums_size",
+      "type": "integer",
+      "nullable": false,
+      "metadata": {}
+    },
+    {
+      "name": "legs_conditions_checks_checkNums_idx",
+      "type": "integer",
+      "nullable": true,
+      "metadata": {}
+    }
+  ]
+}
