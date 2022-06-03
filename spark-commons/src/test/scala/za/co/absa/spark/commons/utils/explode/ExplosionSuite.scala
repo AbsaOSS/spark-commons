@@ -337,10 +337,11 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
     val ar = actualResults.collect()
     val er = expectedResults.collect()
     if (!ar.sameElements(er)) {
-      actualResults.show(false)
-      println("  differs from\n")
-      expectedResults.show(false)
-      fail()
+      import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
+      val failMessage = actualResults.dataAsString(false) +
+        ("  differs from\n") +
+        expectedResults.dataAsString(false)
+      fail(failMessage)
     }
   }
 
