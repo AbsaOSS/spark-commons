@@ -3,33 +3,24 @@
 
 [![Build](https://github.com/AbsaOSS/spark-hats/workflows/Build/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions)
 
-sbt
-```scala
-libraryDependencies += "za.co.absa" %% "spark-commons" % "X.Y.Z"
-```
+`spark-commons` is a library offering commonly needed routines, classes and functionality. It consists of three modules.
+* spark2-commons
+* spark3-commons
+* spark-commons-test
 
-### Scala 2.11 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.11)
+**spark2-commons** and **spark3-commons** both offer the same logic for the respective major versions of Spark addressing
+usual needs of Spark applications.
 
-Maven
-```xml
-<dependency>
-   <groupId>za.co.absa</groupId>
-   <artifactId>spark-commons_2.11</artifactId>
-   <version>${latest_version}</version>
-</dependency>
-```
+**spark-commons-test** then brings routines to help in testing Spark applications (and it's independent of Spark 
+version used) 
 
-### Scala 2.12 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons_2.12)
 
-```xml
-<dependency>
-   <groupId>za.co.absa</groupId>
-   <artifactId>spark-commons_2.12</artifactId>
-   <version>${latest_version}</version>
-</dependency>
-```
+|               | spark2-commons | spark3-commons                                                                                                                                                                                 | spark-commons-test                                                                                                                                                                                     |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| _Scala 2.11_  | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.11) | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.11) | 
+| _Scala 2.12_ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.12) | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark3-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark3-commons_2.12) | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.12) | 
 
-# Spark Utils
+## SparkX-Commons
 
 ### NonFatalQueryExecutionListenerAdapter
 
@@ -43,19 +34,13 @@ val myListener = new MyQueryExecutionListener with NonFatalQueryExecutionListene
 spark.listenerManager.register(myListener)
 ```
 
-### Schema Utils
+### TransformAdapter
 
->
->**Note:**
->Different _Scala_ variants of the _Schema Utils_ are compiled against different _Spark_, _Json4s_ and _Jackson_ versions.
->2.13 is not yet fully supported:
->
->| | Scala 2.11 | Scala 2.12 | Scala 2.12 |
->|---|---|---|---|
->|Spark| 2.4.7 | 2.4.7 | 3.2.1 |
->|Json4s| 3.5 | 3.7 | 3.7 |
->|Jackson| 2.6 | 2.10 | 2.12 |
-_Schema Utils_ provides methods for working with schemas, its comparison and alignment.  
+A trait that brings Spark version independent implementation of `transform` function.
+
+### SchemaUtils
+
+_SchemaUtils_ provides methods for working with schemas, its comparison and alignment.  
 
 1. Returns the parent path of a field. Returns an empty string if a root level field name is provided.
 
@@ -81,7 +66,7 @@ _Schema Utils_ provides methods for working with schemas, its comparison and ali
       SchemaUtils.appendPath(path, fieldName)
     ```
 
-### Json Utils
+### JsonUtils
 
 _Json Utils_ provides methods for working with Json, both on input and output.
 
@@ -332,7 +317,7 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
 
 
 
-# Spark Version Guard
+### Spark Version Guard
 
 A class which checks if the Spark job version is compatible with the Spark Versions supported by the library
 
@@ -385,42 +370,16 @@ _DataFrameImplicits_ provides methods for transformations on Dataframes
       df.alignSchema(listColumns)
    ```
    
-##Spark Commons Test
+## Spark Commons Test
 
-The separate spark-commons-test module provides classes providing spark sessions to be used for testing
-
-sbt
-```scala
-libraryDependencies += "za.co.absa" %% "spark-commons-test" % "X.Y.Z" % Test
-```
-
-Maven
-```xml
-<dependency>
-   <groupId>za.co.absa</groupId>
-   <artifactId>spark-commons-test_2.11</artifactId>
-   <version>${latest_version}</version>
-    <scope>test</scope>
-</dependency>
-```
-
-```xml
-<dependency>
-   <groupId>za.co.absa</groupId>
-   <artifactId>spark-commons-test_2.12</artifactId>
-   <version>${latest_version}</version>
-    <scope>test</scope>
-</dependency>
-```
-
-Usage:
+### Usage:
 
 ```scala
 class MyTest extends SparkTestBase {
 }
 ```
 
-By default it will instantiate a local Spark.
+By default, it will instantiate a local Spark.
 There is also the possibility to use it in yarn mode:
 
 ```scala
