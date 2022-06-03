@@ -17,6 +17,7 @@
 package za.co.absa.spark.commons.utils
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object JsonUtils {
@@ -51,11 +52,35 @@ object JsonUtils {
   /**
    * Creates a Spark DataFrame from a JSON document(s).
    *
-   * @param json A json string to convert to a DataFrame
+   * @param spark The spark session to operate within
+   * @param json  A json string to convert to a DataFrame
    * @return A data frame
    */
-  def getDataFrameFromJson(spark: SparkSession, json: Seq[String]): DataFrame = {
+  def getDataFrameFromJson(json: Seq[String])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
     spark.read.json(json.toDS)
+  }
+
+  /**
+   * Creates a Spark DataFrame from a JSON document(s).
+   *
+   * @param spark   The spark session to operate within
+   * @param json    A json string to convert to a DataFrame
+   * @param schema  Schema to apply to the data
+   * @return A data frame
+   */
+  def getDataFrameFromJson(json: Seq[String], schema: StructType)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+    spark.read.schema(schema).json(json.toDS)
+  }
+
+  /**
+   * Creates a Spark Schema from a JSON document(s).
+   *
+   * @param json A json string to convert to a schema
+   * @return A schema
+   */
+  def getSchemaFromJson(json: Seq[String]): StructType = {
+    DataType.fromJson(json.mkString).asInstanceOf[StructType]
   }
 }

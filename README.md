@@ -80,6 +80,23 @@ _Schema Utils_ provides methods for working with schemas, its comparison and ali
     ```scala
       SchemaUtils.appendPath(path, fieldName)
     ```
+
+### Json Utils
+
+_Json Utils_ provides methods for working with Json, both on input and output.
+
+1. Create a Spark DataFrame from a JSON document(s).
+
+    ```scala
+      JsonUtils.getDataFrameFromJson(json)
+      JsonUtils.getDataFrameFromJson(json, schema)(implicit spark)
+    ```
+
+2. Creates a Spark Schema from a JSON document(s).
+
+    ```scala
+      JsonUtils.getSchemaFromJson(json)
+    ```
    
 ### ColumnImplicits
 

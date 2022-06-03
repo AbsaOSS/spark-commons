@@ -52,7 +52,7 @@ class JsonUtilsSuite extends AnyFunSuite with SparkTestBase {
   test("Test a dataframe created from a JSON") {
     val inputJson = Seq("""{"value":1}""", """{"value":2}""")
 
-    val df = JsonUtils.getDataFrameFromJson(spark, inputJson)
+    val df = JsonUtils.getDataFrameFromJson(inputJson)
 
     val expectedSchema = """root
                            | |-- value: long (nullable = true)

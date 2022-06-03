@@ -251,7 +251,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"value":[2,3,4,5,6,7,8,9,10,11],"static":2}""",
       """{"value":[],"static":3}""",
       """{"static":4}""")
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val expectedExplodedSchema =
       """root
@@ -319,7 +319,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"id":3,"leg":{"legid":300,"conditions":[]}}""" ::
       """{"id":4,"leg":{"legid":400}}""" :: Nil
 
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val expectedDeconstructedSchema =
       """root
@@ -418,7 +418,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"id":6,"legs":[]}""" ::
       """{"id":7}""" :: Nil
 
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val expectedOriginalSchema =
       """root
@@ -576,7 +576,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"id":3,"leg":{"conditions":[]}}""" ::
       """{"id":4}""" :: Nil
 
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val expectedOriginalSchema =
       """root
@@ -684,7 +684,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"id":3,"leg":{"legid":300,"conditions":[]}}""" ::
       """{"id":4,"leg":{"legid":400}}""" :: Nil
 
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val (explodedDf, explodeContext) = ExplodeTools.explodeArray("leg.conditions", df)
     val restoredDf = ExplodeTools.revertAllExplosions(explodedDf, explodeContext)
@@ -735,7 +735,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"id":2,"errors":[],"leg":{"legid":200,"conditions":[{"check":"0","action":"b"}]}}""" ::
       """{"id":3,"errors":[],"leg":{"legid":300}}""" :: Nil
 
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val (explodedDf, explodeContext) = ExplodeTools.explodeArray("leg.conditions", df)
 
@@ -794,7 +794,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"order":5,"a":[],"myFlag":true}""" ::
       """{"order":6,"myFlag":true}""" :: Nil
 
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val (explodedDf1, explodeContext1) = ExplodeTools.explodeArray("a", df)
     val (explodedDf2, explodeContext2) = ExplodeTools.explodeArray("a.c", explodedDf1, explodeContext1)
@@ -857,7 +857,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
       """{"order":4,"a":[],"myFlag":true}""" ::
       """{"order":5,"myFlag":true}""" :: Nil
 
-    val df = JsonUtils.getDataFrameFromJson(spark, sample)
+    val df = JsonUtils.getDataFrameFromJson(sample)
 
     val (explodedDf1, explodeContext1) = ExplodeTools.explodeArray("a", df)
 
