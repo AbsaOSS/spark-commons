@@ -22,7 +22,7 @@ import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancem
 
 object DataTypeImplicits {
 
-  implicit class DataTypeEnhancements(dt: DataType) {
+  implicit class DataTypeEnhancements(val dt: DataType) extends AnyVal {
     /**
      * Compares 2 fields of a dataframe utils.
      *
