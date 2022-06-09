@@ -23,7 +23,7 @@ import scala.annotation.tailrec
 
 object ArrayTypeImplicits {
 
-  implicit class ArrayTypeEnhancements(arrayType: ArrayType) {
+  implicit class ArrayTypeEnhancements(val arrayType: ArrayType) extends AnyVal {
 
     /**
      * Compares 2 array fields of a dataframe utils.

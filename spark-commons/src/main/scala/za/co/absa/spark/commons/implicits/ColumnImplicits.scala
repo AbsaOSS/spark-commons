@@ -20,7 +20,7 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions._
 
 object ColumnImplicits {
-  implicit class ColumnEnhancements(column: Column) {
+  implicit class ColumnEnhancements(val column: Column) extends AnyVal{
     def isInfinite: Column = {
       column.isin(Double.PositiveInfinity, Double.NegativeInfinity)
     }
