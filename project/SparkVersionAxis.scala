@@ -28,13 +28,10 @@ case class SparkVersionAxis(sparkVersion: String) extends sbt.VirtualAxis.WeakAx
 
 object SparkVersionAxis {
   private def makeModuleName(origName: String, sparkAxis: SparkVersionAxis): String = {
-    println(s"origName: $origName")
-    val result = origName
+    origName
       .replaceAll("([A-Z])", "-$1")
       .toLowerCase()
       .replaceAllLiterally("spark", s"spark${sparkAxis.sparkVersionMajor}")
-    println(s"result: $result")
-    result
   }
 
   implicit class ProjectExtension(val p: ProjectMatrix) extends AnyVal {
