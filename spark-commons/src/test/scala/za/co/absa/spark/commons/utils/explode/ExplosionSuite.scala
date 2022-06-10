@@ -20,7 +20,6 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StructType
 import org.scalatest.funsuite.AnyFunSuite
-import org.slf4j.LoggerFactory
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancementsArrays
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.utils.{ExplodeTools, JsonUtils}
@@ -30,10 +29,7 @@ import scala.io.Source
 
 class ExplosionSuite extends AnyFunSuite with SparkTestBase {
 
-  private val logger = LoggerFactory.getLogger(this.getClass)
-
   import spark.implicits._
-
 
   test("Test explosion of a simple array") {
     // An array of 5 elements each having 10 elements

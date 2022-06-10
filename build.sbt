@@ -26,9 +26,10 @@ import SparkVersionAxis._
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
-val commonSettings = Seq(
+lazy val commonSettings = Seq(
   libraryDependencies ++= commonDependencies,
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
+  javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 )
 
 lazy val parent = (project in file("."))
@@ -46,9 +47,11 @@ lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
+    commonSettings ++ Seq(
     name := "spark-commons-test",
     libraryDependencies ++= sparkDependencies(spark2),
     Test / parallelExecution := false
+    ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))
 

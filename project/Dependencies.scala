@@ -22,9 +22,7 @@ object Dependencies {
   }
 
   def commonDependencies: Seq[ModuleID] = Seq(
-    "za.co.absa.commons"    %% "commons"     % "1.0.0",
-    "za.co.absa"            %% "spark-hofs"  % "0.4.0",
-    "org.scalatest"         %% "scalatest"   % "3.1.0" % Test
+    "org.scalatest"         %% "scalatest"   % "3.1.0"      % Test
   )
 
   def sparkDependencies(sparkVersion: String): Seq[ModuleID] = Seq(
@@ -34,6 +32,8 @@ object Dependencies {
 
   def sparkCommonsDependencies(sparkVersion: String): Seq[ModuleID] = {
     Seq(
+      "za.co.absa.commons"  %% "commons"     % "1.0.0",
+      "za.co.absa"          %% "spark-hofs"  % "0.4.0",
       "za.co.absa"          %% "spark-hats"  % "0.2.2"
     ) ++
       sparkDependencies(sparkVersion)
