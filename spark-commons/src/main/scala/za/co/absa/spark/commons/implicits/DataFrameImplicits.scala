@@ -92,7 +92,7 @@ object DataFrameImplicits {
     def alignSchema(selector: List[Column]): DataFrame = df.select(selector: _*)
 
     /**
-     * Using utils selector from [[DataFrameSelector.getDataFrameSelector]] aligns the utils of a DataFrame to the selector for operations
+     * Using utils selector from [[StructTypeImplicits.DataFrameSelector.getDataFrameSelector]] aligns the utils of a DataFrame to the selector for operations
      * where utils order might be important (e.g. hashing the whole rows and using except)
      *
      * @param structType model structType for the alignment of df
