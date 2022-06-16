@@ -17,19 +17,25 @@ import sbt._
 
 object Dependencies {
 
-  def sparkVersion: String = sys.props.getOrElse("SPARK_VERSION", "2.4.7")
+  def majorVersion(fullVersion: String): String = {
+    fullVersion.split("\\.", 2).headOption.getOrElse(fullVersion)
+  }
 
-  def sparkCommonsDependencies(): Seq[ModuleID] = Seq(
-    "org.apache.spark"   %% "spark-core" % sparkVersion % "provided",
-    "org.apache.spark"   %% "spark-sql" % sparkVersion % "provided"
+  def commonDependencies: Seq[ModuleID] = Seq(
+    "org.scalatest"         %% "scalatest"   % "3.1.0"      % Test
   )
 
-  def sparkCommonslibraryDependencies(scalaVersion: String): Seq[ModuleID] =
-    sparkCommonsDependencies() ++ Seq(
-    "za.co.absa.commons" %% "commons" % "1.0.0",
-    "za.co.absa"         %% "spark-hofs" % "0.4.0",
-    "za.co.absa"         %% "spark-hats" % "0.2.2",
-    "org.scala-lang"     % "scala-compiler" % scalaVersion,
-    "org.scalatest"      %% "scalatest" % "3.1.0" % Test
+  def sparkDependencies(sparkVersion: String): Seq[ModuleID] = Seq(
+    "org.apache.spark"      %% "spark-core"  % sparkVersion % "provided",
+    "org.apache.spark"      %% "spark-sql"   % sparkVersion % "provided"
   )
+
+  def sparkCommonsDependencies(sparkVersion: String): Seq[ModuleID] = {
+    Seq(
+      "za.co.absa.commons"  %% "commons"     % "1.0.0",
+      "za.co.absa"          %% "spark-hofs"  % "0.4.0",
+      "za.co.absa"          %% "spark-hats"  % "0.2.2"
+    ) ++
+      sparkDependencies(sparkVersion)
+  }
 }

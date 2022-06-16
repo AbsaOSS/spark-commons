@@ -1,9 +1,10 @@
 /*
- * Copyright 2019 ABSA Group Limited
+ * Copyright 2021 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -13,7 +14,14 @@
  * limitations under the License.
  */
 
-addSbtPlugin("de.heikoseeberger"  % "sbt-header"        % "5.6.0")
-addSbtPlugin("com.github.sbt"     % "sbt-release"       % "1.1.0")
-addSbtPlugin("com.github.sbt"     % "sbt-pgp"           % "2.1.2")
-addSbtPlugin("com.eed3si9n"       % "sbt-projectmatrix" % "0.9.0")
+package za.co.absa.spark.commons.adapters
+
+import org.apache.spark.sql.Column
+import org.apache.spark.sql.functions.{transform => sparkTransform}
+
+trait TransformAdapter {
+  /**
+   * For Spark versions prior 3.0.0, delegates to {{{hofs.transform()}}}
+   */
+  def transform: (Column, Column => Column) => Column = sparkTransform
+}

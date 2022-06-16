@@ -19,15 +19,54 @@ package za.co.absa.spark.commons.implicits
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types._
+import za.co.absa.spark.commons.adapters.TransformAdapter
 import za.co.absa.spark.commons.implicits.DataTypeImplicits.DataTypeEnhancements
 import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
-import za.co.absa.spark.commons.utils.SchemaUtils.{getAllArraySubPaths, isCommonSubPath, transform}
+import za.co.absa.spark.commons.utils.SchemaUtils.{getAllArraySubPaths, isCommonSubPath}
 
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.util.Try
 
 object StructTypeImplicits {
+
+  implicit class DataFrameSelector(schema: StructType) extends TransformAdapter {
+    /**
+     * Returns data selector that can be used to align utils of a data frame. You can use [[alignSchema]].
+     *
+     * @return Sorted DF to conform to utils
+     */
+    def getDataFrameSelector(): List[Column] = {
+
+      def processArray(arrType: ArrayType, column: Column, name: String): Column = {
+        arrType.elementType match {
+          case arrType: ArrayType =>
+            transform(column, x => processArray(arrType, x, name)).as(name)
+          case nestedStructType: StructType =>
+            transform(column, x => struct(processStruct(nestedStructType, Some(x)): _*)).as(name)
+          case _ => column
+        }
+      }
+
+      def processStruct(curSchema: StructType, parent: Option[Column]): List[Column] = {
+        curSchema.foldRight(List.empty[Column])((field, acc) => {
+          val currentCol: Column = parent match {
+            case Some(x) => x.getField(field.name).as(field.name)
+            case None => col(field.name)
+          }
+          field.dataType match {
+            case arrType: ArrayType => processArray(arrType, currentCol, field.name) :: acc
+            case structType: StructType => struct(processStruct(structType, Some(currentCol)): _*).as(field.name) :: acc
+            case _ => currentCol :: acc
+          }
+        })
+      }
+
+      processStruct(schema, None)
+    }
+
+  }
+
   implicit class StructTypeEnhancements(val schema: StructType) {
     /**
      * Get a field from a text path and a given utils
@@ -124,40 +163,6 @@ object StructTypeImplicits {
      */
     def getAllArrayPaths(): Seq[String] = {
       schema.fields.flatMap(f => getAllArraySubPaths("", f.name, f.dataType)).toSeq
-    }
-
-    /**
-     * Returns data selector that can be used to align utils of a data frame. You can use [[alignSchema]].
-     *
-     * @return Sorted DF to conform to utils
-     */
-    def getDataFrameSelector(): List[Column] = {
-
-      def processArray(arrType: ArrayType, column: Column, name: String): Column = {
-        arrType.elementType match {
-          case arrType: ArrayType =>
-            transform(column, x => processArray(arrType, x, name)).as(name)
-          case nestedStructType: StructType =>
-            transform(column, x => struct(processStruct(nestedStructType, Some(x)): _*)).as(name)
-          case _ => column
-        }
-      }
-
-      def processStruct(curSchema: StructType, parent: Option[Column]): List[Column] = {
-        curSchema.foldRight(List.empty[Column])((field, acc) => {
-          val currentCol: Column = parent match {
-            case Some(x) => x.getField(field.name).as(field.name)
-            case None => col(field.name)
-          }
-          field.dataType match {
-            case arrType: ArrayType => processArray(arrType, currentCol, field.name) :: acc
-            case structType: StructType => struct(processStruct(structType, Some(currentCol)): _*).as(field.name) :: acc
-            case _ => currentCol :: acc
-          }
-        })
-      }
-
-      processStruct(schema, None)
     }
 
     /**

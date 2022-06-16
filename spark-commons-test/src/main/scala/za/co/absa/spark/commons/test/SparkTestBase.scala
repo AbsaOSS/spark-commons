@@ -19,9 +19,9 @@ package za.co.absa.spark.commons.test
 import org.apache.spark.sql.SparkSession
 
 trait SparkTestBase {
-  implicit lazy val spark: SparkSession = initSpark()
-
   protected def initSpark(implicit sparkConfig: SparkTestConfig = DefaultSparkConfiguration): SparkSession = {
     sparkConfig.sparkSession
   }
+
+  implicit lazy val spark: SparkSession = initSpark()
 }

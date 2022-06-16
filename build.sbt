@@ -17,40 +17,42 @@ ThisBuild / organization := "za.co.absa"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.12"
+lazy val spark2   = "2.4.7"
+lazy val spark3   = "3.2.1"
 
 import Dependencies._
+import SparkVersionAxis._
 
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
-lazy val printSparkScalaVersion = taskKey[Unit]("Print Spark and Scala versions spark-commons is being built for.")
-ThisBuild / printSparkScalaVersion := {
-    val log = streams.value.log
-    log.info(s"Building with Spark ${sparkVersion}, Scala ${scalaVersion.value}")
-}
+lazy val commonSettings = Seq(
+  libraryDependencies ++= commonDependencies,
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
+  javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
+)
 
 lazy val parent = (project in file("."))
-  .aggregate(sparkCommons, sparkCommonsTest)
+  .aggregate(sparkCommons.projectRefs ++ sparkCommonsTest.projectRefs: _*)
   .settings(
     name := "spark-commons-parent",
-    libraryDependencies ++= sparkCommonsDependencies(),
-    javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
     publish / skip := true
   )
 
-lazy val sparkCommons = (project in file("spark-commons"))
-  .settings(
-    name := "spark-commons",
-    libraryDependencies ++= sparkCommonslibraryDependencies(scalaVersion.value),
-    (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
-  ).dependsOn(sparkCommonsTest)
+lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
+  .settings(commonSettings: _*)
+  .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
+  .sparkRow(SparkVersionAxis(spark3), scalaVersions = Seq(scala212))
+  .dependsOn(sparkCommonsTest)
 
-lazy val sparkCommonsTest = (project in file("spark-commons-test"))
+lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
+    commonSettings ++ Seq(
     name := "spark-commons-test",
-    libraryDependencies ++= sparkCommonsDependencies(),
-    Test / parallelExecution := false,
-    (Compile / compile) := ((Compile / compile) dependsOn printSparkScalaVersion).value // printSparkScalaVersion is run with compile
+    libraryDependencies ++= sparkDependencies(spark2),
+    Test / parallelExecution := false
+    ): _*
   )
+  .jvmPlatform(scalaVersions = Seq(scala211, scala212))
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
