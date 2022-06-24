@@ -17,20 +17,13 @@ package za.co.absa.spark.commons
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.slf4j.LoggerFactory
-import za.co.absa.spark.commons.test.SparkTestBase
+import za.co.absa.spark.commons.test.{DependenciesInfo, SparkTestBase}
 
-class SparkCommonsDependenciesReport extends AnyFunSuite with SparkTestBase {
+class SparkCommonsDependenciesReport extends AnyFunSuite with SparkTestBase with DependenciesInfo{
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-
   test("Log versions") {
-    val line = s"Running Spark ${spark.version} on Scala ${util.Properties.versionNumberString}"
-    val spaceCount = 1.max(80 - 2 - 1 - line.length) //at least one space, otherwise original length - starting * and space ending * and text length
-    val spaces = " " * spaceCount
-
-    logger.info("********************************************************************************")
-    logger.info((s"* $line$spaces*"))
-    logger.info("********************************************************************************")
+    logger.info(dependenciesInfo)
   }
 }
