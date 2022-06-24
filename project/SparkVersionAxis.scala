@@ -21,17 +21,16 @@ import sbtprojectmatrix.ProjectMatrixKeys._
 import Dependencies._
 
 case class SparkVersionAxis(sparkVersion: String) extends sbt.VirtualAxis.WeakAxis {
-  val sparkVersionMajor: String = majorVersion(sparkVersion)
-  override val directorySuffix = s"-spark${sparkVersionMajor}"
-  override val idSuffix: String = s"_spark${sparkVersionMajor}_"
+  val sparkVersionMinor: String = sparkVersion.split("\\.", 3).take(2).mkString(".")
+  override val directorySuffix = s"-spark${sparkVersionMinor}"
+  override val idSuffix: String = directorySuffix.replaceAll("""\W+""", "_")
 }
 
 object SparkVersionAxis {
-  private def makeModuleName(origName: String, sparkAxis: SparkVersionAxis): String = {
+  private def camelCaseToLowerDashCase(origName: String): String = {
     origName
       .replaceAll("([A-Z])", "-$1")
       .toLowerCase()
-      .replaceAllLiterally("spark", s"spark${sparkAxis.sparkVersionMajor}")
   }
 
   implicit class ProjectExtension(val p: ProjectMatrix) extends AnyVal {
@@ -41,7 +40,7 @@ object SparkVersionAxis {
         scalaVersions = scalaVersions,
         axisValues = Seq(sparkAxis, VirtualAxis.jvm),
         _.settings(
-            moduleName := makeModuleName(name.value, sparkAxis),
+            moduleName := camelCaseToLowerDashCase(name.value + sparkAxis.directorySuffix),
             libraryDependencies ++= sparkCommonsDependencies(sparkAxis.sparkVersion)
         ).settings(settings: _*)
       )
