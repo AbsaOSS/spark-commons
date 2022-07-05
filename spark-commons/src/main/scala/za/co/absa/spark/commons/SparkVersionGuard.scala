@@ -58,7 +58,7 @@ case class SparkVersionGuard(minVersionInclusive: SemanticVersion, maxVersionExc
                             (implicit log:Logger = LoggerFactory.getLogger(SparkVersionGuard.getClass)) {
 
   /**
-   * String wrapper for [[SparkVersionGuard#checkSparkVersionCompatibility(SemanticVersion)]]
+   * String wrapper for [[ensureSparkVersionCompatibility(SemanticVersion)]]
    *
    * @param yourVersion provided spark version
    */
@@ -84,7 +84,6 @@ case class SparkVersionGuard(minVersionInclusive: SemanticVersion, maxVersionExc
            |Your detected version was ${yourVersion.asString}""".stripMargin)
       }
     }
-
   }
 
 }

@@ -4,8 +4,8 @@
 [![Build](https://github.com/AbsaOSS/spark-hats/workflows/Build/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions)
 
 `spark-commons` is a library offering commonly needed routines, classes and functionality. It consists of three modules.
-* spark2-commons
-* spark3-commons
+* spark-commons-spark2.4
+* spark-commons-spark3.7
 * spark-commons-test
 
 **spark2-commons** and **spark3-commons** both offer the same logic for the respective major versions of Spark addressing
@@ -15,12 +15,12 @@ usual needs of Spark applications.
 version used) 
 
 
-|               | spark2-commons | spark3-commons                                                                                                                                                                                 | spark-commons-test                                                                                                                                                                                     |
-|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| _Scala 2.11_  | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.11) | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.11) | 
-| _Scala 2.12_ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.12) | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark3-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark3-commons_2.12) | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.12) | 
+|               | spark-commons-spark2.4                                                                                                                                                                        | spark-commons-spark3.2                                                                                                                                                                       | spark-commons-test                                                                                                                                                                                     |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| _Scala 2.11_  | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.11) |                                                                                                                                                                                              | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.11) | 
+| _Scala 2.12_ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark2-commons_2.12)  | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark3-commons_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark3-commons_2.12) | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/za.co.absa/spark-commons-test_2.12) | 
 
-## SparkX-Commons
+## Spark-Commons
 
 ### NonFatalQueryExecutionListenerAdapter
 

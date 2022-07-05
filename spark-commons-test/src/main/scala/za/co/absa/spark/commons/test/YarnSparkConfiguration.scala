@@ -17,14 +17,13 @@
 package za.co.absa.spark.commons.test
 
 import java.io.File
-
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import za.co.absa.spark.commons.test.YarnSparkConfiguration._
 
-import scala.collection.JavaConversions.iterableAsScalaIterable
+import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
 class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends SparkTestConfig {
 
@@ -74,7 +73,7 @@ object YarnSparkConfiguration {
    * @param hadoopConf Hadoop Configuration object to be converted into Spark configs
    */
   def hadoopConfToSparkMap(hadoopConf: Configuration): Map[String, String] = {
-    hadoopConf.map(entry => (s"spark.hadoop.${entry.getKey}", entry.getValue)).toMap
+    hadoopConf.asScala.map(entry => (s"spark.hadoop.${entry.getKey}", entry.getValue)).toMap
   }
 
   /**

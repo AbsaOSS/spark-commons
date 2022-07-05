@@ -28,8 +28,9 @@ ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
 lazy val commonSettings = Seq(
   libraryDependencies ++= commonDependencies,
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
+  javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
+  Test / parallelExecution := false
 )
 
 lazy val parent = (project in file("."))
@@ -49,8 +50,7 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
     commonSettings ++ Seq(
     name := "spark-commons-test",
-    libraryDependencies ++= sparkDependencies(spark2),
-    Test / parallelExecution := false
+    libraryDependencies ++= sparkDependencies(spark2)
     ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))

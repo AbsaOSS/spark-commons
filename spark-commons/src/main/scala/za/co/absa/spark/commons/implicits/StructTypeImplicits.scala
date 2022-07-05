@@ -32,7 +32,8 @@ object StructTypeImplicits {
 
   implicit class DataFrameSelector(schema: StructType) extends TransformAdapter {
     /**
-     * Returns data selector that can be used to align utils of a data frame. You can use [[alignSchema]].
+     * Returns data selector that can be used to align utils of a data frame.
+     * You can use [[DataFrameImplicits.DataFrameEnhancements.alignSchema]].
      *
      * @return Sorted DF to conform to utils
      */
