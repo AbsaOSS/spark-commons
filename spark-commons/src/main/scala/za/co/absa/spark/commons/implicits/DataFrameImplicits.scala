@@ -35,8 +35,9 @@ object DataFrameImplicits {
       dfData
     }
 
+    //TODO  Fix ScalaDoc cross-module links #48 - Dataset.show()
     /**
-     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset.show()]] displays them
+     * Get the string representation of the data in the format as Dataset.show() displays them
      *
      * @return  The string representation of the data in the DataFrame
      * @since 0.2.0
@@ -102,9 +103,10 @@ object DataFrameImplicits {
       alignSchema(structType.getDataFrameSelector())
     }
 
+    //TODO  Fix ScalaDoc cross-module links #48 - Dataset.cache()
     /**
      * Persist this Dataset with the default storage level (`MEMORY_AND_DISK`), the same way as
-     * [[org.apache.spark.sql.Dataset.cache]] does. But does not throw a warning if the DataFrame has been cached before.
+     * Dataset.cache does. But does not throw a warning if the DataFrame has been cached before.
      *
      * @return the DataFrame itself
      * @since 0.3.0
