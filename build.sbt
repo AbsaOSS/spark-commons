@@ -44,7 +44,7 @@ lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
   .sparkRow(SparkVersionAxis(spark3), scalaVersions = Seq(scala212))
-  .dependsOn(sparkCommonsTest)
+  .dependsOn(sparkCommonsTest % "test")
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
