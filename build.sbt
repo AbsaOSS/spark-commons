@@ -56,3 +56,8 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
+
+// licenceHeader check:
+ThisBuild / organizationName := "ABSA Group Limited"
+ThisBuild / startYear := Some(2021)
+ThisBuild / licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")

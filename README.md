@@ -1,7 +1,8 @@
 # spark-commons
 
-
-[![Build](https://github.com/AbsaOSS/spark-hats/workflows/Build/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Build](https://github.com/AbsaOSS/spark-commons/actions/workflows/build.yml/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions/workflows/build.yml)
+[![Release](https://github.com/AbsaOSS/spark-commons/actions/workflows/release.yml/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions/workflows/release.yml)
 
 `spark-commons` is a library offering commonly needed routines, classes and functionality. It consists of three modules.
 * spark-commons-spark2.4
@@ -387,3 +388,26 @@ class MyTest extends SparkTestBase {
 override lazy val spark: SparkSession = initSpark(new YarnSparkConfiguration(confDir, distJarsDir))
 }
 ```
+
+## How to Release
+
+Release of this library is currently implemented with [sbt-ci-release](https://github.com/sbt/sbt-ci-release).
+Please see its documentation for more details about how it works if you are interested to know more.
+The actual deployments are triggered manually by the maintainers of this repository, using `workflow_dispatch` event
+trigger.
+
+Once changes from a PR were reviewed and merged into the master branch, follow these steps:
+1. Create a new Git Tag and push it to the repository, to the master branch. For example,
+   if you want to release a version 0.4.0 (note that we are using [Semantic Versioning](https://semver.org/)):
+
+    ```shell
+    git tag -a v0.4.0 -m "v0.4.0"
+    git push origin v0.4.0
+    ```
+
+2. In GitHub UI, go to the repository's **Actions** -> **Release** -> **Run workflow**, and under **Use workflow from**
+   use **Tags** and find the tag you created in the previous step.
+
+   > **Important note**: don't run the workflow against the master branch, but against the tag.
+   > `sbt-ci-release` plugin won't be able to correctly find tag, and it will think that you are trying
+   > to do a snapshot release, not an actual release that should be synchronized with Maven Central.
