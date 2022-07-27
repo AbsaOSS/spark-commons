@@ -26,6 +26,8 @@ import SparkVersionAxis._
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
+ThisBuild / versionScheme := Some("early-semver")
+
 lazy val commonSettings = Seq(
   libraryDependencies ++= commonDependencies,
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
@@ -54,8 +56,3 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))
-
-// licenceHeader check:
-ThisBuild / organizationName := "ABSA Group Limited"
-ThisBuild / startYear := Some(2021)
-ThisBuild / licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")
