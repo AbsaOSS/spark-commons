@@ -1,7 +1,8 @@
 # spark-commons
 
-
-[![Build](https://github.com/AbsaOSS/spark-hats/workflows/Build/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Build](https://github.com/AbsaOSS/spark-commons/actions/workflows/build.yml/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions/workflows/build.yml)
+[![Release](https://github.com/AbsaOSS/spark-commons/actions/workflows/release.yml/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions/workflows/release.yml)
 
 `spark-commons` is a library offering commonly needed routines, classes and functionality. It consists of three modules.
 * spark-commons-spark2.4
@@ -387,3 +388,7 @@ class MyTest extends SparkTestBase {
 override lazy val spark: SparkSession = initSpark(new YarnSparkConfiguration(confDir, distJarsDir))
 }
 ```
+
+## How to Release
+
+Please see [this file](RELEASE.md) for more details.
