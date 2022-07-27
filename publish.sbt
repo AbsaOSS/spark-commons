@@ -60,5 +60,3 @@ ThisBuild / developers := List(
 
 ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/spark-commomns"))
 ThisBuild / description := "Spark Common Utilities for ABSA"
-
-ThisBuild / pomIncludeRepository := { _ => false }
