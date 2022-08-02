@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-ThisBuild / organizationName := "ABSA Group Limited"
 ThisBuild / organizationHomepage := Some(url("https://www.absa.africa"))
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -48,22 +47,19 @@ ThisBuild / developers := List(
     name  = "Adrian Olosutean",
     email = "adrian.olosutean@absa.africa",
     url   = url("https://github.com/AdrianOlosutean")
+  ),
+  Developer(
+    id    = "lsulak",
+    name  = "Ladislav Sulak",
+    email = "ladislav.sulak@absa.africa",
+    url   = url("https://github.com/lsulak")
   )
 )
 
 ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/spark-commomns"))
 ThisBuild / description := "Spark Common Utilities for ABSA"
+
+// licenceHeader check:
+ThisBuild / organizationName := "ABSA Group Limited"
 ThisBuild / startYear := Some(2021)
 ThisBuild / licenses += "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")
-
-ThisBuild / pomIncludeRepository := { _ => false }
-ThisBuild / publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value) {
-    Some("snapshots" at s"${nexus}content/repositories/snapshots")
-  } else {
-    Some("releases" at s"${nexus}service/local/staging/deploy/maven2")
-  }
-}
-ThisBuild / publishMavenStyle := true
-

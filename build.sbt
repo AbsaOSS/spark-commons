@@ -26,6 +26,8 @@ import SparkVersionAxis._
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
 
+ThisBuild / versionScheme := Some("early-semver")
+
 lazy val commonSettings = Seq(
   libraryDependencies ++= commonDependencies,
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
@@ -54,5 +56,3 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))
-
-releasePublishArtifactsAction := PgpKeys.publishSigned.value
