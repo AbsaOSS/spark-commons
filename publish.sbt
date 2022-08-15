@@ -56,7 +56,7 @@ ThisBuild / developers := List(
   )
 )
 
-ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/spark-commomns"))
+ThisBuild / homepage := Some(url("https://github.com/AbsaOSS/spark-commons"))
 ThisBuild / description := "Spark Common Utilities for ABSA"
 
 // licenceHeader check:
