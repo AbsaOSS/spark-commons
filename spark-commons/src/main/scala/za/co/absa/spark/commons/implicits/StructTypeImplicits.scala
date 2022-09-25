@@ -22,6 +22,7 @@ import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.adapters.TransformAdapter
 import za.co.absa.spark.commons.implicits.DataTypeImplicits.DataTypeEnhancements
 import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
+import za.co.absa.spark.commons.utils.SchemaUtils
 import za.co.absa.spark.commons.utils.SchemaUtils.{getAllArraySubPaths, isCommonSubPath}
 
 import scala.annotation.tailrec
@@ -102,7 +103,7 @@ object StructTypeImplicits {
         }
       }
 
-      val pathTokens = path.split('.').toList
+      val pathTokens = SchemaUtils.splitPath(path)
       Try{
         examineStructField(pathTokens.tail, schema(pathTokens.head))
       }.getOrElse(None)
@@ -192,7 +193,7 @@ object StructTypeImplicits {
      * @return true if the column is the only column in a struct
      */
     def isOnlyField(path: String): Boolean = {
-      val pathSegments = path.split('.')
+      val pathSegments = SchemaUtils.splitPath(path)
       evaluateConditionsForField(schema, pathSegments, path, applyArrayHelper = false, applyLeafCondition = true,
         field => field.fields.length == 1)
     }
@@ -330,7 +331,7 @@ object StructTypeImplicits {
         }
       }
 
-      val pathToks = path.split('.')
+      val pathToks = SchemaUtils.splitPath(path)
       helper(pathToks, Seq()).mkString(".")
     }
 
@@ -358,7 +359,7 @@ object StructTypeImplicits {
         }
       }
 
-      val pathToks = path.split("\\.")
+      val pathToks = SchemaUtils.splitPath(path)
       helper(pathToks, Seq(), Seq())
     }
 
@@ -411,7 +412,7 @@ object StructTypeImplicits {
      * @return true if a field is an array that is not nested in another array
      */
     def isNonNestedArray(path: String): Boolean = {
-      val pathSegments = path.split('.')
+      val pathSegments = SchemaUtils.splitPath(path)
       evaluateConditionsForField(schema, pathSegments, path, applyArrayHelper = false)
     }
   }

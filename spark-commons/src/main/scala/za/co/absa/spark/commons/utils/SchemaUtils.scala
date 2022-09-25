@@ -67,7 +67,7 @@ object SchemaUtils {
     }
 
     var isParentCommon = true // For Seq() the property holds by [my] convention
-    var restOfPaths: Seq[Seq[String]] = paths.map(_.split('.').toSeq).filter(_.nonEmpty)
+    var restOfPaths: Seq[Seq[String]] = paths.map(SchemaUtils.splitPath).filter(_.nonEmpty)
     while (isParentCommon && restOfPaths.nonEmpty) {
       val parent = restOfPaths.head.head
       isParentCommon = restOfPaths.forall(path => path.head == parent)
@@ -82,7 +82,7 @@ object SchemaUtils {
    * @param path      The dot-separated existing path
    * @param fieldName Name of the field to be appended to the path
    * @return The path with the new field appended or the field itself if path is empty
-   */
+   */()
   def appendPath(path: String, fieldName: String): String = {
     if (path.isEmpty) {
       fieldName
@@ -90,6 +90,24 @@ object SchemaUtils {
       path
     } else {
       s"$path.$fieldName"
+    }
+  }
+
+  /**
+   * Separates the field name components of a fully qualified column name as they hierachy goes from root down to the
+   * deepest one.
+   * Trailing '.' is ignored, leading one not.
+   *
+   * @param columnName  A fully qualified column name
+   * @return Each level field name in sequence how they go from root to the lowest one
+   */
+  def splitPath(columnName: String): List[String] = {
+    val stripped = columnName.stripSuffix(".")
+
+    if (stripped.isEmpty) {
+      List.empty
+    } else {
+      stripped.split('.').toList
     }
   }
 

@@ -36,4 +36,15 @@ class SchemaUtilsTest extends AnyFunSuite with Matchers {
     assertResult(getParentPath("a.bcd"))("a")
     assertResult(getParentPath(""))("")
   }
+
+  test("Test splitPath") {
+    assertResult(List("a", "b", "c", "d", "e"))(splitPath("a.b.c.d.e"))
+    assertResult(List("a"))(splitPath("a"))
+    assertResult(List("a", "bcd"))(splitPath("a.bcd"))
+    assertResult(List("a", "bcd"))(splitPath("a.bcd."))
+    assertResult(List("", "a", "bcd"))(splitPath(".a.bcd"))
+    assertResult(List.empty[String])(splitPath(""))
+    assertResult(List.empty[String])(splitPath("."))
+  }
+
 }

@@ -252,7 +252,7 @@ object ExplodeTools {
     }
 
     val newFieldName = inputDf.schema.getClosestUniqueName(deconstructedColumnName)
-    val resultDf = inputDf.select(processStruct(inputDf.schema, columnName.split('.'), None)
+    val resultDf = inputDf.select(processStruct(inputDf.schema, SchemaUtils.splitPath(columnName), None)
       :+ col(columnName).as(newFieldName): _*)
     DeconstructedNestedField(resultDf, newFieldName, transientColName)
   }
@@ -287,7 +287,7 @@ object ExplodeTools {
       val newFields2 = if (isColumnToFound) newFields else newFields :+ col(columnFrom).as(columnTo)
       inputDf.select(newFields2: _*)
     } else {
-      putFieldIntoNestedStruct(inputDf, columnFrom, columnTo.split('.'), positionColumn)
+      putFieldIntoNestedStruct(inputDf, columnFrom, SchemaUtils.splitPath(columnTo), positionColumn)
     }
   }
 
@@ -342,7 +342,7 @@ object ExplodeTools {
 
   private def addSuperTransientField(inputDf: DataFrame, arrayColPathName: String): (DataFrame, String) = {
     val colName = inputDf.schema.getClosestUniqueName(superTransientColumnName)
-    val nestedColName = (arrayColPathName.split('.').dropRight(1) :+ colName).mkString(".")
+    val nestedColName = (SchemaUtils.splitPath(arrayColPathName).dropRight(1) :+ colName).mkString(".")
     val df = inputDf.nestedWithColumn(nestedColName, lit(null))
     (df, nestedColName)
   }
