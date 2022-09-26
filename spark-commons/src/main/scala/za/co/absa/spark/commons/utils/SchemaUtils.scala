@@ -35,7 +35,7 @@ object SchemaUtils {
    * Extracts the field name of a fully qualified column name.
    *
    * @param columnName A fully qualified column name
-   * @return The field name without the partent path or the whole string if the input column is a root level column
+   * @return The field name without the parent path or the whole string if the input column is a root level column
    */
   def stripParentPath(columnName: String): String = {
     //using a sub-function might be tiny bit less efficient, as it generates both part, but it ensures consistency
