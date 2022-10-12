@@ -47,4 +47,11 @@ class SchemaUtilsTest extends AnyFunSuite with Matchers {
     assertResult(List.empty[String])(splitPath("."))
   }
 
+  test("Test splitPath with removing empty fields") {
+    assertResult(List("a", "b", "c", "d", "e"))(splitPath("a.b.c.d.e", keepEmptyFields = false))
+    assertResult(List("a", "e"))(splitPath("a....e", keepEmptyFields = false))
+    assertResult(List("a", "bcd"))(splitPath(".a.bcd", keepEmptyFields = false))
+    assertResult(List.empty[String])(splitPath("", keepEmptyFields = false))
+    assertResult(List.empty[String])(splitPath(".", keepEmptyFields = false))
+  }
 }

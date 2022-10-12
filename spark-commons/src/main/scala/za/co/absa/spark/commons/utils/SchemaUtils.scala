@@ -82,7 +82,7 @@ object SchemaUtils {
    * @param path      The dot-separated existing path
    * @param fieldName Name of the field to be appended to the path
    * @return The path with the new field appended or the field itself if path is empty
-   */()
+   */
   def appendPath(path: String, fieldName: String): String = {
     if (path.isEmpty) {
       fieldName
@@ -93,21 +93,41 @@ object SchemaUtils {
     }
   }
 
+
   /**
-   * Separates the field name components of a fully qualified column name as they hierachy goes from root down to the
-   * deepest one.
+   * Separates the field name components of a fully qualified column name as they hierarchy goes from root down to the
+   * deepest one. No validation on the field names is done
+   * Example: `"com.my.package.xyz"` -> `List("com", "my", "package", "xyz")`
    * Trailing '.' is ignored, leading one not.
    *
-   * @param columnName  A fully qualified column name
+   * @param columnName      A fully qualified column name
    * @return Each level field name in sequence how they go from root to the lowest one
    */
-  def splitPath(columnName: String): List[String] = {
+  def splitPath(columnName: String): List[String] = splitPath(columnName, keepEmptyFields = true)
+
+  /**
+   * Separates the field name components of a fully qualified column name as their hierarchy goes from root down to the
+   * deepest one. No validation on the field names is done
+   * Function is rather overloaded than using default parameter for easier use in functions like `map`
+   * Example: `"com.my.package.xyz"` -> `List("com", "my", "package", "xyz")`
+   * Trailing '.' is ignored, leading one not.
+   *
+   * @param columnName      A fully qualified column name
+   * @param keepEmptyFields If `false` any empty field names are removed from the result list, otherwise kept
+   * @return Each level field name in sequence how they go from root to the lowest one
+   */
+  def splitPath(columnName: String, keepEmptyFields: Boolean): List[String] = {
     val stripped = columnName.stripSuffix(".")
 
     if (stripped.isEmpty) {
       List.empty
     } else {
-      stripped.split('.').toList
+      val segments = stripped.split('.').toList
+      if (keepEmptyFields) {
+        segments
+      } else {
+        segments.filterNot(_.isEmpty)
+      }
     }
   }
 
