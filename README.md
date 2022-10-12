@@ -43,25 +43,32 @@ A trait that brings Spark version independent implementation of `transform` func
 
 _SchemaUtils_ provides methods for working with schemas, its comparison and alignment.  
 
-1. Returns the parent path of a field. Returns an empty string if a root level field name is provided.
+1. Extracts the parent path of a field. Returns an empty string if a root level column name is provided.
 
     ```scala
       SchemaUtils.getParentPath(columnName)
     ```
 
-2. Get paths for all array subfields of this given datatype
+2. Extracts the field name of a fully qualified column name.
+
+    ```scala
+      SchemaUtils.stripParentPath(columnName)
+    ```
+
+
+3. Get paths for all array subfields of this given datatype.
 
     ```scala
       SchemaUtils.getAllArraySubPaths(other)
     ```
 
-3. For a given list of field paths determines if any path pair is a subset of one another.
+4. For a given list of field paths determines if any path pair is a subset of one another.
 
     ```scala
       SchemaUtils.isCommonSubPath(paths)
     ```
 
-4. Append a new attribute to path or empty string.
+5. Append a new attribute to path or empty string.
 
     ```scala
       SchemaUtils.appendPath(path, fieldName)

@@ -21,18 +21,25 @@ import org.apache.spark.sql.types._
 object SchemaUtils {
 
   /**
-   * Returns the parent path of a field. Returns an empty string if a root level field name is provided.
+   * Extracts the parent path of a field. Returns an empty string if a root level column name is provided.
    *
    * @param columnName A fully qualified column name
    * @return The parent column name or an empty string if the input column is a root level column
    */
   def getParentPath(columnName: String): String = {
-    val index = columnName.lastIndexOf('.')
-    if (index > 0) {
-      columnName.substring(0, index)
-    } else {
-      ""
-    }
+    //using a sub-function might be tiny bit less efficient, as it generates both part, but it ensures consistency
+    columnPathAndCore(columnName)._1
+  }
+
+  /**
+   * Extracts the field name of a fully qualified column name.
+   *
+   * @param columnName A fully qualified column name
+   * @return The field name without the parent path or the whole string if the input column is a root level column
+   */
+  def stripParentPath(columnName: String): String = {
+    //using a sub-function might be tiny bit less efficient, as it generates both part, but it ensures consistency
+    columnPathAndCore(columnName)._2
   }
 
   /**
@@ -131,4 +138,13 @@ object SchemaUtils {
     }
   }
 
+  private def columnPathAndCore(columnName: String): (String, String) = {
+    val index = columnName.lastIndexOf('.')
+    if (index >= 0) {
+      (columnName.take(index), columnName.drop((index + 1)))
+    } else {
+      ("", columnName)
+    }
+
+  }
 }

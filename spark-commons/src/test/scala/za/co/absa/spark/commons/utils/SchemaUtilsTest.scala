@@ -21,20 +21,29 @@ import org.scalatest.matchers.should.Matchers
 import za.co.absa.spark.commons.utils.SchemaUtils._
 
 class SchemaUtilsTest extends AnyFunSuite with Matchers {
-  // scalastyle:off magic.number
 
-  test("Test isCommonSubPath()") {
+  test("Test getParentPath") {
+    assertResult("a.b.c.d")(getParentPath("a.b.c.d.e"))
+    assertResult("")(getParentPath("a"))
+    assertResult("a")(getParentPath("a.bcd"))
+    assertResult("")(getParentPath(""))
+    assertResult("")(getParentPath("."))
+  }
+
+  test("Test stripParentPath") {
+    assertResult("e")(stripParentPath("a.b.c.d.e"))
+    assertResult("a")(stripParentPath("a"))
+    assertResult("bcd")(stripParentPath("a.bcd"))
+    assertResult("")(stripParentPath(""))
+    assertResult("")(stripParentPath("."))
+  }
+
+
+  test("Test isCommonSubPath") {
     assert (isCommonSubPath())
     assert (isCommonSubPath("a"))
     assert (isCommonSubPath("a.b.c.d.e.f", "a.b.c.d", "a.b.c", "a.b", "a"))
     assert (!isCommonSubPath("a.b.c.d.e.f", "a.b.c.x", "a.b.c", "a.b", "a"))
-  }
-
-  test("Test getParentPath") {
-    assertResult(getParentPath("a.b.c.d.e"))("a.b.c.d")
-    assertResult(getParentPath("a"))("")
-    assertResult(getParentPath("a.bcd"))("a")
-    assertResult(getParentPath(""))("")
   }
 
   test("Test splitPath") {
