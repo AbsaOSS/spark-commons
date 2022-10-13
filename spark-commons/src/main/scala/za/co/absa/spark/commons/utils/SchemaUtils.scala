@@ -102,7 +102,7 @@ object SchemaUtils {
 
 
   /**
-   * Separates the field name components of a fully qualified column name as they hierarchy goes from root down to the
+   * Separates the field name components of a fully qualified column name as their hierarchy goes from root down to the
    * deepest one. No validation on the field names is done
    * Example: `"com.my.package.xyz"` -> `List("com", "my", "package", "xyz")`
    * Trailing '.' is ignored, leading one not.
