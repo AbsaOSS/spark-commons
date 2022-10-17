@@ -74,6 +74,14 @@ _SchemaUtils_ provides methods for working with schemas, its comparison and alig
       SchemaUtils.appendPath(path, fieldName)
     ```
 
+5. Separates the field name components of a fully qualified column name as their hierarchy goes from root down to the
+deepest one.
+
+    ```scala
+      SchemaUtils.splitPath(columnName, keepEmptyFields = True)
+    ```
+
+
 ### JsonUtils
 
 _Json Utils_ provides methods for working with Json, both on input and output.

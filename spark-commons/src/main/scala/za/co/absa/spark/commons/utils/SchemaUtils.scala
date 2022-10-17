@@ -74,7 +74,7 @@ object SchemaUtils {
     }
 
     var isParentCommon = true // For Seq() the property holds by [my] convention
-    var restOfPaths: Seq[Seq[String]] = paths.map(_.split('.').toSeq).filter(_.nonEmpty)
+    var restOfPaths: Seq[Seq[String]] = paths.map(SchemaUtils.splitPath).filter(_.nonEmpty)
     while (isParentCommon && restOfPaths.nonEmpty) {
       val parent = restOfPaths.head.head
       isParentCommon = restOfPaths.forall(path => path.head == parent)
@@ -97,6 +97,44 @@ object SchemaUtils {
       path
     } else {
       s"$path.$fieldName"
+    }
+  }
+
+
+  /**
+   * Separates the field name components of a fully qualified column name as their hierarchy goes from root down to the
+   * deepest one. No validation on the field names is done
+   * Example: `"com.my.package.xyz"` -> `List("com", "my", "package", "xyz")`
+   * Trailing '.' is ignored, leading one not.
+   *
+   * @param columnName      A fully qualified column name
+   * @return Each level field name in sequence how they go from root to the lowest one
+   */
+  def splitPath(columnName: String): List[String] = splitPath(columnName, keepEmptyFields = true)
+
+  /**
+   * Separates the field name components of a fully qualified column name as their hierarchy goes from root down to the
+   * deepest one. No validation on the field names is done
+   * Function is rather overloaded than using default parameter for easier use in functions like `map`
+   * Example: `"com.my.package.xyz"` -> `List("com", "my", "package", "xyz")`
+   * Trailing '.' is ignored, leading one not.
+   *
+   * @param columnName      A fully qualified column name
+   * @param keepEmptyFields If `false` any empty field names are removed from the result list, otherwise kept
+   * @return Each level field name in sequence how they go from root to the lowest one
+   */
+  def splitPath(columnName: String, keepEmptyFields: Boolean): List[String] = {
+    val stripped = columnName.stripSuffix(".")
+
+    if (stripped.isEmpty) {
+      List.empty
+    } else {
+      val segments = stripped.split('.').toList
+      if (keepEmptyFields) {
+        segments
+      } else {
+        segments.filterNot(_.isEmpty)
+      }
     }
   }
 

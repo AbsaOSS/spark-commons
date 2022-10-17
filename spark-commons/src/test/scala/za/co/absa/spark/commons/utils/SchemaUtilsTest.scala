@@ -46,4 +46,21 @@ class SchemaUtilsTest extends AnyFunSuite with Matchers {
     assert (!isCommonSubPath("a.b.c.d.e.f", "a.b.c.x", "a.b.c", "a.b", "a"))
   }
 
+  test("Test splitPath") {
+    assertResult(List("a", "b", "c", "d", "e"))(splitPath("a.b.c.d.e"))
+    assertResult(List("a"))(splitPath("a"))
+    assertResult(List("a", "bcd"))(splitPath("a.bcd"))
+    assertResult(List("a", "bcd"))(splitPath("a.bcd."))
+    assertResult(List("", "a", "bcd"))(splitPath(".a.bcd"))
+    assertResult(List.empty[String])(splitPath(""))
+    assertResult(List.empty[String])(splitPath("."))
+  }
+
+  test("Test splitPath with removing empty fields") {
+    assertResult(List("a", "b", "c", "d", "e"))(splitPath("a.b.c.d.e", keepEmptyFields = false))
+    assertResult(List("a", "e"))(splitPath("a....e", keepEmptyFields = false))
+    assertResult(List("a", "bcd"))(splitPath(".a.bcd", keepEmptyFields = false))
+    assertResult(List.empty[String])(splitPath("", keepEmptyFields = false))
+    assertResult(List.empty[String])(splitPath(".", keepEmptyFields = false))
+  }
 }
