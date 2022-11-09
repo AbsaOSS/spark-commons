@@ -35,6 +35,28 @@ lazy val commonSettings = Seq(
   Test / parallelExecution := false
 )
 
+lazy val jacocoSparkCommonsReportSettings = Seq(
+  jacocoReportSettings := JacocoReportSettings(
+    s"spark-commons Jacoco Report",
+    None,
+    JacocoThresholds(),
+    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
+    "utf-8"),
+  jacocoExcludes := Seq(
+//    "za.co.absa.spark.commons.utils.JsonUtils*", // class and related objects
+//    "za.co.absa.spark.commons.utils.ExplodeTools" // class only
+  )
+)
+
+lazy val jacocoSparkCommonsTestReportSettings = Seq(
+  jacocoReportSettings := JacocoReportSettings(
+    s"spark-commons-test Jacoco Report",
+    None,
+    JacocoThresholds(),
+    Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML),
+    "utf-8")
+)
+
 lazy val parent = (project in file("."))
   .aggregate(sparkCommons.projectRefs ++ sparkCommonsTest.projectRefs: _*)
   .settings(
@@ -44,6 +66,7 @@ lazy val parent = (project in file("."))
 
 lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
+  .settings(jacocoSparkCommonsReportSettings: _*)
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
   .sparkRow(SparkVersionAxis(spark3), scalaVersions = Seq(scala212))
   .dependsOn(sparkCommonsTest % "test")
@@ -55,4 +78,5 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     libraryDependencies ++= sparkDependencies(spark2)
     ): _*
   )
+  .settings(jacocoSparkCommonsTestReportSettings: _*)
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))
