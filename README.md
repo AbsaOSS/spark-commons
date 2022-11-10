@@ -356,7 +356,8 @@ SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibili
 
 Abstract class to help attach/register UDFs and similar object only once to a spark session.
 
-_Usage:+ extend this abstract class and implement the method [`register`]. On initialization the `register` method gets 
+
+_Usage:_ Extend this abstract class and implement the method `register`. On initialization the `register` method gets 
 executed only if the class + spark session combination is unique. 
 
 This way we ensure only single registration per spark session.
