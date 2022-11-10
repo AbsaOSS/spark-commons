@@ -352,6 +352,15 @@ Checking for 3.X versions
 SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
 ```
 
+### OncePerSparkSession
+
+Abstract class to help attach/register UDFs and similar object only once to a spark session.
+
+_Usage:+ extend this abstract class and implement the method [`register`]. On initialization the `register` method gets 
+executed only if the class + spark session combination is unique. 
+
+This way we ensure only single registration per spark session.
+
 ### DataFrameImplicits
 _DataFrameImplicits_ provides methods for transformations on Dataframes  
 
