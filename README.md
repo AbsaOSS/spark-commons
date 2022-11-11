@@ -414,6 +414,17 @@ override lazy val spark: SparkSession = initSpark(new YarnSparkConfiguration(con
 }
 ```
 
+## How to generate Code coverage report
+```sbt
+sbt jacoco
+```
+Code coverage will be generated on path:
+```
+{project-root}/target/sparkX.Y-jvm-{scala_version}/jacoco/report/html
+{project-root}/spark-commons-test/target/jvm-{scala_version}/jacoco/report/html
+```
+
+
 ## How to Release
 
 Please see [this file](RELEASE.md) for more details.
