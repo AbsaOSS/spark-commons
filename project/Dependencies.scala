@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ABSA Group Limited
+ * Copyright 2021 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ object Dependencies {
   }
 
   def commonDependencies: Seq[ModuleID] = Seq(
-    "org.scalatest"         %% "scalatest"   % "3.1.0"      % Test
+    "org.scalatest"         %% "scalatest"     % "3.2.2"      % Test,
+    "org.mockito"           %% "mockito-scala" % "1.17.12"    % Test
   )
 
   def sparkDependencies(sparkVersion: String): Seq[ModuleID] = Seq(

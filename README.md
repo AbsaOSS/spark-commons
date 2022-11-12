@@ -352,6 +352,16 @@ Checking for 3.X versions
 SparkVersionGuard.fromSpark3XCompatibilitySettings.ensureSparkVersionCompatibility(SPARK_VERSION)
 ```
 
+### OncePerSparkSession
+
+Abstract class to help attach/register UDFs and similar object only once to a spark session.
+
+
+_Usage:_ Extend this abstract class and implement the method `register`. On initialization the `register` method gets 
+executed only if the class + spark session combination is unique. 
+
+This way we ensure only single registration per spark session.
+
 ### DataFrameImplicits
 _DataFrameImplicits_ provides methods for transformations on Dataframes  
 
@@ -413,6 +423,17 @@ class MyTest extends SparkTestBase {
 override lazy val spark: SparkSession = initSpark(new YarnSparkConfiguration(confDir, distJarsDir))
 }
 ```
+
+## How to generate Code coverage report
+```sbt
+sbt jacoco
+```
+Code coverage will be generated on path:
+```
+{project-root}/target/sparkX.Y-jvm-{scala_version}/jacoco/report/html
+{project-root}/spark-commons-test/target/jvm-{scala_version}/jacoco/report/html
+```
+
 
 ## How to Release
 
