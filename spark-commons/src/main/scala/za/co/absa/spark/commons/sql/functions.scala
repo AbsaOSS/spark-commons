@@ -28,7 +28,7 @@ object functions {
 
   /**
    *  Similarly to [[col]] function evaluates the column based on the provided column name. But here, it can be a full
-   *  path even of nested fields. It also evaluates arrays and maps where the array index or map key is in brackets [].
+   *  path even of nested fields. It also evaluates arrays and maps where the array index or map key is in brackets `[]`.
    *
    * @param fullColName The full name of the column, where segments are separated by dots and array indexes or map keys
    *                    are in brackets
