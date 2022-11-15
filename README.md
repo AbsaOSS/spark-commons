@@ -395,6 +395,16 @@ _DataFrameImplicits_ provides methods for transformations on Dataframes
    ```scala
       df.alignSchema(listColumns)
    ```
+
+## Functions
+
+1. Similarly to `col` function evaluates the column based on the provided column name. But here, it can be a full
+path even of nested fields. It also evaluates arrays and maps where the array index or map key is in brackets `[]`.
+
+   ```scala
+       def col_of_path(fullColName: String): Column
+   ```
+
    
 ## Spark Commons Test
 
