@@ -22,11 +22,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Abstract class to help attach/register UDFs and similar object only once to a spark session.
- * This is done by using the companion object's registry [[ConcurrentHashMap]] that holds already
+ * This is done by using the companion object's registry `ConcurrentHashMap` that holds already
  * instantiated classes thus not running the method [[register]] again on them.
  *
  * Usage: extend this abstract class and implement the method [[register]]. On initialization the
- * [[register]] method gets called by the [[registerMe]] method if the class + spark session
+ * [[register]] method gets called by the [[za.co.absa.spark.commons.OncePerSparkSession$.registerMe]] method if the class + spark session
  * combination is unique. If it is not unique [[register]] will not get called again.
  * This way we ensure only single registration per spark session.
  *
@@ -51,7 +51,8 @@ object OncePerSparkSession {
     )
   }
 
-  private def registerMe(library: OncePerSparkSession, spark: SparkSession): Unit = {
+  protected def registerMe(library: OncePerSparkSession, spark: SparkSession): Unit = {
+    // the function is `protected` to make it visible to `ScalaDoc`
     Option(registry.putIfAbsent(makeKey(library, spark), Unit))
       .getOrElse(library.register(spark))
   }
