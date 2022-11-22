@@ -430,7 +430,7 @@ sbt jacoco
 ```
 Code coverage will be generated on path:
 ```
-{project-root}/target/sparkX.Y-jvm-{scala_version}/jacoco/report/html
+{project-root}/spark-commons/target/spark{spark_version}-jvm-{scala_version}/jacoco/report/html
 {project-root}/spark-commons-test/target/jvm-{scala_version}/jacoco/report/html
 ```
 
