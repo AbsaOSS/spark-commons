@@ -31,5 +31,6 @@ object DefaultSparkConfiguration extends SparkTestConfig {
       .config("spark.driver.host", "127.0.0.1")
       .config("spark.sql.hive.convertMetastoreParquet", value = false)
       .config("fs.defaultFS", "file:/")
+      .config("spark.sql.shuffle.partitions", "1")
   }
 }
