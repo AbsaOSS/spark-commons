@@ -332,6 +332,11 @@ _StructTypeImplicits_ provides implicit methods for working with StructType obje
    dataFrame.withColumnIfDoesNotExist(path)
  ```
 
+5. Casts all `NullType` fields of the DataFrame to their corresponding types in targetSchema.
+
+ ```scala
+   dataFrame.enforceTypeOnNullTypeFields(targetSchema)
+ ```
 
 
 ### Spark Version Guard
