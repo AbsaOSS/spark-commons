@@ -16,15 +16,17 @@
 
 package za.co.absa.spark.commons.implicits
 
-import java.io.ByteArrayOutputStream
-
-import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.functions.{col, lit, struct}
+import org.apache.spark.sql.types.{ArrayType, NullType, StructType}
 import org.apache.spark.sql.{Column, DataFrame}
+import za.co.absa.spark.commons.adapters.TransformAdapter
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.DataFrameSelector
+
+import java.io.ByteArrayOutputStream
 
 object DataFrameImplicits {
 
-  implicit class DataFrameEnhancements(val df: DataFrame) extends AnyVal {
+  implicit class DataFrameEnhancements(val df: DataFrame) extends TransformAdapter {
 
     private def gatherData(showFnc: () => Unit): String = {
       val outCapture = new ByteArrayOutputStream
@@ -81,6 +83,68 @@ object DataFrameImplicits {
       } else {
         df.withColumn(colName, colExpr)
       }
+    }
+
+    /**
+     * Casts NullType (aka VOID) fields to their target types as defined in `targetSchema`.
+     *
+     * Matching of fields is "by name", so order of fields in schema(s) doesn't matter.
+     * Resulting DataFrame has the same fields order as original DataFrame.
+     *
+     * @param targetSchema definition of field types to which potential NullTypes will be casted to
+     * @return DataFrame with fields of NullType casted to their type in `targetSchema`
+     */
+    def enforceTypeOnNullTypeFields(targetSchema: StructType): DataFrame = {
+
+      def processArray(
+                        thisArrType: ArrayType, targetArrType: ArrayType, thisArrayColumn: Column
+                      ): Column =
+        (thisArrType.elementType, targetArrType.elementType) match {
+          case (_: NullType, _) =>
+            transform(
+              thisArrayColumn,
+              _ => lit(null).cast(targetArrType.elementType)
+            )
+          case (thisNestedArrType: ArrayType, targetNestedArrType: ArrayType) =>
+            transform(
+              thisArrayColumn,
+              processArray(thisNestedArrType, targetNestedArrType, _)
+            )
+          case (thisNestedStructType: StructType, targetNestedStructType: StructType) =>
+            transform(
+              thisArrayColumn,
+              element => struct(processStruct(thisNestedStructType, targetNestedStructType, Some(element)): _*)
+            )
+          case _ => thisArrayColumn
+        }
+
+      def processStruct(
+                         currentThisSchema: StructType, currentTargetSchema: StructType, parent: Option[Column]
+                       ): List[Column] = {
+        val currentTargetSchemaMap = currentTargetSchema.map(f => (f.name, f)).toMap
+
+        currentThisSchema.foldRight(List.empty[Column])((field, acc) => {
+          val currentColumn: Column = parent
+            .map(_.getField(field.name))
+            .getOrElse(col(field.name))
+            .as(field.name)
+          val correspondingTargetType = currentTargetSchemaMap.get(field.name).map(_.dataType)
+
+          (field.dataType, correspondingTargetType) match {
+            case (NullType, Some(targetType)) =>
+              currentColumn.cast(targetType).as(field.name) :: acc
+            case (arrType: ArrayType, Some(targetArrType: ArrayType)) =>
+              processArray(arrType, targetArrType, currentColumn).as(field.name) :: acc
+            case (structType: StructType, Some(targetStructType: StructType)) =>
+              struct(processStruct(structType, targetStructType, Some(currentColumn)): _*).as(field.name) :: acc
+            case _ => currentColumn :: acc
+          }
+        })
+      }
+
+      val thisSchema = df.schema
+      val selector = processStruct(thisSchema, targetSchema, None)
+      df.select(selector: _*)
     }
 
     /**
