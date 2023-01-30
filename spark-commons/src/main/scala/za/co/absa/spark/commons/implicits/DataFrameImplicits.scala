@@ -121,14 +121,14 @@ object DataFrameImplicits {
       def processStruct(
                          currentThisSchema: StructType, currentTargetSchema: StructType, parent: Option[Column]
                        ): List[Column] = {
-        val currentTargetSchemaMap = currentTargetSchema.map(f => (f.name, f)).toMap
+        val currentTargetSchemaMap = currentTargetSchema.map(f => (f.name.toLowerCase, f)).toMap
 
         currentThisSchema.foldRight(List.empty[Column])((field, acc) => {
           val currentColumn: Column = parent
             .map(_.getField(field.name))
             .getOrElse(col(field.name))
             .as(field.name)
-          val correspondingTargetType = currentTargetSchemaMap.get(field.name).map(_.dataType)
+          val correspondingTargetType = currentTargetSchemaMap.get(field.name.toLowerCase).map(_.dataType)
 
           (field.dataType, correspondingTargetType) match {
             case (NullType, Some(targetType)) =>

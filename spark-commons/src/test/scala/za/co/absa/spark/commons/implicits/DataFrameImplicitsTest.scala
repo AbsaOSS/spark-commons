@@ -309,7 +309,8 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
         // to ensure enforceTypeOnNullTypeFields converts by name
         StructField("nullShouldBeInteger", IntegerType),
         StructField("nullShouldBeString", StringType),
-        StructField("nullShouldBeArrayOfIntegers", ArrayType(IntegerType)),
+        // checks case-insensitivity
+        StructField("nullShouldBeArrayOfINTEGERS", ArrayType(IntegerType)),
         StructField("nullShouldBeArrayOfArraysOfIntegers", ArrayType(ArrayType(IntegerType))),
         StructField(
           "nullShouldBeArrayOfStructs",
@@ -352,7 +353,8 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
               // to ensure enforceTypeOnNullTypeFields converts by name
               StructField("nullShouldBeInteger", IntegerType),
               StructField("nullShouldBeString", StringType),
-              StructField("shouldIgnoreNonNullTypeMismatch", IntegerType, false),
+              // checks case-insensitivity
+              StructField("shouldIgnoreNonNullTypeMISMATCH", IntegerType, false),
               StructField("shouldIgnoreNonNullArrayTypeMismatch", ArrayType(StringType, false), false),
               StructField(
                 "nestedStruct",
@@ -361,7 +363,8 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
                     // nullShouldBeInteger and nullShouldBeString are swapped comparing to dfWithComplexTypes
                     // to ensure enforceTypeOnNullTypeFields converts by name
                     StructField("nullShouldBeInteger", IntegerType),
-                    StructField("nullShouldBeString", StringType),
+                    // checks case-insensitivity
+                    StructField("nullSHOULDBeString", StringType),
                     StructField("shouldIgnoreNonNullTypeMismatch", IntegerType, false)
                   )
                 ),
