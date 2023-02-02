@@ -90,6 +90,7 @@ object DataFrameImplicits {
      *
      * Matching of fields is "by name", so order of fields in schema(s) doesn't matter.
      * Resulting DataFrame has the same fields order as original DataFrame.
+     * All fields from original DataFrame are kept in resulting DataFrame, even those that are not in `targetSchema`.
      *
      * @param targetSchema definition of field types to which potential NullTypes will be casted to
      * @return DataFrame with fields of NullType casted to their type in `targetSchema`
@@ -100,6 +101,7 @@ object DataFrameImplicits {
                         thisArrType: ArrayType, targetArrType: ArrayType, thisArrayColumn: Column
                       ): Column =
         (thisArrType.elementType, targetArrType.elementType) match {
+          case (_: NullType, _: NullType) => thisArrayColumn
           case (_: NullType, _) =>
             transform(
               thisArrayColumn,
@@ -127,17 +129,17 @@ object DataFrameImplicits {
           val currentColumn: Column = parent
             .map(_.getField(field.name))
             .getOrElse(col(field.name))
-            .as(field.name)
           val correspondingTargetType = currentTargetSchemaMap.get(field.name.toLowerCase).map(_.dataType)
 
           (field.dataType, correspondingTargetType) match {
+            case (NullType, Some(NullType)) => currentColumn.as(field.name) :: acc
             case (NullType, Some(targetType)) =>
               currentColumn.cast(targetType).as(field.name) :: acc
             case (arrType: ArrayType, Some(targetArrType: ArrayType)) =>
               processArray(arrType, targetArrType, currentColumn).as(field.name) :: acc
             case (structType: StructType, Some(targetStructType: StructType)) =>
               struct(processStruct(structType, targetStructType, Some(currentColumn)): _*).as(field.name) :: acc
-            case _ => currentColumn :: acc
+            case _ => currentColumn.as(field.name) :: acc
           }
         })
       }
