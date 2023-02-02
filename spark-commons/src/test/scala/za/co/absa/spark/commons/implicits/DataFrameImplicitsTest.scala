@@ -16,7 +16,8 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.functions.{array, lit, struct}
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{AnalysisException, DataFrame}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
@@ -258,6 +259,197 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     assertThrows[AnalysisException]{
       dfA.alignSchema(dfB.schema)
     }
+  }
+
+  test("cast NullTypes to corresponding types by enforceTypeOnNullTypeFields") {
+    val dfWithComplexTypes = spark.read.json(Seq(jsonF).toDS)
+      .withColumn("nullShouldBeString", lit(null))
+      .withColumn("nullShouldBeInteger", lit(null))
+      .withColumn("nullShouldBeArrayOfIntegers", lit(null))
+      .withColumn("nullShouldBeArrayOfArraysOfIntegers", lit(null))
+      .withColumn("nullShouldBeArrayOfStructs", lit(null))
+      .withColumn("nullShouldBeStruct", lit(null))
+      .withColumn("shouldIgnoreNonNullTypeMismatch", lit("abc"))
+      .withColumn("arrayOfNullShouldBeArrayOfIntegers", array(lit(null), lit(null)))
+      .withColumn(
+        "arrayOfArrayOfNullShouldBeArrayOfArrayOfStrings",
+        array(array(lit(null), lit(null)))
+      )
+      .withColumn(
+        "arrayOfStructs",
+        array(
+          struct(
+            lit(null).as("nullShouldBeString"),
+            lit(null).as("nullShouldBeInteger"),
+            lit("abc").as("shouldIgnoreNonNullTypeMismatch"),
+            array(lit(null), lit(null)).as("arrayOfNullShouldBeArrayOfIntegers")
+          )
+        )
+      )
+      .withColumn(
+        "complexStruct",
+        struct(
+          lit(null).as("nullShouldBeString"),
+          lit(null).as("nullShouldBeInteger"),
+          lit("abc").as("shouldIgnoreNonNullTypeMismatch"),
+          array(lit(1), lit(2), lit(3)).as("shouldIgnoreNonNullArrayTypeMismatch"),
+          struct(
+            lit(null).as("nullShouldBeString"),
+            lit(null).as("nullShouldBeInteger"),
+            lit("abc").as("shouldIgnoreNonNullTypeMismatch")
+          ).as("nestedStruct"),
+          array(lit(null), lit(null)).as("arrayOfNullShouldBeArrayOfIntegers")
+        )
+      )
+
+    val targetSchema = StructType(
+      Seq(
+        StructField("id", LongType),
+        // nullShouldBeInteger and nullShouldBeString are swapped comparing to dfWithComplexTypes
+        // to ensure enforceTypeOnNullTypeFields converts by name
+        StructField("nullShouldBeInteger", IntegerType),
+        StructField("nullShouldBeString", StringType),
+        // checks case-insensitivity
+        StructField("nullShouldBeArrayOfINTEGERS", ArrayType(IntegerType)),
+        StructField("nullShouldBeArrayOfArraysOfIntegers", ArrayType(ArrayType(IntegerType))),
+        StructField(
+          "nullShouldBeArrayOfStructs",
+          ArrayType(
+            StructType(
+              Seq(StructField("a", StringType), StructField("b", DecimalType(28, 8)))
+            )
+          )
+        ),
+        StructField(
+          "nullShouldBeStruct",
+          StructType(
+            Seq(StructField("a", StringType), StructField("b", DecimalType(28, 8)))
+          )
+        ),
+        StructField("shouldIgnoreNonNullTypeMismatch", IntegerType, false),
+        StructField("arrayOfNullShouldBeArrayOfIntegers", ArrayType(IntegerType), false),
+        StructField("arrayOfArrayOfNullShouldBeArrayOfArrayOfStrings", ArrayType(ArrayType(StringType), false), false),
+        StructField(
+          "arrayOfStructs",
+          ArrayType(
+            StructType(
+              Seq(
+                // nullShouldBeInteger and nullShouldBeString are swapped comparing to dfWithComplexTypes
+                // to ensure enforceTypeOnNullTypeFields converts by name
+                StructField("nullShouldBeInteger", IntegerType),
+                StructField("nullShouldBeString", StringType),
+                StructField("shouldIgnoreNonNullTypeMismatch", IntegerType, false),
+                StructField("arrayOfNullShouldBeArrayOfIntegers", ArrayType(IntegerType), false)
+              )
+            )
+          ),
+          false
+        ),
+        StructField(
+          "complexStruct",
+          StructType(
+            Seq(
+              // nullShouldBeInteger and nullShouldBeString are swapped comparing to dfWithComplexTypes
+              // to ensure enforceTypeOnNullTypeFields converts by name
+              StructField("nullShouldBeInteger", IntegerType),
+              StructField("nullShouldBeString", StringType),
+              // checks case-insensitivity
+              StructField("shouldIgnoreNonNullTypeMISMATCH", IntegerType, false),
+              StructField("shouldIgnoreNonNullArrayTypeMismatch", ArrayType(StringType, false), false),
+              StructField(
+                "nestedStruct",
+                StructType(
+                  Seq(
+                    // nullShouldBeInteger and nullShouldBeString are swapped comparing to dfWithComplexTypes
+                    // to ensure enforceTypeOnNullTypeFields converts by name
+                    StructField("nullShouldBeInteger", IntegerType),
+                    // checks case-insensitivity
+                    StructField("nullSHOULDBeString", StringType),
+                    StructField("shouldIgnoreNonNullTypeMismatch", IntegerType, false)
+                  )
+                ),
+                false
+              ),
+              StructField("arrayOfNullShouldBeArrayOfIntegers", ArrayType(IntegerType), false)
+            )
+          ),
+          false
+        )
+      )
+    )
+
+    val actual = dfWithComplexTypes.enforceTypeOnNullTypeFields(targetSchema)
+
+    assert(actual.count() === dfWithComplexTypes.count())
+
+    val actualSchema = actual.schema
+    val expectedSchema = StructType(
+      Seq(
+        StructField("id", LongType),
+        StructField("nullShouldBeString", StringType),
+        StructField("nullShouldBeInteger", IntegerType),
+        StructField("nullShouldBeArrayOfIntegers", ArrayType(IntegerType)),
+        StructField("nullShouldBeArrayOfArraysOfIntegers", ArrayType(ArrayType(IntegerType))),
+        StructField(
+          "nullShouldBeArrayOfStructs",
+          ArrayType(
+            StructType(
+              Seq(StructField("a", StringType), StructField("b", DecimalType(28, 8)))
+            )
+          )
+        ),
+        StructField(
+          "nullShouldBeStruct",
+          StructType(
+            Seq(StructField("a", StringType), StructField("b", DecimalType(28, 8)))
+          )
+        ),
+        StructField("shouldIgnoreNonNullTypeMismatch", StringType, false),
+        StructField("arrayOfNullShouldBeArrayOfIntegers", ArrayType(IntegerType), false),
+        StructField("arrayOfArrayOfNullShouldBeArrayOfArrayOfStrings", ArrayType(ArrayType(StringType), false), false),
+        StructField(
+          "arrayOfStructs",
+          ArrayType(
+            StructType(
+              Seq(
+                StructField("nullShouldBeString", StringType),
+                StructField("nullShouldBeInteger", IntegerType),
+                StructField("shouldIgnoreNonNullTypeMismatch", StringType, false),
+                StructField("arrayOfNullShouldBeArrayOfIntegers", ArrayType(IntegerType), false)
+              )
+            ),
+            false
+          ),
+          false
+        ),
+        StructField(
+          "complexStruct",
+          StructType(
+            Seq(
+              StructField("nullShouldBeString", StringType),
+              StructField("nullShouldBeInteger", IntegerType),
+              StructField("shouldIgnoreNonNullTypeMismatch", StringType, false),
+              StructField("shouldIgnoreNonNullArrayTypeMismatch", ArrayType(IntegerType, false), false),
+              StructField(
+                "nestedStruct",
+                StructType(
+                  Seq(
+                    StructField("nullShouldBeString", StringType),
+                    StructField("nullShouldBeInteger", IntegerType),
+                    StructField("shouldIgnoreNonNullTypeMismatch", StringType, false)
+                  )
+                ),
+                false
+              ),
+              StructField("arrayOfNullShouldBeArrayOfIntegers", ArrayType(IntegerType), false)
+            )
+          ),
+          false
+        )
+      )
+    )
+
+    assert(actualSchema === expectedSchema)
   }
 
   test("Check that cacheIfNotCachedYet caches the data") {
