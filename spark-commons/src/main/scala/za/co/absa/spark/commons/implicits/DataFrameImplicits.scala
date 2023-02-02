@@ -131,16 +131,16 @@ object DataFrameImplicits {
             .getOrElse(col(field.name))
           val correspondingTargetType = currentTargetSchemaMap.get(field.name.toLowerCase).map(_.dataType)
 
-          (field.dataType, correspondingTargetType) match {
-            case (NullType, Some(NullType)) => currentColumn.as(field.name) :: acc
-            case (NullType, Some(targetType)) =>
-              currentColumn.cast(targetType).as(field.name) :: acc
+          val castedColumn = (field.dataType, correspondingTargetType) match {
+            case (NullType, Some(NullType)) => currentColumn
+            case (NullType, Some(targetType)) => currentColumn.cast(targetType)
             case (arrType: ArrayType, Some(targetArrType: ArrayType)) =>
-              processArray(arrType, targetArrType, currentColumn).as(field.name) :: acc
+              processArray(arrType, targetArrType, currentColumn)
             case (structType: StructType, Some(targetStructType: StructType)) =>
-              struct(processStruct(structType, targetStructType, Some(currentColumn)): _*).as(field.name) :: acc
-            case _ => currentColumn.as(field.name) :: acc
+              struct(processStruct(structType, targetStructType, Some(currentColumn)): _*)
+            case _ => currentColumn
           }
+          castedColumn.as(field.name) :: acc
         })
       }
 
