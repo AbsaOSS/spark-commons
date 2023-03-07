@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling
 
-import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, LongType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 
@@ -24,16 +24,11 @@ class ErrorMessageTest extends AnyFunSuite with SparkTestBase {
   test("errorColSchema returns the expected structure"){
     val expected = StructType(Seq(
       StructField("errType", StringType, nullable = true),
-      StructField("errCode", StringType, nullable = true),
+      StructField("errCode", LongType, nullable = false),
       StructField("errMsg", StringType, nullable = true),
       StructField("errCol", StringType, nullable = true),
       StructField("rawValues", ArrayType(StringType, containsNull = true), nullable = true),
-      StructField("mappings", ArrayType(
-        StructType(Seq(
-          StructField("mappingTableColumn", StringType, nullable = true),
-          StructField("mappedDatasetColumn", StringType, nullable = true)
-        )), containsNull = true),
-        nullable = true)
+      StructField("additionInfo", StringType, nullable = true)
     ))
 
     val result = ErrorMessage.errorColSchema
