@@ -39,8 +39,12 @@ abstract class OncePerSparkSession() extends Serializable {
     this()
     register(sparkToRegisterTo)
   }
-  def register(implicit spark: SparkSession): Unit = {
-    OncePerSparkSession.registerMe(this, spark)
+
+  def register(implicit spark: SparkSession): Boolean = {
+    val created = OncePerSparkSession.registerMe(this, spark)
+
+    if (created == this) true
+    else false
   }
 
   protected def registerBody(spark: SparkSession): Unit
