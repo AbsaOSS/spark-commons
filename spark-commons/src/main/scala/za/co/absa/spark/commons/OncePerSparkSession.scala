@@ -17,6 +17,7 @@
 package za.co.absa.spark.commons
 
 import org.apache.spark.sql.SparkSession
+import org.fusesource.hawtjni.runtime.Library
 
 import java.util.concurrent.ConcurrentHashMap
 
@@ -32,11 +33,18 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @param sparkToRegisterTo Spark session to which we wish to attach objects
  */
-abstract class OncePerSparkSession()(implicit sparkToRegisterTo: SparkSession) extends Serializable {
+abstract class OncePerSparkSession() extends Serializable {
 
-  protected def register(implicit spark: SparkSession): Unit
+  def this()(implicit sparkToRegisterTo: SparkSession) = {
+    this()
+    register(sparkToRegisterTo)
+  }
+  def register(implicit spark: SparkSession): Unit = {
+    OncePerSparkSession.registerMe(this, spark)
+  }
 
-  OncePerSparkSession.registerMe(this, sparkToRegisterTo)
+  protected def registerBody(spark: SparkSession): Unit
+
 }
 
 object OncePerSparkSession {
@@ -54,6 +62,7 @@ object OncePerSparkSession {
   protected def registerMe(library: OncePerSparkSession, spark: SparkSession): Unit = {
     // the function is `protected` to make it visible to `ScalaDoc`
     Option(registry.putIfAbsent(makeKey(library, spark), Unit))
-      .getOrElse(library.register(spark))
+      .getOrElse(library.registerBody(spark))
   }
+
 }
