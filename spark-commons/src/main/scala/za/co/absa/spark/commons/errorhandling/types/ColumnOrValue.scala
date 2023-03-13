@@ -36,6 +36,9 @@ object ColumnOrValue {
 
   def apply[T](columnName: String): ColumnOrValue[T] = CoVNamedColumn(columnName)
   def apply[T](column: Column): ColumnOrValue[T] = CoVDefinedColumn(column)
+  def apply[T](values: Seq[T]): ColumnOrValue[Seq[T]] = ??? //TODO
+  def apply[T](value: Option[T]): ColumnOrValue[Option[T]] = ??? //TODO
+
   def withOption[T](value: Option[T]): ColumnOrValue[Option[T]] = {
     value match {
       case None => CoVNull()

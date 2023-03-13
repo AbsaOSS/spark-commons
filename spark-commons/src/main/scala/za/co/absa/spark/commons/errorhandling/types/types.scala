@@ -19,13 +19,12 @@ package za.co.absa.spark.commons.errorhandling
 import org.apache.spark.sql.Column
 
 package object types {
-  type ErrSourceColName = String
+  type ErrColName = String
 
   type ErrType = String
   type ErrCode = Long // was string
   type ErrMsg = String
-  type ErrCol = Option[ErrSourceColName] // wouldn't Seq[String] be better? But perhaps AdditionalInfo will suffice, while usually having one main column
-  //wouldn't a better name be SourceOfErrCol?
+  type ErrCols = Seq[ErrColName]
   type RawValues = Seq[String]
   type AdditionalInfo = Option[String] // actually a JSON
   //mapping is missing, should be part of AdditionalInfo, as being very specific

@@ -17,18 +17,21 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.functions.array
-import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.types._
 
 class ErrorMessageSubmitWithoutColumn(
-                                       val errType: ColumnOrValue[ErrType],
-                                       val errCode: ColumnOrValue[ErrCode],
-                                       val errMsg: ColumnOrValue[ErrMsg],
-                                       override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
-                                     ) extends ErrorMessageSubmit {
-
-  val errCol: ColumnOrValue[ErrCol] = ColumnOrValue.asEmpty
-  val rawValues: ColumnOrValue[RawValues] = ColumnOrValue(array())
+                                       errType: ColumnOrValue[ErrType],
+                                       errCode: ColumnOrValue[ErrCode],
+                                       errMsg: ColumnOrValue[ErrMsg],
+                                       additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
+                                     ) extends ErrorMessageSubmitOnMoreColumns(
+                                       errType,
+                                       errCode,
+                                       errMsg,
+                                       Seq.empty,
+                                       additionInfo
+                                     ) {
+  override val rawValues: ColumnOrValue[RawValues] = ColumnOrValue(array())
 }
 
 object ErrorMessageSubmitWithoutColumn {

@@ -23,10 +23,13 @@ import za.co.absa.spark.commons.errorhandling.types._
 trait ErrorHandling {
   def register(sparkToRegisterTo: SparkSession): Unit = {}
 
-  def putErrorToColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errCol: ErrCol, additionalInfo: AdditionalInfo = None): ErrorColumn = {
-    val toSubmit = errCol
-      .map(errSourceColName => ErrorMessageSubmitOnColumn(errType, errCode, errMessage, errSourceColName, additionalInfo))
-      .getOrElse(ErrorMessageSubmitWithoutColumn(errType, errCode, errMessage, additionalInfo))
+  def putErrorToColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, additionalInfo: AdditionalInfo = None): ErrorColumn = {
+    val toSubmit = ErrorMessageSubmitWithoutColumn(errType, errCode, errMessage, additionalInfo)
+    putErrorToColumn(toSubmit)
+  }
+
+  def putErrorToColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errColName: ErrColName, additionalInfo: AdditionalInfo = None): ErrorColumn = {
+    val toSubmit = ErrorMessageSubmitOnColumn(errType, errCode, errMessage, errColName, additionalInfo)
     putErrorToColumn(toSubmit)
   }
   def putErrorToColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn
