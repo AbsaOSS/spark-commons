@@ -35,16 +35,13 @@ import java.util.concurrent.ConcurrentHashMap
  */
 abstract class OncePerSparkSession() extends Serializable {
 
-  def this()(implicit sparkToRegisterTo: SparkSession) = {
+  def this(sparkToRegisterTo: SparkSession) = {
     this()
     register(sparkToRegisterTo)
   }
 
-  def register(implicit spark: SparkSession): Boolean = {
-    val registered = OncePerSparkSession.registerMe(this, spark)
-
-    if (registered == this) true
-    else false
+  def register(spark: SparkSession): Boolean = {
+    OncePerSparkSession.registerMe(this, spark)
   }
 
   protected def registerBody(spark: SparkSession): Unit
@@ -54,7 +51,7 @@ abstract class OncePerSparkSession() extends Serializable {
 object OncePerSparkSession {
   private[this] type Key = (Int, String)
 
-  private[this] val registry = new ConcurrentHashMap[Key, Unit]
+  private[this] val registry = new ConcurrentHashMap[Key, Boolean]
 
   private[this] def makeKey(library: OncePerSparkSession, spark: SparkSession): Key = {
     (
@@ -63,10 +60,13 @@ object OncePerSparkSession {
     )
   }
 
-  protected def registerMe(library: OncePerSparkSession, spark: SparkSession): Unit = {
+  protected def registerMe(library: OncePerSparkSession, spark: SparkSession): Boolean = {
     // the function is `protected` to make it visible to `ScalaDoc`
-    Option(registry.putIfAbsent(makeKey(library, spark), Unit))
-      .getOrElse(library.registerBody(spark))
+    Option(registry.putIfAbsent(makeKey(library, spark), false))
+      .getOrElse{
+        library.registerBody(spark)
+        true
+      }
   }
 
 }
