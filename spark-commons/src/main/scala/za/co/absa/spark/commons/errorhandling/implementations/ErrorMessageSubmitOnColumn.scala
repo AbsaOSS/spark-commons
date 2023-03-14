@@ -28,6 +28,7 @@ class ErrorMessageSubmitOnColumn (
 }
 
 object ErrorMessageSubmitOnColumn {
+
   def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errColName: ErrSourceColName, additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnColumn = {
     new ErrorMessageSubmitOnColumn(
       ColumnOrValue.withValue(errType),
