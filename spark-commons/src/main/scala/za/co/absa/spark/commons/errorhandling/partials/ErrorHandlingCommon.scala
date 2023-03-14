@@ -37,9 +37,10 @@ trait ErrorHandlingCommon extends ErrorHandling {
   }
 
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame = {
-    val errorsByColumn = errorsWhen.groupBy(_.errorMessageSubmit.errCol.getValue)
-    val errorColumns1 = errorsByColumn.getOrElse(None, Seq.empty).map(errorWhenToCol) // no grouping without ErrCol name
-    val errorColumns2 = (errorsByColumn - None).values.map(errorWhenSeqToCol).toSeq
+    val errorsByColumn = errorsWhen.groupBy(_.errorMessageSubmit.errColsAndValues.columnNames)
+    val noColNames = Set.empty[String]
+    val errorColumns1 = errorsByColumn.getOrElse(noColNames, Seq.empty).map(errorWhenToCol) // no grouping without ErrCol names
+    val errorColumns2 = (errorsByColumn - noColNames).values.map(errorWhenSeqToCol).toSeq
     doTheAggregation(dataFrame, errorColumns1 ++ errorColumns2: _*)
   }
 

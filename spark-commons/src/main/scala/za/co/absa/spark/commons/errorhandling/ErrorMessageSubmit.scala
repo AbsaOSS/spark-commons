@@ -22,8 +22,7 @@ trait ErrorMessageSubmit {
   def errType: ColumnOrValue[ErrType]
   def errCode: ColumnOrValue[ErrCode]
   def errMsg: ColumnOrValue[ErrMsg]
-  def errCol: ColumnOrValue[ErrCol]
-  def rawValues: ColumnOrValue[RawValues]
+  def errColsAndValues: ColumnOrValue[ErrColsAndValues]
   def additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
 }
 

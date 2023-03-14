@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.sql
+package za.co.absa.spark.commons.adapters
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.callUDF
 
-import scala.util.{Success, Try}
-
-// scalastyle:off
-object functions2 {
-// scalastyle:on
-
-  def call_udf(udfName: String, cols: Column*): Column = call_udf(udfName, cols:_*)
-
+trait CallUdfAdapter {
+  def call_udf(udfName: String, cols: Column*): Column = callUDF(udfName, cols:_*)
 }
