@@ -68,5 +68,4 @@ object functions {
     lit(None.orNull).cast(dataType)
   }
 
-
 }
