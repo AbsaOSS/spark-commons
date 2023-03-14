@@ -37,6 +37,7 @@ trait ErrorHandlingCommon extends ErrorHandling {
   }
 
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame = {
+    register(dataFrame.sparkSession)
     val errorsByColumn = errorsWhen.groupBy(_.errorMessageSubmit.errColsAndValues.columnNames)
     val noColNames = Set.empty[String]
     val errorColumns1 = errorsByColumn.getOrElse(noColNames, Seq.empty).map(errorWhenToCol) // no grouping without ErrCol names
