@@ -18,6 +18,7 @@ package za.co.absa.spark.commons.sql
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.col
+//import za.co.absa.spark.commons.utils.SchemaUtils
 import za.co.absa.spark.commons.utils.SchemaUtils
 
 import scala.util.{Success, Try}
