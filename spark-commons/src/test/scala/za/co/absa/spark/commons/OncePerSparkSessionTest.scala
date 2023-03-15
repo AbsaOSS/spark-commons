@@ -49,27 +49,25 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
   }
 
   test("should return true if the library is registered successfully and false if not and if spark is not hasn't started"){
-    var libraryAInitCounter = 0
-    var results_1 = false
-    var results_2 = false
     class UDFLibrary()(implicit sparkToRegister: SparkSession) extends OncePerSparkSession(){
-      results_1 = this.register(sparkToRegister)
-      results_2 = this.register(sparkToRegister)
+
+      var libraryAInitCounter = 0
+      val results_1 = this.register(sparkToRegister)
+      val results_2 = this.register(sparkToRegister)
       override protected def registerBody(spark: SparkSession): Unit = {
-        libraryAInitCounter += 1
+        this.libraryAInitCounter += 1
       }
+
     }
 
-    new UDFLibrary()
-    assert(results_1 == true)
-    assert(results_2 == false)
+    val UdfLibrary = new UDFLibrary()
+    assert(UdfLibrary.results_1 == true)
+    assert(UdfLibrary.results_2 == false)
+    assert(UdfLibrary.libraryAInitCounter == 1)
   }
 
-  test("should return is registered successfully and false if not and if spark is not hasn't started") {
+  test("should return false if the library is registered successfully and false if provided that spark session has started") {
     var libraryAInitCounter = 0
-//    var results_1 = false
-//    var results_2 = false
-
     val anotherSpark: SparkSession =  mock[SparkSession]
     class UDFLibrary()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {
       val results_1 = this.register(sparkToRegisterTo)
@@ -78,12 +76,13 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
       override protected def registerBody(spark: SparkSession): Unit = {
         libraryAInitCounter += 1
       }
+
     }
 
-//    new UDFLibrary()
-    val results = new UDFLibrary()(anotherSpark)
-    assert(results.results_1 == true)
-    assert(results.results_2 == false)
+    val library = new UDFLibrary()(anotherSpark)
+    assert(library.results_1 == false)
+    assert(library.results_2 == false)
+    assert(libraryAInitCounter == 1)
   }
 
 }
