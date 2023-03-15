@@ -48,4 +48,21 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
     assert(libraryBInitCounter == 2)
   }
 
+  test("should return true if the library is registered successfully and false if not"){
+    var libraryAInitCounter = 0
+    var results_1 = false
+    var results_2 = false
+    class UDFLibrary()(implicit sparkToRegister: SparkSession) extends OncePerSparkSession(){
+      results_1 = this.register(sparkToRegister)
+      results_2 = this.register(sparkToRegister)
+      override protected def registerBody(spark: SparkSession): Unit = {
+        libraryAInitCounter += 1
+      }
+    }
+
+    new UDFLibrary()
+    assert(results_1 == true)
+    assert(results_2 == false)
+  }
+
 }
