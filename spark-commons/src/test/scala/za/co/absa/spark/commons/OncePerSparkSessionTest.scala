@@ -48,7 +48,7 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
     assert(libraryBInitCounter == 2)
   }
 
-  test("should return true if the library is registered successfully and false if not"){
+  test("should return true if the library is registered successfully and false if not and if spark is not hasn't started"){
     var libraryAInitCounter = 0
     var results_1 = false
     var results_2 = false
@@ -63,6 +63,27 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
     new UDFLibrary()
     assert(results_1 == true)
     assert(results_2 == false)
+  }
+
+  test("should return is registered successfully and false if not and if spark is not hasn't started") {
+    var libraryAInitCounter = 0
+//    var results_1 = false
+//    var results_2 = false
+
+    val anotherSpark: SparkSession =  mock[SparkSession]
+    class UDFLibrary()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {
+      val results_1 = this.register(sparkToRegisterTo)
+      val results_2 = this.register(sparkToRegisterTo)
+
+      override protected def registerBody(spark: SparkSession): Unit = {
+        libraryAInitCounter += 1
+      }
+    }
+
+//    new UDFLibrary()
+    val results = new UDFLibrary()(anotherSpark)
+    assert(results.results_1 == true)
+    assert(results.results_2 == false)
   }
 
 }
