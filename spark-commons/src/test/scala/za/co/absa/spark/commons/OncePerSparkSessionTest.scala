@@ -48,7 +48,7 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
   }
 
   test("should return true if the library is registered successfully and false if not and if spark is not hasn't started"){
-    class UDFLibrary()(implicit sparkToRegister: SparkSession) extends OncePerSparkSession(){
+    class UDFLibrary() extends OncePerSparkSession(){
 
       var libraryAInitCounter = 0
       val results_1 = this.register(sparkToRegister)
