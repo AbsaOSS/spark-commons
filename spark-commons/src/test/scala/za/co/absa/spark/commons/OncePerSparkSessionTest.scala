@@ -27,7 +27,7 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
     var libraryBInitCounter = 0
 
     val anotherSpark: SparkSession =  mock[SparkSession]
-    class UDFLibraryA()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession() {
+    class UDFLibraryA(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {
       this.register(sparkToRegisterTo)
       override protected def registerBody(spark: SparkSession): Unit = {
         libraryAInitCounter += 1
