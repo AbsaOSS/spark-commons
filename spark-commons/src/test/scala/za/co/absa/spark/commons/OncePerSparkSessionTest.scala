@@ -60,9 +60,8 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
     }
 
     val UdfLibrary = new UDFLibrary()
-    assert(UdfLibrary.results_1 == true)
-    assert(UdfLibrary.results_2 == false)
-    assert(UdfLibrary.libraryAInitCounter == 1)
+    assert(UdfLibrary.register())
+    assert(!UdfLibrary.register())
   }
 
   test("should return false if the library is registered successfully and false if provided that spark session has started") {
