@@ -19,6 +19,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
 import za.co.absa.spark.commons.test.SparkTestBase
 import org.apache.spark.sql.functions.{col, length}
+import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {

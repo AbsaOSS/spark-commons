@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandling.implementations
+package za.co.absa.spark.commons.errorhandling.implementations.submits
 
-import org.apache.spark.sql.functions.array
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
+import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.columnNameToItsStringValue
 import za.co.absa.spark.commons.errorhandling.types._
 
-class ErrorMessageSubmitWithoutColumn(
+class ErrorMessageSubmitOnMoreColumns(
                                        val errType: ColumnOrValue[ErrType],
                                        val errCode: ColumnOrValue[ErrCode],
                                        val errMsg: ColumnOrValue[ErrMsg],
+                                       errColNames: Set[ErrSourceColName],
                                        override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
                                      ) extends ErrorMessageSubmit {
+  val errColsAndValues: ColumnOrValue[ErrColsAndValues] = ColumnOrValue(errColNames, columnNameToItsStringValue)
 
-  val errCol: ColumnOrValue[ErrCol] = ColumnOrValue.asEmpty
-  val rawValues: ColumnOrValue[RawValues] = ColumnOrValue(array())
 }
 
-object ErrorMessageSubmitWithoutColumn {
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitWithoutColumn = {
-    new ErrorMessageSubmitWithoutColumn(
-      ColumnOrValue.withActualValue(errType),
-      ColumnOrValue.withActualValue(errCode),
-      ColumnOrValue.withActualValue(errMessage),
+object ErrorMessageSubmitOnMoreColumns {
+  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errColNames: Set[ErrSourceColName], additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnMoreColumns = {
+    new ErrorMessageSubmitOnMoreColumns(
+      ColumnOrValue.withValue(errType),
+      ColumnOrValue.withValue(errCode),
+      ColumnOrValue.withValue(errMessage),
+      errColNames,
       ColumnOrValue.withOption(additionalInfo)
     )
   }
 }
-

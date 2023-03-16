@@ -19,17 +19,29 @@ package za.co.absa.spark.commons.errorhandling.partials
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.struct
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
+import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
 
 trait EvaluateIntoErrorMessage {
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
     struct(
-      errorMessageSubmit.errType.column as "errType",
-      errorMessageSubmit.errCode.column as "errCode",
-      errorMessageSubmit.errMsg.column as "errMsg",
-      errorMessageSubmit.errCol.column as "errCol",
-      errorMessageSubmit.rawValues.column as "rawValues",
-      errorMessageSubmit.additionInfo.column as "additionInfo"
+      errorMessageSubmit.errType.column as errType,
+      errorMessageSubmit.errCode.column as errCode,
+      errorMessageSubmit.errMsg.column as errMsg,
+      errorMessageSubmit.errColsAndValues.column as errColsAndValues,
+      errorMessageSubmit.additionInfo.column as additionInfo
     )
+  }
+}
+
+object EvaluateIntoErrorMessage {
+  object FieldNames {
+    val errType = "errType"
+    val errCode = "errCode"
+    val errMsg = "errMsg"
+    val errColsAndValues = "errColsAndValues"
+    val additionInfo = "additionInfo"
+    val errCols = "errCols"
+    val errValues = "errValues"
   }
 
 }

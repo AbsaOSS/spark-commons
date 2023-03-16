@@ -17,13 +17,11 @@
 package za.co.absa.spark.commons.errorhandling
 
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import za.co.absa.spark.commons.errorhandling.implementations.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
+import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types._
 
 trait ErrorHandling {
-  def register(sparkToRegisterTo: SparkSession): Unit = {}
-
-  def putErrorToColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errCol: ErrCol, additionalInfo: AdditionalInfo = None): ErrorColumn = {
+  def putErrorToColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errCol: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None): ErrorColumn = {
     val toSubmit = errCol
       .map(errSourceColName => ErrorMessageSubmitOnColumn(errType, errCode, errMessage, errSourceColName, additionalInfo))
       .getOrElse(ErrorMessageSubmitWithoutColumn(errType, errCode, errMessage, additionalInfo))

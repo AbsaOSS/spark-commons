@@ -17,28 +17,27 @@
 package za.co.absa.spark.commons.errorhandling.partials
 
 import org.apache.spark.sql.{Column, SparkSession}
+import za.co.absa.spark.commons.adapters.CallUdfAdapter
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.EvaluateViaUdf.ErrorMessageFunction
 import za.co.absa.spark.commons.errorhandling.types._
-import za.co.absa.spark.commons.sql.functions2.call_udf
 
-trait EvaluateViaUdf[T] {
+trait EvaluateViaUdf[T] extends CallUdfAdapter{
   def evaluationUdfName: String
   protected def evaluationUdf: ErrorMessageFunction[T]
-  def register(sparkToRegisterTo: SparkSession): Unit // TODO refactor when #82 has been implemented
+  def register(sparkToRegisterTo: SparkSession): Boolean // TODO refactor when #82 has been implemented
 
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
    call_udf(evaluationUdfName,
      errorMessageSubmit.errType.column,
      errorMessageSubmit.errCode.column,
      errorMessageSubmit.errMsg.column,
-     errorMessageSubmit.errCol.column,
-     errorMessageSubmit.rawValues.column,
+     errorMessageSubmit.errColsAndValues.column,
      errorMessageSubmit.additionInfo.column
    )
   }
 }
 
 object EvaluateViaUdf {
-  type ErrorMessageFunction[T] = (ErrType, ErrCode, ErrMsg, ErrCol, RawValues, AdditionalInfo) => T //TODO needed?
+  type ErrorMessageFunction[T] = (ErrType, ErrCode, ErrMsg, ErrColsAndValues, AdditionalInfo) => T //TODO needed?
 }

@@ -25,22 +25,22 @@ import org.apache.spark.sql.functions.when
 trait ErrorHandlingCommon extends ErrorHandling {
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column
 
-  protected def doTheAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame
+  protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame
 
   def putErrorToColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn = {
     ErrorColumn(evaluate(errorMessageSubmit))
   }
 
   def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
-    register(dataFrame.sparkSession)
-    doTheAggregation(dataFrame, errCols.map(_.column): _*)
+    doTheColumnsAggregation(dataFrame, errCols.map(_.column): _*)
   }
 
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame = {
-    val errorsByColumn = errorsWhen.groupBy(_.errorMessageSubmit.errCol.getValue)
-    val errorColumns1 = errorsByColumn.getOrElse(None, Seq.empty).map(errorWhenToCol) // no grouping without ErrCol name
-    val errorColumns2 = (errorsByColumn - None).values.map(errorWhenSeqToCol).toSeq
-    doTheAggregation(dataFrame, errorColumns1 ++ errorColumns2: _*)
+    val errorsByColumn = errorsWhen.groupBy(_.errorMessageSubmit.errColsAndValues.columnNames)
+    val noColNames = Set.empty[String]
+    val errorColumns1 = errorsByColumn.getOrElse(noColNames, Seq.empty).map(errorWhenToCol) // no grouping without ErrCol names
+    val errorColumns2 = (errorsByColumn - noColNames).values.map(errorWhenSeqToCol).toSeq
+    doTheColumnsAggregation(dataFrame, errorColumns1 ++ errorColumns2: _*)
   }
 
 

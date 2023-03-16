@@ -18,6 +18,7 @@ package za.co.absa.spark.commons.sql
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{col, lit}
+import org.apache.spark.sql.types.DataType
 import za.co.absa.spark.commons.utils.SchemaUtils
 
 import scala.util.{Success, Try}
@@ -61,6 +62,10 @@ object functions {
    */
   def null_col:Column = {
     lit(None.orNull)
+  }
+
+  def null_col(dataType: DataType):Column = {
+    lit(None.orNull).cast(dataType)
   }
 
 }
