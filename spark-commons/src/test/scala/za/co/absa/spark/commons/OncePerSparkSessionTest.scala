@@ -59,11 +59,6 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
   }
 
   test("should return false for result provided that spark session has started") {
-    /*
-    * It returns false because the constructor will actually register the library before the call for the register
-    * method on line 77.
-    * Up for discussion though.
-    */
 
     val anotherSpark: SparkSession =  mock[SparkSession]
     class UDFLibrary()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {

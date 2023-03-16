@@ -17,7 +17,6 @@
 package za.co.absa.spark.commons
 
 import org.apache.spark.sql.SparkSession
-import org.fusesource.hawtjni.runtime.Library
 
 import java.util.concurrent.ConcurrentHashMap
 
