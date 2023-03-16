@@ -59,7 +59,7 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
     dataFrame.withColumn(errorColName, reMap(array_union(deMap(col(errorColName)), colToUnion)))
   }
 
-  protected def doTheAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
+  protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val aggregated = array(errCols.map(decomposeMap): _*) //need to decompose the map field, as it's not supported in array functions
     val aggregatedWithoutNulls = array_except(aggregated, array(null_col))
     val joinToExisting: (DataFrame, String) => DataFrame = appendToErrCol(_, _, aggregatedWithoutNulls)

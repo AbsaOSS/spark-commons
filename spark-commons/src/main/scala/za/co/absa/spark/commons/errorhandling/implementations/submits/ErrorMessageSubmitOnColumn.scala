@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandling.implementations
+package za.co.absa.spark.commons.errorhandling.implementations.submits
 
 import za.co.absa.spark.commons.errorhandling.types._
 
