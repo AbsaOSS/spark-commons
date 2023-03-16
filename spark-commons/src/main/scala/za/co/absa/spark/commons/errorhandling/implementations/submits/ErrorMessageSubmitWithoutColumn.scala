@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandling.implementations
+package za.co.absa.spark.commons.errorhandling.implementations.submits
 
+import org.apache.spark.sql.functions.typedLit
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.columnNameToItsStringValue
+import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitWithoutColumn.emptyErrorColsAndValues
 import za.co.absa.spark.commons.errorhandling.types._
 
-class ErrorMessageSubmitOnMoreColumns(
+class ErrorMessageSubmitWithoutColumn(
                                        val errType: ColumnOrValue[ErrType],
                                        val errCode: ColumnOrValue[ErrCode],
                                        val errMsg: ColumnOrValue[ErrMsg],
-                                       errColNames: Set[ErrSourceColName],
                                        override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
                                      ) extends ErrorMessageSubmit {
-  val errColsAndValues: ColumnOrValue[ErrColsAndValues] = ColumnOrValue(errColNames, columnNameToItsStringValue)
 
+  val errColsAndValues: ColumnOrValue[ErrColsAndValues] =  ColumnOrValue(typedLit(emptyErrorColsAndValues))
 }
 
-object ErrorMessageSubmitOnMoreColumns {
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errColNames: Set[ErrSourceColName], additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnMoreColumns = {
-    new ErrorMessageSubmitOnMoreColumns(
+object ErrorMessageSubmitWithoutColumn {
+  private val emptyErrorColsAndValues: ErrColsAndValues = Map.empty
+
+  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitWithoutColumn = {
+    new ErrorMessageSubmitWithoutColumn(
       ColumnOrValue.withValue(errType),
       ColumnOrValue.withValue(errCode),
       ColumnOrValue.withValue(errMessage),
-      errColNames,
       ColumnOrValue.withOption(additionalInfo)
     )
   }

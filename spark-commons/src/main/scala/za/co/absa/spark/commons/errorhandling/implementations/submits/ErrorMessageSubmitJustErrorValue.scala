@@ -14,38 +14,28 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandling.implementations
+package za.co.absa.spark.commons.errorhandling.implementations.submits
 
 import org.apache.spark.sql.functions.{lit, map}
 import org.apache.spark.sql.types.StringType
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.implementations.ErrorMessageSubmitJustErrorValue.noColumnKey
+import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitJustErrorValue.noColumnKey
 import za.co.absa.spark.commons.errorhandling.types._
 
-case class ErrorMessageSubmitJustErrorValue(
-                                             errType: ColumnOrValue[ErrType],
-                                             errCode: ColumnOrValue[ErrCode],
-                                             errMsg: ColumnOrValue[ErrMsg],
-                                             errValue: ColumnOrValue[String],
-                                             override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
-                                           ) extends ErrorMessageSubmit {
+class ErrorMessageSubmitJustErrorValue(
+                                        val errType: ColumnOrValue[ErrType],
+                                        val errCode: ColumnOrValue[ErrCode],
+                                        val errMsg: ColumnOrValue[ErrMsg],
+                                        errValue: ColumnOrValue[String],
+                                        override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
+                                      ) extends ErrorMessageSubmit {
   val errColsAndValues: ColumnOrValue[ErrColsAndValues] = ColumnOrValue(map(lit(noColumnKey), errValue.column.cast(StringType)))
 }
 
 object ErrorMessageSubmitJustErrorValue {
   val noColumnKey: ErrSourceColName = ""
 
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errValue: String): ErrorMessageSubmitJustErrorValue = {
-    new ErrorMessageSubmitJustErrorValue(
-      ColumnOrValue.withValue(errType),
-      ColumnOrValue.withValue(errCode),
-      ColumnOrValue.withValue(errMessage),
-      ColumnOrValue.withValue(errValue),
-      ColumnOrValue.asEmpty
-    )
-  }
-
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errValue: String, additionalInfo: AdditionalInfo): ErrorMessageSubmitJustErrorValue = {
+  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errValue: String, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitJustErrorValue = {
     new ErrorMessageSubmitJustErrorValue(
       ColumnOrValue.withValue(errType),
       ColumnOrValue.withValue(errCode),

@@ -25,7 +25,7 @@ import za.co.absa.spark.commons.errorhandling.types._
 trait EvaluateViaUdf[T] extends CallUdfAdapter{
   def evaluationUdfName: String
   protected def evaluationUdf: ErrorMessageFunction[T]
-  def register(sparkToRegisterTo: SparkSession): Unit // TODO refactor when #82 has been implemented
+  def register(sparkToRegisterTo: SparkSession): Boolean // TODO refactor when #82 has been implemented
 
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
    call_udf(evaluationUdfName,

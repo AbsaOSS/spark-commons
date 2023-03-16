@@ -18,7 +18,7 @@ package za.co.absa.spark.commons.errorhandling.partials
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.struct
-import za.co.absa.spark.commons.errorhandling.{ErrorMessage, ErrorMessageSubmit}
+import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
 
 trait EvaluateIntoErrorMessage {
