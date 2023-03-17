@@ -62,13 +62,11 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
 
     val anotherSpark: SparkSession =  mock[SparkSession]
     class UDFLibrary()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {
-      // Results will yield false because this will be second attempt of registering after the auto register has taken place
-      val results = this.register(sparkToRegisterTo)
       override protected def registerBody(spark: SparkSession): Unit = {}
     }
 
     val library = new UDFLibrary()
-    assert(!library.results)
+    assert(!library.register(spark))
     assert(library.register(anotherSpark))
   }
 
