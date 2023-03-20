@@ -17,7 +17,6 @@
 package za.co.absa.spark.commons.errorhandling.implementations.submits
 
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.columnNameToItsStringValue
 import za.co.absa.spark.commons.errorhandling.types._
 
 class ErrorMessageSubmitOnMoreColumns(
@@ -27,8 +26,7 @@ class ErrorMessageSubmitOnMoreColumns(
                                        errColNames: Set[ErrSourceColName],
                                        override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
                                      ) extends ErrorMessageSubmit {
-  val errColsAndValues: ColumnOrValue[ErrColsAndValues] = ColumnOrValue(errColNames, columnNameToItsStringValue)
-
+  val errColsAndValues: ColumnOrValue[ErrColsAndValues] = ColumnOrValue.asMapOfStringColumns(errColNames)
 }
 
 object ErrorMessageSubmitOnMoreColumns {

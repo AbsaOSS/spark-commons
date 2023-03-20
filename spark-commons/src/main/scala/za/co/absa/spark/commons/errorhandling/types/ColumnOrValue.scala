@@ -37,20 +37,20 @@ object ColumnOrValue {
 
   def apply[T](columnName: String): ColumnOrValue[T] = CoVNamedColumn(columnName)
   def apply[T](column: Column): ColumnOrValue[T] = CoVDefinedColumn(column)
-  def apply[T](columnNames: Set[String], columnTransformer: ColumnTransformer): ColumnOrValue[Map[String, T]] = CoVMapColumn(columnNames, columnTransformer) //should it be explicit function?
+  def apply[T](mapColumnNames: Set[String], columnTransformer: ColumnTransformer): ColumnOrValue[Map[String, T]] = CoVMapColumn(mapColumnNames, columnTransformer) //should it be explicit function?
 
   def withOption(value: Option[String]): ColumnOrValue[Option[String]] = { // could be safely an apply, or done more generally
     value match {
       case None => CoVNull(StringType)
-      case _ => CoVValue(value)
+      case Some(x) => CoVOption(x)
     }
   }
   def withValue[T](value: T): ColumnOrValue[T] = CoVValue(value)
-  def asEmpty: ColumnOrValue[Option[String]] = CoVNull(StringType)
 
-  def columnNameToItsStringValue(colName: String): Column = {
-    col(colName).cast(StringType)
-  }
+  def asEmpty: ColumnOrValue[Option[String]] = CoVNull(StringType)
+  def asMapOfStringColumns(mapColumnNames: Set[String]): ColumnOrValue[Map[String, String]] = CoVMapColumn(mapColumnNames, columnNameToItsStringValue)
+
+  def columnNameToItsStringValue(colName: String): Column = col(colName).cast(StringType)
 
   private final case class CoVNamedColumn[T](columnName: String) extends ColumnOrValue[T] {
     val column: Column = col(columnName)
@@ -80,11 +80,20 @@ object ColumnOrValue {
     val isValue: Boolean = false
     val getValue: Option[Map[String, T]] = None
     val column: Column = {
-      val (mapKeys, mapValues) = columnNames.foldLeft(Seq.empty[Column], Seq.empty[Column]) {case ((accKeys, accVals), colName) =>
+      val (mapKeys, mapValues) = columnNames.foldRight(Seq.empty[Column], Seq.empty[Column]) {case (colName, (accKeys, accVals)) =>
         (typedLit(colName) +: accKeys , columnTransformer(colName) +: accVals)
       }
       map_from_arrays(array(mapKeys: _*), array(mapValues: _*))
     }
+  }
+
+  private final case class CoVOption[T](value: T) extends ColumnOrValue[Option[T]] {
+    val column: Column = lit(value)
+
+    val isColumn: Boolean = false
+    val isValue: Boolean = true
+    val columnNames: Set[String] = Set.empty
+    val getValue: Option[Option[T]] = Some(Some(value))
   }
 
   private final case class CoVNull[T](dataType: DataType) extends ColumnOrValue[T] {
