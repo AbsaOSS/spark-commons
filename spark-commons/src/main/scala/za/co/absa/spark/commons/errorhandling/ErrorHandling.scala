@@ -16,6 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling
 
+import org.apache.spark.sql.functions.{coalesce, col, collect_list}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import za.co.absa.spark.commons.errorhandling.implementations.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types._
@@ -31,7 +32,11 @@ trait ErrorHandling {
   }
   def putErrorToColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn
 
-  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame
+  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
+    val aggregatedDF = dataFrame.groupBy("ErrorColumn")
+      .agg(coalesce(collect_list("ErrorColumn")) as "AggregatedError")
+    aggregatedDF.filter(!col("AggregatedError"))
+  }
 
   def putError(dataFrame: DataFrame)(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
     putErrorsWithGrouping(dataFrame)(Seq(ErrorWhen(when, errorMessageSubmit)))
