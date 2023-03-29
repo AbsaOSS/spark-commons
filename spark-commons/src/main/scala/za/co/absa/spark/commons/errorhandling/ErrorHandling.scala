@@ -32,11 +32,7 @@ trait ErrorHandling {
   }
   def putErrorToColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn
 
-  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
-    val aggregatedDF = dataFrame.groupBy("errCode")
-      .agg(coalesce(collect_list("errCols")) as "AggregatedError")
-    aggregatedDF.filter(!col("AggregatedError"))
-  }
+  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame
 
   def putError(dataFrame: DataFrame)(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
     putErrorsWithGrouping(dataFrame)(Seq(ErrorWhen(when, errorMessageSubmit)))
