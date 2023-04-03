@@ -17,9 +17,10 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   }
 
   override protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
-//    val colCheck: Array[Boolean] = errorMessageSubmit.fill(errorColumn =>false).toArray()
-    val columnCheck: Array[Boolean] = Array.fill(errorMessageSubmit.errColsAndValues)(false)
-    columnCheck
+
+//    val columnCheck: Array[Boolean] = errorMessageSubmit.map(_ => false).toArray
+//    val columnCheck: Array[Boolean] = Array.map(errorMessageSubmit.errColsAndValues)(false)
+    val columnCheck: Array[Boolean] = List.fill(errorMessageSubmit.errMsg)(true)
   }
 
   override protected def doTheAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
