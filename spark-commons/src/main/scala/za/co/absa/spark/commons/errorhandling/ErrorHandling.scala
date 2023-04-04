@@ -16,6 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling
 
+import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import za.co.absa.spark.commons.errorhandling.implementations.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types._
@@ -31,11 +32,13 @@ trait ErrorHandling {
   }
   def putErrorToColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn
 
-  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame
+  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): Option[DataFrame]
 
   def putError(dataFrame: DataFrame)(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
     putErrorsWithGrouping(dataFrame)(Seq(ErrorWhen(when, errorMessageSubmit)))
   }
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame
+
+  def errorColumnType(errorColumn: ErrorColumn): DataType
 }
 
