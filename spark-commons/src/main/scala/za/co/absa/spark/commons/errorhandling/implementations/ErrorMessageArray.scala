@@ -30,8 +30,8 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
     def appendToArray(dataFrame: DataFrame, colName: String, colToUnion: Column): DataFrame = {
       dataFrame.withColumn(colName, array_union(col(colName), colToUnion))
     }
-    val aggregatedWithouNulls = array_except(array(errCols: _*), array(null_col))
-    dataFrame.withColumnIfDoesNotExist(appendToArray(_, _, aggregatedWithouNulls))(errorColumnName, aggregatedWithouNulls)
+    val aggregatedWithoutNulls = array_except(array(errCols: _*), array(null_col))
+    dataFrame.withColumnIfDoesNotExist(appendToArray(_, _, aggregatedWithoutNulls))(errorColumnName, aggregatedWithoutNulls)
   }
 
 }
