@@ -22,7 +22,6 @@ import za.co.absa.spark.commons.errorhandling.implementations.{ErrorMessageSubmi
 import za.co.absa.spark.commons.errorhandling.types._
 
 trait ErrorHandling {
-//  type ErrorColumn <: Column
 
   def register(sparkToRegisterTo: SparkSession): Unit = {}
 
@@ -34,13 +33,16 @@ trait ErrorHandling {
   }
   def putErrorToColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn
 
-  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): Option[DataFrame]
+  def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame
 
   def putError(dataFrame: DataFrame)(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
     putErrorsWithGrouping(dataFrame)(Seq(ErrorWhen(when, errorMessageSubmit)))
   }
+
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame
 
   def errorColumnType: DataType
+
+  def errorColumnAggregationType: DataType
 }
 

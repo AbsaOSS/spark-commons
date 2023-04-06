@@ -18,10 +18,11 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{array, array_except, array_union, col, map_from_arrays, map_keys, map_values, struct, when}
-import org.apache.spark.sql.types.DataType
+import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.adapters.TransformAdapter
 import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
 import za.co.absa.spark.commons.errorhandling.partials.{ErrorHandlingCommon, EvaluateIntoErrorMessage}
+import za.co.absa.spark.commons.errorhandling.types.ErrType
 import za.co.absa.spark.commons.sql.functions.null_col
 import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
 
@@ -67,7 +68,22 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
     dataFrame.withColumnIfDoesNotExist(joinToExisting)(errorColumnName, reMap(aggregatedWithoutNulls))
   }
 
-  override def errorColumnType: DataType = ???
+  override def errorColumnType: DataType = {
+    StructType(
+      Seq(
+        StructField("errType", StringType, nullable = false),
+        StructField("errCode", LongType, nullable = false),
+        StructField("errMsg", StringType, nullable = false),
+        StructField("errColsAndValues", MapType(StringType, StringType), nullable = false),
+        StructField("additionInfo", StringType, nullable = true)
+      )
+    )
+  }
+
+  override def errorColumnAggregationType: DataType = {
+    ArrayType(errorColumnType, containsNull = false)
+  }
+
 }
 
 object ErrorMessageArray {

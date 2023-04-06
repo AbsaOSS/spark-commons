@@ -16,13 +16,11 @@
 
 package za.co.absa.spark.commons.errorhandling.partials
 
-import org.apache.hadoop.yarn.util.resource.Resources.none
 import org.apache.spark.sql.catalyst.expressions.{CaseWhen, Expression}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 import za.co.absa.spark.commons.errorhandling.types._
-import org.apache.spark.sql.functions.{schema_of_json, when}
-import org.apache.spark.sql.types.DataType
+import org.apache.spark.sql.functions.when
 
 trait ErrorHandlingCommon extends ErrorHandling {
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column
@@ -33,10 +31,10 @@ trait ErrorHandlingCommon extends ErrorHandling {
     ErrorColumn(evaluate(errorMessageSubmit))
   }
 
-  override def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): Option[DataFrame] = {
+  override def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
     register(dataFrame.sparkSession)
     val aggregateValue = doTheAggregation(dataFrame, errCols.map(_.column): _*)
-    Option(aggregateValue)
+    aggregateValue
   }
 
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame = {
@@ -47,7 +45,6 @@ trait ErrorHandlingCommon extends ErrorHandling {
     doTheAggregation(dataFrame, errorColumns1 ++ errorColumns2: _*)
   }
 
-
   private def errorWhenToCol(errorWhen: ErrorWhen): Column = {
     when(errorWhen.when, evaluate(errorWhen.errorMessageSubmit))
   }
@@ -56,7 +53,5 @@ trait ErrorHandlingCommon extends ErrorHandling {
     val branches: Seq[(Expression, Expression)] = errorsWhen.map(errorWhen => (errorWhen.when.expr, evaluate(errorWhen.errorMessageSubmit).expr))
     new Column(CaseWhen(branches))
   }
-
-  def errorColumnType: DataType
 
 }
