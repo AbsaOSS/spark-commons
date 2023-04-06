@@ -57,8 +57,6 @@ trait ErrorHandlingCommon extends ErrorHandling {
     new Column(CaseWhen(branches))
   }
 
-  def errorColumnType(errorColumn: ErrorColumn, dataFrame: DataFrame): DataType = {
-    dataFrame.schema(s"$errorColumn").dataType
-  }
+  def errorColumnType: DataType
 
 }

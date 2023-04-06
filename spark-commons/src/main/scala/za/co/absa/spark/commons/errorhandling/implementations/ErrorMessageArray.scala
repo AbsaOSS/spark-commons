@@ -18,6 +18,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{array, array_except, array_union, col, map_from_arrays, map_keys, map_values, struct, when}
+import org.apache.spark.sql.types.DataType
 import za.co.absa.spark.commons.adapters.TransformAdapter
 import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
 import za.co.absa.spark.commons.errorhandling.partials.{ErrorHandlingCommon, EvaluateIntoErrorMessage}
@@ -66,6 +67,7 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
     dataFrame.withColumnIfDoesNotExist(joinToExisting)(errorColumnName, reMap(aggregatedWithoutNulls))
   }
 
+  override def errorColumnType: DataType = ???
 }
 
 object ErrorMessageArray {
