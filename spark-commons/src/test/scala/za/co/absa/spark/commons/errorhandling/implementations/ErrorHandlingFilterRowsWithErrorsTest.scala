@@ -1,11 +1,11 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
+import za.co.absa.spark.commons.errorhandling.implementations.ErrorHandlingFilterRowsWithErrors
 
 class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
 
-  val errorHandlingFilterRowsWithErrors = new ErrorHandlingFilterRowsWithErrorsTest()
   private val col1Name = "Col1"
   private val col2Name = "Col2"
   private val data = Seq(
