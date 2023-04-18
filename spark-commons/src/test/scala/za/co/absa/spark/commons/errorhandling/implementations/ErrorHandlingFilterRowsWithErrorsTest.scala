@@ -15,7 +15,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     (Some(3), "ccc")
   ).toDF(col1Name, col2Name)
 
-  test("") {
+  test("Collect columns and aggregate the columns") {
     val errorMessageArray = ErrorMessageArray()
 
     val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
