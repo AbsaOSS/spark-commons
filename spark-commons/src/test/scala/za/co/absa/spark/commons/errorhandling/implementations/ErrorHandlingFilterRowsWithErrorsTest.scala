@@ -1,19 +1,22 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
-import za.co.absa.spark.commons.errorhandling.implementations.ErrorHandlingFilterRowsWithErrors
 
 class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
+  private val columnToAdd = "col3"
   private val data = Seq(
     (None, ""),
     (Some(1), "a"),
     (Some(2), "bb"),
     (Some(3), "ccc")
   ).toDF(col1Name, col2Name)
+  private val expectedResults = Seq(
+    (None, "", "")
+  ).toDF(col1Name,col2Name, columnToAdd)
 
   test("Collect columns and aggregate the columns") {
     val errorMessageArray = ErrorMessageArray()
@@ -26,7 +29,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
 
     val result = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(data)(e1, e2, e3)
 
-    assert(result == false)
+    assert(expectedResults == result)
   }
 
 }
