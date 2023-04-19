@@ -38,8 +38,9 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
    * @return Returns the aggregated dataset with errors.
    */
   override protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
-    val aggregatedDF = dataFrame.groupBy("errCode")
-      .agg(coalesce(errCols:_*, lit(false)) as "AggregatedError")
+    val columns: Seq[Column] = errCols :+ lit(false)
+    val aggregatedDF = dataFrame
+      .agg(coalesce(columns:_*) as "AggregatedError")
     aggregatedDF.filter(!col("AggregatedError"))
   }
 
