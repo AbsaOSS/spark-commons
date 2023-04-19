@@ -14,34 +14,32 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandling.implementations
+package za.co.absa.spark.commons.errorhandling.implementations.submits
 
-import org.apache.spark.sql.functions.array
+import org.apache.spark.sql.functions.typedLit
+import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
+import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitWithoutColumn.emptyErrorColsAndValues
 import za.co.absa.spark.commons.errorhandling.types._
 
 class ErrorMessageSubmitWithoutColumn(
-                                       errType: ColumnOrValue[ErrType],
-                                       errCode: ColumnOrValue[ErrCode],
-                                       errMsg: ColumnOrValue[ErrMsg],
-                                       additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
-                                     ) extends ErrorMessageSubmitOnMoreColumns(
-                                       errType,
-                                       errCode,
-                                       errMsg,
-                                       Seq.empty,
-                                       additionInfo
-                                     ) {
-  override val rawValues: ColumnOrValue[RawValues] = ColumnOrValue(array())
+                                       val errType: ColumnOrValue[ErrType],
+                                       val errCode: ColumnOrValue[ErrCode],
+                                       val errMsg: ColumnOrValue[ErrMsg],
+                                       override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
+                                     ) extends ErrorMessageSubmit {
+
+  val errColsAndValues: ColumnOrValue[ErrColsAndValues] =  ColumnOrValue(typedLit(emptyErrorColsAndValues))
 }
 
 object ErrorMessageSubmitWithoutColumn {
+  private val emptyErrorColsAndValues: ErrColsAndValues = Map.empty
+
   def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitWithoutColumn = {
     new ErrorMessageSubmitWithoutColumn(
-      ColumnOrValue.withActualValue(errType),
-      ColumnOrValue.withActualValue(errCode),
-      ColumnOrValue.withActualValue(errMessage),
+      ColumnOrValue.withValue(errType),
+      ColumnOrValue.withValue(errCode),
+      ColumnOrValue.withValue(errMessage),
       ColumnOrValue.withOption(additionalInfo)
     )
   }
 }
-
