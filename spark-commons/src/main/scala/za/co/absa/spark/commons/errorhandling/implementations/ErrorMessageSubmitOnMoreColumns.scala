@@ -16,6 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling.implementations
 
+<<<<<<<< HEAD:spark-commons/src/main/scala/za/co/absa/spark/commons/errorhandling/implementations/ErrorMessageSubmitOnMoreColumns.scala
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{array, col, lit}
 import org.apache.spark.sql.types.StringType
@@ -45,6 +46,27 @@ object ErrorMessageSubmitOnMoreColumns {
             errColNames: Seq[ErrColName],
             additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnMoreColumns = {
     new ErrorMessageSubmitOnMoreColumns(
+========
+import za.co.absa.spark.commons.errorhandling.types._
+
+class ErrorMessageSubmitOnColumn (
+                                   errType: ColumnOrValue[ErrType],
+                                   errCode: ColumnOrValue[ErrCode],
+                                   errMsg: ColumnOrValue[ErrMsg],
+                                   errColName: ErrColName,
+                                   additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
+                                 ) extends ErrorMessageSubmitOnMoreColumns(
+                                   errType,
+                                   errCode,
+                                   errMsg,
+                                   Seq(errColName),
+                                   additionInfo
+                                 )
+
+object ErrorMessageSubmitOnColumn {
+  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: ErrColName, additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnColumn = {
+    new ErrorMessageSubmitOnColumn(
+>>>>>>>> origin/feature/83-create-a-spike-for-error-handling:spark-commons/src/main/scala/za/co/absa/spark/commons/errorhandling/implementations/ErrorMessageSubmitOnColumn.scala
       ColumnOrValue.withActualValue(errType),
       ColumnOrValue.withActualValue(errCode),
       ColumnOrValue.withActualValue(errMessage),

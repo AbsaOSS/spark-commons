@@ -19,17 +19,15 @@ package za.co.absa.spark.commons.errorhandling
 import org.apache.spark.sql.Column
 
 package object types {
-  type ErrSourceColName = String
-  type JsonString = String // TODO make it more "type safe"
+  type ErrColName = String
 
   type ErrType = String
   type ErrCode = Long // was string
   type ErrMsg = String
-  type ErrColsAndValues = Map[String, String]
-  type AdditionalInfo = Option[JsonString] // actually a JSON
+  type ErrCols = Seq[ErrColName]
+  type RawValues = Seq[String]
+  type AdditionalInfo = Option[String] // actually a JSON
   //mapping is missing, should be part of AdditionalInfo, as being very specific
-
-  type ColumnTransformer = String => Column
 
   //This is to ensure some level of type-safety
   final case class ErrorColumn(column: Column) extends AnyVal
