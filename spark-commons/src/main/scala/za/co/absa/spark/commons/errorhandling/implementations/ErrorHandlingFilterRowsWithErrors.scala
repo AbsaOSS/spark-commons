@@ -19,7 +19,6 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
    * @return returns rows with errors
    */
   override def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
-    register(dataFrame.toString(), errCols.toString())
     doTheColumnsAggregation(dataFrame, errCols.map(_.column): _*)
   }
 
