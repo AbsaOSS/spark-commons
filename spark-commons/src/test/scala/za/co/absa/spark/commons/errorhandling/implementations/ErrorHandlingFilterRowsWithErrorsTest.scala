@@ -1,6 +1,7 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
+import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 
 class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
@@ -27,9 +28,10 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
     val e3 = errorMessageArray.putErrorToColumn(errorSubmitB)
 
-    val result = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(data)(e1, e2, e3)
-
-    assert(expectedResults == result)
+    val results = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(data)(e1, e2, e3)
+    results.printSchema()
+    results.show(false)
+    assert(expectedResults == results)
   }
 
 }

@@ -2,6 +2,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{coalesce, col, lit}
+import org.apache.spark.sql.types.UDTRegistration
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 import za.co.absa.spark.commons.errorhandling.types.ErrorColumn
@@ -18,8 +19,8 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
    * @return returns rows with errors
    */
   override def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
-    register(dataFrame.sparkSession)
-    doTheAggregation(dataFrame, errCols.map(_.column): _*)
+    register(dataFrame.toString(), errCols.toString())
+    doTheColumnsAggregation(dataFrame, errCols.map(_.column): _*)
   }
 
   /**
@@ -37,7 +38,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
    * @param errCols the columns to aggregate the dataframe with
    * @return Returns the aggregated dataset with errors.
    */
-  override protected def doTheAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
+  override protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val aggregatedDF = dataFrame.groupBy("errCode")
       .agg(coalesce(errCols:_*, lit(false)) as "AggregatedError")
     aggregatedDF.filter(!col("AggregatedError"))
