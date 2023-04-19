@@ -39,7 +39,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
    */
   override protected def doTheAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val aggregatedDF = dataFrame.groupBy("errCode")
-      .agg(coalesce(errCols: _*, lit(false)) as "AggregatedError")
+      .agg(coalesce(errCols:_*, lit(false)) as "AggregatedError")
     aggregatedDF.filter(!col("AggregatedError"))
   }
 
