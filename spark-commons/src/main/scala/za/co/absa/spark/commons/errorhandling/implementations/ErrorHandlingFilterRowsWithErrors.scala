@@ -40,8 +40,8 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   override protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val columns: Seq[Column] = errCols :+ lit(false)
     val aggregatedDF = dataFrame
-      .agg(coalesce(columns:_*) as "AggregatedError")
-    aggregatedDF.filter(!col("AggregatedError"))
+      .withColumn("AggregatedError", coalesce(columns:_*))
+    aggregatedDF.filter(!col("AggregatedError")).drop("AggregatedError")
   }
 
 }
