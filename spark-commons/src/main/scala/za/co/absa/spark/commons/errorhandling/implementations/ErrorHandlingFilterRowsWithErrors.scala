@@ -32,16 +32,14 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   }
 
   /**
-   * Checks for relationship of the provided column in the given dataframe.
+   * Filters out the rows where the first non-null values selected columns when it is false or null
    * @param dataFrame the overall data structure that need to be aggregated
    * @param errCols the columns to aggregate the dataframe with
-   * @return Returns the aggregated dataset with errors.
+   * @return Returns aggregated dataset with errors.
    */
   override protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val columns: Seq[Column] = errCols :+ lit(false)
-    val aggregatedDF = dataFrame
-      .withColumn("AggregatedError", coalesce(columns:_*))
-    aggregatedDF.filter(!col("AggregatedError")).drop("AggregatedError")
+    dataFrame.filter(!coalesce(columns: _*).isNull)
   }
 
 }
