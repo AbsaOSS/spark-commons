@@ -8,18 +8,14 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
-  private val columnToAdd = "col3"
   private val data = Seq(
     (None, ""),
     (Some(1), "a"),
     (Some(2), "bb"),
     (Some(3), "ccc")
   ).toDF(col1Name, col2Name)
-//  private val expectedResults = Seq(
-//    (None, "", "")
-//  ).toDF(col1Name,col2Name, columnToAdd)
 
-  test("Collect columns and aggregate the columns") {
+  test("aggregateErrorColumns\" should \"return a DataFrame with the specified columns aggregated\"") {
 
     val e1 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
@@ -27,10 +23,12 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
     val e3 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(errorSubmitB)
 
+    val dfSchema = Seq("Col1","Col2").toList
+
     val results = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(data)(e1, e2, e3)
     results.printSchema()
     results.show(false)
-//    assert(expectedResults == results)
+//    assert(results.schema == dfSchema)
   }
 
 }

@@ -1,8 +1,7 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
-import org.apache.spark.sql.functions.{coalesce, col, lit}
-import org.apache.spark.sql.types.UDTRegistration
+import org.apache.spark.sql.functions.{coalesce, lit}
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 import za.co.absa.spark.commons.errorhandling.types.ErrorColumn
