@@ -15,10 +15,10 @@
 
 import sbt._
 import sbt.Keys._
-import sbt.VirtualAxis._
 import sbt.internal.ProjectMatrix
-import sbtprojectmatrix.ProjectMatrixKeys._
 import Dependencies._
+import JacocoSetup._
+import com.github.sbt.jacoco.JacocoKeys.{jacocoExcludes, jacocoReportSettings}
 
 case class SparkVersionAxis(sparkVersion: String) extends sbt.VirtualAxis.WeakAxis {
   val sparkVersionMinor: String = sparkVersion.split("\\.", 3).take(2).mkString(".")
@@ -33,16 +33,22 @@ object SparkVersionAxis {
       .toLowerCase()
   }
 
-  implicit class ProjectExtension(val p: ProjectMatrix) extends AnyVal {
+  implicit class ProjectExtension(val projectMatrix: ProjectMatrix) extends AnyVal {
 
-    def sparkRow(sparkAxis: SparkVersionAxis, scalaVersions: Seq[String], settings: Def.SettingsDefinition*): ProjectMatrix =
-      p.customRow(
-        scalaVersions = scalaVersions,
-        axisValues = Seq(sparkAxis, VirtualAxis.jvm),
-        _.settings(
+    def sparkRow(sparkAxis: SparkVersionAxis, scalaVersions: Seq[String], settings: Def.SettingsDefinition*): ProjectMatrix = {
+      val sparkVersion = sparkAxis.sparkVersion
+      scalaVersions.foldLeft(projectMatrix)((currentProjectMatrix, scalaVersion) =>
+        currentProjectMatrix.customRow(
+          scalaVersions = Seq(scalaVersion),
+          axisValues = Seq(sparkAxis, VirtualAxis.jvm),
+          _.settings(
             moduleName := camelCaseToLowerDashCase(name.value + sparkAxis.directorySuffix),
-            libraryDependencies ++= sparkCommonsDependencies(sparkAxis.sparkVersion)
-        ).settings(settings: _*)
+            libraryDependencies ++= sparkCommonsDependencies(sparkAxis.sparkVersion),
+            jacocoReportSettings := jacocoSettings(sparkVersion, scalaVersion),
+            jacocoExcludes := jacocoProjectExcludes(sparkVersion, scalaVersion)
+          ).settings(settings: _*)
+        )
       )
+    }
   }
 }
