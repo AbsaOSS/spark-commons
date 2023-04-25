@@ -21,12 +21,6 @@ import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMess
 import za.co.absa.spark.commons.errorhandling.types._
 
 trait ErrorHandling {
-  def putErrorToColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errCol: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None): ErrorColumn = {
-    val toSubmit = errCol
-      .map(errSourceColName => ErrorMessageSubmitOnColumn(errType, errCode, errMessage, errSourceColName, additionalInfo))
-      .getOrElse(ErrorMessageSubmitWithoutColumn(errType, errCode, errMessage, additionalInfo))
-    putErrorToColumn(toSubmit)
-  }
   def putErrorToColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn
 
   def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame
@@ -35,5 +29,12 @@ trait ErrorHandling {
     putErrorsWithGrouping(dataFrame)(Seq(ErrorWhen(when, errorMessageSubmit)))
   }
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame
+
+  def putErrorToColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errCol: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None): ErrorColumn = {
+    val toSubmit = errCol
+      .map(errSourceColName => ErrorMessageSubmitOnColumn(errType, errCode, errMessage, errSourceColName, additionalInfo))
+      .getOrElse(ErrorMessageSubmitWithoutColumn(errType, errCode, errMessage, additionalInfo))
+    putErrorToColumn(toSubmit)
+  }
 }
 
