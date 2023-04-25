@@ -22,8 +22,8 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 //  }
 
   /**
-   * Checks if given column has errors or not
-   * @param errorMessageSubmit the object that defines the structure of the column
+   * Creates a column with the error description, in this particular case actually only signals with a boolean flag there was an error in the row.
+   * @param errorMessageSubmit - the description of the error
    * @return returns true if the column contains an error
    */
   override protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
@@ -31,7 +31,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   }
 
   /**
-   * Filters out the rows where the first non-null values selected columns when it is false or null
+   * Filters out rows that contain at least one true flag in the provided boolean error columns
    * @param dataFrame the overall data structure that need to be aggregated
    * @param errCols the columns to aggregate the dataframe with
    * @return Returns aggregated dataset with errors.
