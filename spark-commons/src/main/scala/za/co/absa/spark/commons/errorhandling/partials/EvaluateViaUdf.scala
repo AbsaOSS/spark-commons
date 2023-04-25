@@ -17,24 +17,23 @@
 package za.co.absa.spark.commons.errorhandling.partials
 
 import org.apache.spark.sql.{Column, SparkSession}
+import za.co.absa.spark.commons.OncePerSparkSession
 import za.co.absa.spark.commons.adapters.CallUdfAdapter
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.EvaluateViaUdf.ErrorMessageFunction
 import za.co.absa.spark.commons.errorhandling.types._
 
-trait EvaluateViaUdf[T] extends CallUdfAdapter{
+trait EvaluateViaUdf[T] extends OncePerSparkSession with CallUdfAdapter {
   def evaluationUdfName: String
   protected def evaluationUdf: ErrorMessageFunction[T]
-  def register(sparkToRegisterTo: SparkSession): Boolean // TODO refactor when #82 has been implemented
 
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
    call_udf(evaluationUdfName,
-     errorMessageSubmit.errType.column,
-     errorMessageSubmit.errCode.column,
-     errorMessageSubmit.errMsg.column,
-     errorMessageSubmit.errColsAndValues.column,
-     errorMessageSubmit.additionInfo.column
-   )
+            errorMessageSubmit.errType.column,
+            errorMessageSubmit.errCode.column,
+            errorMessageSubmit.errMsg.column,
+            errorMessageSubmit.errColsAndValues.column,
+            errorMessageSubmit.additionInfo.column)
   }
 }
 

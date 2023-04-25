@@ -21,15 +21,11 @@ import org.scalatest.Assertions
 
 case class ColumnOrValueForm[T] (
                                  column: Column,
-                                 isColumn: Boolean,
-                                 isValue: Boolean,
                                  columnNames: Set[String],
                                  value: Option[T]
                                ) extends Assertions {
   def assertTo(columnOrValue: ColumnOrValue[T]): Unit ={
     assert(column == columnOrValue.column)
-    assert(isColumn == columnOrValue.isColumn)
-    assert(isValue == columnOrValue.isValue)
     assert(columnNames == columnOrValue.columnNames)
     assert(value == columnOrValue.getValue)
   }

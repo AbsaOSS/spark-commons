@@ -23,11 +23,10 @@ package object types {
   type JsonString = String // TODO make it more "type safe"
 
   type ErrType = String
-  type ErrCode = Long // was string
+  type ErrCode = Long
   type ErrMsg = String
   type ErrColsAndValues = Map[String, String]
   type AdditionalInfo = Option[JsonString] // actually a JSON
-  //mapping is missing, should be part of AdditionalInfo, as being very specific
 
   type ColumnTransformer = String => Column
 
