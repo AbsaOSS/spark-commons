@@ -22,7 +22,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   }
 
   /**
-   * Checks if given column has errors or not
+   * Creates a column with the error description, in this particular case actually only signals with a boolean flag there was an error in the row.
    * @param errorMessageSubmit the object that defines the structure of the column
    * @return returns true if the column contains an error
    */
