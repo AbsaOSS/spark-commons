@@ -11,15 +11,15 @@ import za.co.absa.spark.commons.errorhandling.types.ErrorColumn
  */
 
 object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
-  /**
-   * Method return the rows that has errors on aggregation
-   * @param dataFrame  the overall data structure that need to be checked for rows with errors
-   * @param errCols  a final case class that provide error columns
-   * @return returns rows with errors
-   */
-  override def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
-    doTheColumnsAggregation(dataFrame, errCols.map(_.column): _*)
-  }
+//  /**
+//   * Method return the rows that has errors on aggregation
+//   * @param dataFrame  the overall data structure that need to be checked for rows with errors
+//   * @param errCols  a final case class that provide error columns
+//   * @return returns rows with errors
+//   */
+//  override def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
+//    doTheColumnsAggregation(dataFrame, errCols.map(_.column): _*)
+//  }
 
   /**
    * Checks if given column has errors or not
