@@ -23,7 +23,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
   /**
    * Creates a column with the error description, in this particular case actually only signals with a boolean flag there was an error in the row.
-   * @param errorMessageSubmit the object that defines the structure of the column
+   * @param errorMessageSubmit - the description of the error
    * @return returns true if the column contains an error
    */
   override protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
