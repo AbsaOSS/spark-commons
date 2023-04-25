@@ -14,7 +14,7 @@
  */
 
 package za.co.absa.spark.commons.errorhandling.implementations
-import org.apache.hadoop.shaded.com.sun.jersey.spi.inject.Errors.ErrorMessage
+//import org.apache.hadoop.shaded.com.sun.jersey.spi.inject.Errors.ErrorMessage
 import org.apache.spark.sql.DataFrame
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
@@ -28,7 +28,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
-  private val data = Seq(
+  private val srcDf = Seq(
     (None, ""),
     (Some(1), "a"),
     (Some(2), "bb"),
@@ -42,7 +42,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   }
 
   test("aggregateErrorColumns\" should \"return a DataFrame with the specified columns aggregated\"") {
-    val expected: List[ResultDfRecordType] = List(
+    val expectedResults: List[ResultDfRecordType] = List(
       (None, "", List(
         ErrorMessage("Test error 1", 1, "This is a test error", Map("Col1" -> nullString)),
         ErrorMessage("Test error 2", 2, "This is a test error", Map("Col2" -> "")),
@@ -71,12 +71,11 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
     val e3 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(errorSubmitB)
 
-    val dfSchema = Seq("Col1","Col2").toList
+    val resultsDF = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(srcDf)(e1, e2, e3)
+    resultsDF.show()
+    val results = resultDfToResult(resultsDF)
 
-    val results = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(data)(e1, e2, e3)
-    results.printSchema()
-    results.show(false)
-//    assert(results.schema == dfSchema)
+    assert(results == expectedResults)
   }
 
 }
