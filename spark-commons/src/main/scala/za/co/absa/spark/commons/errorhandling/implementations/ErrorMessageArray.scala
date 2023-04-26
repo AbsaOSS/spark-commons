@@ -47,7 +47,7 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
       errorMessageColumn.getField(errType) as errType,
       errorMessageColumn.getField(errCode) as errCode,
       errorMessageColumn.getField(errMsg) as errMsg,
-      map_from_arrays(errorMessageColumn.getField(errCols), errorMessageColumn.getField(errValues)) as errColsAndValues ,
+      map_from_arrays(errorMessageColumn.getField(errCols), errorMessageColumn.getField(errValues)) as errColsAndValues,
       errorMessageColumn.getField(additionInfo) as additionInfo
     )
   }
