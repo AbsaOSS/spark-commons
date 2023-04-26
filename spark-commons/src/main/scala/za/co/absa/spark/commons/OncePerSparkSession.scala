@@ -17,7 +17,6 @@
 package za.co.absa.spark.commons
 
 import org.apache.spark.sql.SparkSession
-
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -32,17 +31,25 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @param sparkToRegisterTo Spark session to which we wish to attach objects
  */
-abstract class OncePerSparkSession()(implicit sparkToRegisterTo: SparkSession) extends Serializable {
+abstract class OncePerSparkSession() extends Serializable {
 
-  protected def register(implicit spark: SparkSession): Unit
+  def this(sparkToRegisterTo: SparkSession) = {
+    this()
+    register(sparkToRegisterTo)
+  }
 
-  OncePerSparkSession.registerMe(this, sparkToRegisterTo)
+  def register(spark: SparkSession): Boolean = {
+    OncePerSparkSession.registerMe(this, spark)
+  }
+
+  protected def registerBody(spark: SparkSession): Unit
+
 }
 
 object OncePerSparkSession {
   private[this] type Key = (Int, String)
 
-  private[this] val registry = new ConcurrentHashMap[Key, Unit]
+  private[this] val registry = new ConcurrentHashMap[Key, Boolean]
 
   private[this] def makeKey(library: OncePerSparkSession, spark: SparkSession): Key = {
     (
@@ -51,9 +58,13 @@ object OncePerSparkSession {
     )
   }
 
-  protected def registerMe(library: OncePerSparkSession, spark: SparkSession): Unit = {
+  protected def registerMe(library: OncePerSparkSession, spark: SparkSession): Boolean = {
     // the function is `protected` to make it visible to `ScalaDoc`
-    Option(registry.putIfAbsent(makeKey(library, spark), Unit))
-      .getOrElse(library.register(spark))
+    Option(registry.putIfAbsent(makeKey(library, spark), false))
+      .getOrElse{
+        library.registerBody(spark)
+        true
+      }
   }
+
 }
