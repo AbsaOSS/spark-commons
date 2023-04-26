@@ -25,7 +25,8 @@ package object types {
   type ErrType = String
   type ErrCode = Long
   type ErrMsg = String
-  type ErrColsAndValues = Map[String, String]
+  type ErrValue = String
+  type ErrColsAndValues = Map[ErrSourceColName, ErrValue]
   type AdditionalInfo = Option[JsonString] // actually a JSON
 
   type ColumnTransformer = String => Column

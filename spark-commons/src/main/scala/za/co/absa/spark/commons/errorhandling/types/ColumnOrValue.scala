@@ -89,8 +89,6 @@ object ColumnOrValue {
   private final case class CoVNull[T](dataType: DataType) extends ColumnOrValue[T] {
     val column: Column = null_col(dataType)
 
-    val isColumn: Boolean = false
-    val isValue: Boolean = true
     val columnNames: Set[String] = Set.empty
     val getValue: Option[T] = None
   }
