@@ -55,12 +55,6 @@ lazy val parent = (project in file("."))
 
 lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
-  .settings(
-    jacocoReportSettings := commonJacocoReportSettings.withTitle("spark-commons Jacoco Report"),
-    jacocoExcludes := commonJacocoExcludes ++ Seq(
-//      "za.co.absa.spark.commons.utils.ExplodeTools" // extra exclude example
-    )
-  )
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
   .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212))
   .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212))
@@ -74,7 +68,7 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     ): _*
   )
   .settings(
-    jacocoReportSettings := commonJacocoReportSettings.withTitle("spark-commons-test Jacoco Report"),
+    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"spark-commons-test Jacoco Report - scala:${scalaVersion.value}"),
     jacocoExcludes := commonJacocoExcludes
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))

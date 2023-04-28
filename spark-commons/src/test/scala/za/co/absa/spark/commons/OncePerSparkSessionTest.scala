@@ -27,18 +27,17 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
     var libraryBInitCounter = 0
 
     val anotherSpark: SparkSession =  mock[SparkSession]
-    class UDFLibraryA()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession()(sparkToRegisterTo) {
-      override protected def register(implicit spark: SparkSession): Unit = {
+    class UDFLibraryA(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {
+      override protected def registerBody(spark: SparkSession): Unit = {
         libraryAInitCounter += 1
       }
     }
 
-    class UDFLibraryB()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession()(sparkToRegisterTo) {
-      override protected def register(implicit spark: SparkSession): Unit = {
+    class UDFLibraryB()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {
+      override protected def registerBody(spark: SparkSession): Unit = {
         libraryBInitCounter += 1
       }
     }
-
 
     new UDFLibraryA()
     new UDFLibraryA()
@@ -46,6 +45,29 @@ class OncePerSparkSessionTest extends AnyFunSuite with MockitoSugar with SparkTe
     new UDFLibraryB()(anotherSpark)
     assert(libraryAInitCounter == 1)
     assert(libraryBInitCounter == 2)
+  }
+
+  test("should return true if the library is registered successfully and false if not, and if spark session hasn't started"){
+    val anotherSpark: SparkSession =  mock[SparkSession]
+    class UDFLibrary() extends OncePerSparkSession(){
+      override protected def registerBody(spark: SparkSession): Unit = {}
+    }
+
+    val UdfLibrary = new UDFLibrary()
+    assert(UdfLibrary.register(anotherSpark))
+    assert(!UdfLibrary.register(anotherSpark))
+  }
+
+  test("should return false for result provided that spark session has started") {
+
+    val anotherSpark: SparkSession =  mock[SparkSession]
+    class UDFLibrary()(implicit sparkToRegisterTo: SparkSession) extends OncePerSparkSession(sparkToRegisterTo) {
+      override protected def registerBody(spark: SparkSession): Unit = {}
+    }
+
+    val library = new UDFLibrary()
+    assert(!library.register(spark))
+    assert(library.register(anotherSpark))
   }
 
 }
