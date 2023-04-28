@@ -36,4 +36,3 @@ trait ErrorHandling {
   }
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame
 }
-
