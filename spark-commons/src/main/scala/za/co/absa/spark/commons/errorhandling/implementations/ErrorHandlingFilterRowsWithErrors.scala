@@ -38,7 +38,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
   /**
    * Filters out rows that contain at least one true flag in the provided boolean error columns
-   * @param dataFrame the overall data structure that need to be aggregated
+   * @param dataFrame - The data frame to filter on
    * @param errCols - the error columns to signal if the row should be filtered or not
    * @return - returns the dataframe without rows with errors
    */
