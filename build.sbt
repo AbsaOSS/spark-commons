@@ -42,6 +42,8 @@ lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings
 )
 
 lazy val commonJacocoExcludes: Seq[String] = Seq(
+  "za.co.absa.spark.commons.adapters.CallUdfAdapter",
+  "za.co.absa.spark.commons.adapters.TransformAdapter"
   //    "za.co.absa.spark.commons.utils.JsonUtils*", // class and related objects
   //    "za.co.absa.spark.commons.utils.ExplodeTools" // class only
 )
