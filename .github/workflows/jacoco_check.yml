@@ -49,12 +49,6 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco211.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco211.outputs.coverage-changed-files }}"
-      - name: Fail PR if changed files coverage is less than 80%
-        if: ${{ steps.jacoco211.outputs.coverage-changed-files < 80.0 }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Changed files coverage is less than 80%!')
       - name: Add coverage to PR for scala 2.12 and spark 3.3
         id: jacoco212
         uses: madrapps/jacoco-report@v1.3
@@ -71,6 +65,12 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco212.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco212.outputs.coverage-changed-files }}"
+      - name: Fail PR if changed files coverage is less than 80%
+        if: ${{ steps.jacoco211.outputs.coverage-changed-files < 80.0 }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Changed files coverage is less than 80%!')
       - name: Fail PR if changed files coverage is less than 80%
         if: ${{ steps.jacoco212.outputs.coverage-changed-files < 80.0 }}
         uses: actions/github-script@v6
