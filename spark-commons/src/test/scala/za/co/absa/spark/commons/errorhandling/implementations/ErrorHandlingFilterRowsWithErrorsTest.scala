@@ -17,6 +17,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, column, length}
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
@@ -78,4 +79,19 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     assert(results == expectedResults)
   }
 
+  test("putError and putErrors does not group by together") {
+//    val errorMessageArray = ErrorMessageArray()
+    val expected: List[ResultDfRecordType] = List((Some(1),"a"))
+
+    val midDf = ErrorHandlingFilterRowsWithErrors.putError(srcDf)(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
+
+    val resultDf = ErrorHandlingFilterRowsWithErrors.putErrorsWithGrouping(midDf)(Seq(
+      ErrorWhen(col(col1Name).isNull, ErrorMessageSubmitWithoutColumn("WrongLine", 0, "This line is wrong")),
+      ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the field is too big", col1Name)),
+      ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitOnColumn("String too long", 10, "The text in the field is too long", col2Name))
+    ))
+    val result = resultDfToResult(resultDf)
+
+    assert(result == expected)
+  }
 }
