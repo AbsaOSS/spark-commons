@@ -38,8 +38,8 @@ jobs:
         uses: madrapps/jacoco-report@v1.3
         with:
           paths: >
-            ${{ github.workspace }}/spark-commons/target/spark2.4-jvm-2.11/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/spark-commons-test/target/jvm-2.11/jacoco/report/jacoco.xml
+            /home/runner/work/spark-commons/spark-commons/spark-commons-test/target/jvm-2.11/jacoco/report/jacoco.xml,
+            ${{ github.workspace }}/spark-commons/target/spark2.4-jvm-2.11/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0.0
           min-coverage-changed-files: 80.0
@@ -54,9 +54,7 @@ jobs:
         id: jacoco212
         uses: madrapps/jacoco-report@v1.3
         with:
-          paths: >
-            ${{ github.workspace }}/spark-commons/target/spark3.3-jvm-2.12/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/spark-commons-test/target/jvm-2.12/jacoco/report/jacoco.xml
+          paths: ${{ github.workspace }}/spark-commons/target/spark3.3-jvm-2.12/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0.0
           min-coverage-changed-files: 80.0
