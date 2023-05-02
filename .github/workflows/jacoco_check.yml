@@ -37,9 +37,7 @@ jobs:
         id: jacoco211
         uses: madrapps/jacoco-report@v1.3
         with:
-          paths: >
-            ${{ github.workspace }}/spark-commons-test/target/jvm-2.11/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/spark-commons/target/spark2.4-jvm-2.11/jacoco/report/jacoco.xml
+          paths: ${{ github.workspace }}/spark-commons/target/spark2.4-jvm-2.11/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0.0
           min-coverage-changed-files: 80.0
@@ -65,22 +63,6 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco212.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco212.outputs.coverage-changed-files }}"
-      - name: Add coverage to PR for scala 2.11 and spark 2.4 - test only
-        id: jacoco211test
-        uses: madrapps/jacoco-report@v1.3
-        with:
-          paths: >
-            ${{ github.workspace }}/spark-commons-test/target/jvm-2.11/jacoco/report/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 0.0
-          min-coverage-changed-files: 80.0
-          title: JaCoCo code coverage report - scala:2.11 - spark:2.4 - tests
-          update-comment: true
-          debug-mode: true
-      - name: Get the Coverage info
-        run: |
-          echo "Total coverage ${{ steps.jacoco211test.outputs.coverage-overall }}"
-          echo "Changed Files coverage ${{ steps.jacoco211test.outputs.coverage-changed-files }}"
       - name: Fail PR if changed files coverage is less than 80%
         if: ${{ steps.jacoco211.outputs.coverage-changed-files < 80.0 }}
         uses: actions/github-script@v6
