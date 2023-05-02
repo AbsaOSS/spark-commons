@@ -30,7 +30,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   /**
    * Creates a column with the error description, in this particular case actually only signals with a boolean flag there was an error in the row.
    * @param errorMessageSubmit - the description of the error
-   * @return returns true if the column contains an error
+   * @return - A column with boolean value indicating there was an error on the row.
    */
   override protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
     lit(true)
@@ -38,7 +38,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
   /**
    * Filters out rows that contain at least one true flag in the provided boolean error columns
-   * @param dataFrame the overall data structure that need to be aggregated
+   * @param dataFrame - The data frame to filter on
    * @param errCols - the error columns to signal if the row should be filtered or not
    * @return - returns the dataframe without rows with errors
    */
