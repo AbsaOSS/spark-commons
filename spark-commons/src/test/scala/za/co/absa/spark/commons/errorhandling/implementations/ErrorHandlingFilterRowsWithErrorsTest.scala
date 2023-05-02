@@ -52,7 +52,6 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     resultsDF.show()
 
     val results = resultDfToResult(resultsDF)
-    println("Results: ", results)
 
     assert(results.length == expectedResults.length)
     assert(results == expectedResults)
