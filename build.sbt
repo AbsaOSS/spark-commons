@@ -23,7 +23,6 @@ lazy val spark33   = "3.3.1"
 
 import Dependencies._
 import SparkVersionAxis._
-import com.github.sbt.jacoco.report.JacocoReportSettings
 
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212)
@@ -35,17 +34,6 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
   Test / parallelExecution := false
-)
-
-lazy val commonJacocoReportSettings: JacocoReportSettings = JacocoReportSettings(
-  formats = Seq(JacocoReportFormats.HTML, JacocoReportFormats.XML)
-)
-
-lazy val commonJacocoExcludes: Seq[String] = Seq(
-  "za.co.absa.spark.commons.adapters.CallUdfAdapter",
-  "za.co.absa.spark.commons.adapters.TransformAdapter"
-  //    "za.co.absa.spark.commons.utils.JsonUtils*", // class and related objects
-  //    "za.co.absa.spark.commons.utils.ExplodeTools" // class only
 )
 
 lazy val parent = (project in file("."))
@@ -68,9 +56,5 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     name := "spark-commons-test",
     libraryDependencies ++= sparkDependencies(spark2)
     ): _*
-  )
-  .settings(
-    jacocoReportSettings := commonJacocoReportSettings.withTitle(s"spark-commons-test Jacoco Report - scala:${scalaVersion.value}"),
-    jacocoExcludes := commonJacocoExcludes
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212))
