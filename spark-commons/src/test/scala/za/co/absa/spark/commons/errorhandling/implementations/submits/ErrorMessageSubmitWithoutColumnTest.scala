@@ -38,10 +38,10 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
 
     expectedErrType assertTo result.errType
     expectedErrCode assertTo result.errCode
-    expectedErrMsg assertTo result.errMsg
+    expectedErrMsg assertTo result.errMessage
     result.errColsAndValues.column.expr
     expectedErrValuesCol assertTo result.errColsAndValues
-    expectedAdditionalInfo assertTo result.additionInfo
+    expectedAdditionalInfo assertTo result.additionalInfo
   }
 
   test("Apply function properly hands over data with additional info") {
@@ -61,8 +61,8 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
 
     expectedErrType assertTo result.errType
     expectedErrCode assertTo result.errCode
-    expectedErrMsg assertTo result.errMsg
+    expectedErrMsg assertTo result.errMessage
     expectedErrValuesCol assertTo result.errColsAndValues
-    expectedAdditionalInfo assertTo result.additionInfo
+    expectedAdditionalInfo assertTo result.additionalInfo
   }
 }

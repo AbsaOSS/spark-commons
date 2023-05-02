@@ -65,7 +65,7 @@ object functions {
   }
 
   def null_col(dataType: DataType):Column = {
-    lit(None.orNull).cast(dataType)
+    null_col.cast(dataType)
   }
 
 }

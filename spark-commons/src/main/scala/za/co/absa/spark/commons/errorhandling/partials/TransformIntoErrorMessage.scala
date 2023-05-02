@@ -19,28 +19,34 @@ package za.co.absa.spark.commons.errorhandling.partials
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.struct
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
+import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage.FieldNames._
 
-trait EvaluateIntoErrorMessage {
-  protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
+/**
+ * Trait offers a presumably very common implementation of [[za.co.absa.spark.commons.errorhandling.ErrorHandling.transformErrorSubmitToColumn ErrorHandling.transformErrorSubmitToColumn()]],
+ * where the error is transformed into the struct of [[za.co.absa.spark.commons.errorhandling.ErrorMessage ErrorMessage]].
+ * @group Error Handling
+ * @since 0.6.0
+ */
+trait TransformIntoErrorMessage {
+  protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
     struct(
       errorMessageSubmit.errType.column as errType,
       errorMessageSubmit.errCode.column as errCode,
-      errorMessageSubmit.errMsg.column as errMsg,
+      errorMessageSubmit.errMessage.column as errMsg,
       errorMessageSubmit.errColsAndValues.column as errColsAndValues,
-      errorMessageSubmit.additionInfo.column as additionInfo
+      errorMessageSubmit.additionalInfo.column as additionInfo
     )
   }
 }
 
-object EvaluateIntoErrorMessage {
+object TransformIntoErrorMessage {
   object FieldNames {
     val errType = "errType"
     val errCode = "errCode"
     val errMsg = "errMsg"
     val errColsAndValues = "errColsAndValues"
     val additionInfo = "additionInfo"
-    val errCols = "errCols"
+    val errSourceCols = "errSourceCols"
     val errValues = "errValues"
   }
 

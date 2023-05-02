@@ -21,6 +21,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{ArrayType, StructType}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
+import za.co.absa.spark.commons.sql.functions.null_col
 import za.co.absa.spark.commons.utils.explode.{Explosion, ExplosionContext}
 import za.co.absa.spark.hats.Extensions.DataFrameExtension
 
@@ -343,7 +344,7 @@ object ExplodeTools {
   private def addSuperTransientField(inputDf: DataFrame, arrayColPathName: String): (DataFrame, String) = {
     val colName = inputDf.schema.getClosestUniqueName(superTransientColumnName)
     val nestedColName = (SchemaUtils.splitPath(arrayColPathName).dropRight(1) :+ colName).mkString(".")
-    val df = inputDf.nestedWithColumn(nestedColName, lit(null))
+    val df = inputDf.nestedWithColumn(nestedColName, null_col)
     (df, nestedColName)
   }
 

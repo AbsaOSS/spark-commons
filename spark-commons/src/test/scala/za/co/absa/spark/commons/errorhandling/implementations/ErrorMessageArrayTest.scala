@@ -77,13 +77,13 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
     val errorMessageArray = ErrorMessageArray()
 
-    val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val e1 = errorMessageArray.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
-    val e2 = errorMessageArray.putErrorToColumn(errorSubmitA)
+    val e2 = errorMessageArray.createErrorAsColumn(errorSubmitA)
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
-    val e3 = errorMessageArray.putErrorToColumn(errorSubmitB)
+    val e3 = errorMessageArray.createErrorAsColumn(errorSubmitB)
 
-    val resultDf = errorMessageArray.aggregateErrorColumns(srcDf)(e1, e2, e3)
+    val resultDf = errorMessageArray.applyErrorColumnsToDataFrame(srcDf)(e1, e2, e3)
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
@@ -150,7 +150,6 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   test("Various error submits combined") {
     val errorMessageArray = ErrorMessageArray("MyErrCol")
 
-
     case class NullError(errColName: String) extends ErrorMessageSubmitOnColumn(
       CoV.withValue("Null Error"),
       CoV.withValue(1L),
@@ -192,6 +191,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
+    assert(resultDf.columns.contains("MyErrCol"))
 
   }
 }
