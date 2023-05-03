@@ -34,8 +34,7 @@ object JacocoSetup {
   def jacocoProjectExcludes(sparkVersion: String, scalaVersion: String): Seq[String] = {
     Seq(
       "za.co.absa.spark.commons.adapters.CallUdfAdapter",
-      "za.co.absa.spark.commons.adapters.TransformAdapter",
-      "za.co.absa.spark.commons.errorhandling.ErrorMessage"
+      "za.co.absa.spark.commons.adapters.TransformAdapter"
     )
   }
 
