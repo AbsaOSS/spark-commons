@@ -23,7 +23,7 @@ import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ColumnOrVal
 import za.co.absa.spark.commons.sql.functions.null_col
 
 class ErrorMessageSubmitOnColumnTest extends AnyFunSuite {
-  ignore("Apply function properly hands over data without additional info") {
+  test("Apply function properly hands over data without additional info") {
     val errType = "Test error"
     val errCode = 201L
     val errMsg = "This is a test error"
@@ -44,7 +44,7 @@ class ErrorMessageSubmitOnColumnTest extends AnyFunSuite {
     expectedAdditionalInfo assertTo result.additionInfo
   }
 
-  ignore("Apply function properly hands over data with additional info") {
+  test("Apply function properly hands over data with additional info") {
     val errType = "Test error"
     val errCode = 201L
     val errMsg = "This is a test error"

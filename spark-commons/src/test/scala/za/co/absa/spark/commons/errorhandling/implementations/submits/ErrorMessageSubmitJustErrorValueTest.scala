@@ -45,7 +45,7 @@ class ErrorMessageSubmitJustErrorValueTest extends AnyFunSuite {
     expectedAdditionalInfo assertTo result.additionInfo
   }
 
-  ignore("Apply function properly hands over data with additional info") {
+  test("Apply function properly hands over data with additional info") {
     val errType = "Test error"
     val errCode = 201L
     val errMsg = "This is a test error"
