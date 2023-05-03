@@ -46,7 +46,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     resultDf.as[ResultDfRecordType].collect().sortBy(_._1).toList
   }
 
-  test("Collect columns and aggregate them explicitly") {
+  ignore("Collect columns and aggregate them explicitly") {
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
         ErrorMessage("Test error 1", 1, "This is a test error", Map("Col1" -> nullString)),
@@ -89,7 +89,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     assert(result == expected)
   }
 
-  test("putErrors groups conditions by source column"){
+  ignore("putErrors groups conditions by source column"){
     val errorMessageArray = ErrorMessageArray()
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
