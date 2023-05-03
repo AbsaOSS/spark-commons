@@ -43,7 +43,7 @@ jobs:
           min-coverage-changed-files: 80.0
           title: JaCoCo code coverage report - scala:2.11 - spark:2.4
           update-comment: true
-          debug-mode: false
+          debug-mode: true
       - name: Get the Coverage info
         run: |
           echo "Total coverage ${{ steps.jacoco211.outputs.coverage-overall }}"
