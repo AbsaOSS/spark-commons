@@ -29,13 +29,14 @@ import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
 import za.co.absa.spark.commons.test.SparkTestBase
 import org.apache.spark.sql.functions.{col, length}
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
-<<<<<<< HEAD
-import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
-=======
-import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
+import za.co.absa.spark.commons.errorhandling.implementations.submits
+.{
+  ErrorMessageSubmitJustErrorValue,
+  ErrorMessageSubmitOnColumn,
+  ErrorMessageSubmitOnMoreColumns,
+  ErrorMessageSubmitWithoutColumn
+}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
->>>>>>> master
-
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
@@ -48,12 +49,8 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     (None, ""),
     (Some(1), "a"),
     (Some(2), "bb"),
-<<<<<<< HEAD
-    (Some(3), "ccc")
-=======
     (Some(3), "ccc"),
     (Some(0), "X")
->>>>>>> master
   ).toDF(col1Name, col2Name)
 
   private type ResultDfRecordType = (Option[Integer], String, List[ErrorMessage])
@@ -69,14 +66,11 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
         ErrorMessage("Test error 2", 2, "This is a test error", Map("Col2" -> "")),
         ErrorMessage("Test error 3", 3, "This is a test error", Map.empty)
       )),
-<<<<<<< HEAD
-=======
       (Some(0), "X", List(
         ErrorMessage("Test error 1", 1, "This is a test error", Map("Col1" -> "0")),
         ErrorMessage("Test error 2", 2, "This is a test error", Map("Col2" -> "X")),
         ErrorMessage("Test error 3", 3, "This is a test error", Map.empty)
       )),
->>>>>>> master
       (Some(1), "a", List(
         ErrorMessage("Test error 1", 1, "This is a test error", Map("Col1" -> "1")),
         ErrorMessage("Test error 2", 2, "This is a test error", Map("Col2" -> "a")),
@@ -114,10 +108,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       (None, "", List(
         ErrorMessage("WrongLine", 0, "This line is wrong", Map.empty)
       )),
-<<<<<<< HEAD
-=======
       (Some(0), "X", List.empty),
->>>>>>> master
       (Some(1), "a", List.empty),
       (Some(2), "bb", List(
         ErrorMessage("ValueStillTooBig", 2, "The value of the field is too big", Map("Col1" -> "2"))
@@ -145,10 +136,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       (None, "", List(
         ErrorMessage("WrongLine", 0, "This line is wrong", Map.empty)
       )),
-<<<<<<< HEAD
-=======
       (Some(0), "X", List.empty),
->>>>>>> master
       (Some(1), "a", List.empty),
       (Some(2), "bb", List(
         ErrorMessage("ValueStillTooBig", 2, "The value of the field is too big", Map("Col1" -> "2"))
@@ -171,12 +159,9 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
     assert(result == expected)
   }
-<<<<<<< HEAD
-=======
 
   test("Various error submits combined") {
     val errorMessageArray = ErrorMessageArray("MyErrCol")
-
 
     case class NullError(errColName: String) extends ErrorMessageSubmitOnColumn(
       CoV.withValue("Null Error"),
@@ -221,5 +206,4 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     assert(result == expected)
 
   }
->>>>>>> master
 }
