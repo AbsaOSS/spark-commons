@@ -52,6 +52,7 @@ trait ColumnOrValue[T] {
    * @group Error Handling
    * @since 0.6.0
    */
+
   def getValue: Option[T]
 }
 

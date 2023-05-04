@@ -33,7 +33,8 @@ object JacocoSetup {
 
   def jacocoProjectExcludes(sparkVersion: String, scalaVersion: String): Seq[String] = {
     Seq(
-      //      "za.co.absa.spark.commons.utils.ExplodeTools" // extra exclude example
+      "za.co.absa.spark.commons.adapters.CallUdfAdapter",
+      "za.co.absa.spark.commons.adapters.TransformAdapter"
     )
   }
 

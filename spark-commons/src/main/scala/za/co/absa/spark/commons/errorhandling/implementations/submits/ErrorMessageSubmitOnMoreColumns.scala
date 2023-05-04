@@ -56,6 +56,7 @@ object ErrorMessageSubmitOnMoreColumns {
             errCode: ErrCode,
             errMessage: ErrMsg,
             errSourceColNames: Set[ErrSourceColName],
+
             additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnMoreColumns = {
     new ErrorMessageSubmitOnMoreColumns(
       ColumnOrValue.withValue(errType),

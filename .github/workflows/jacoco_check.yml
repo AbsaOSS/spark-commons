@@ -37,9 +37,7 @@ jobs:
         id: jacoco211
         uses: madrapps/jacoco-report@v1.3
         with:
-          paths: >
-            ${{ github.workspace }}/spark-commons/target/spark2.4-jvm-2.11/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/spark-commons-test/target/jvm-2.11/jacoco/report/jacoco.xml
+          paths: ${{ github.workspace }}/spark-commons/target/spark2.4-jvm-2.11/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0.0
           min-coverage-changed-files: 80.0
@@ -49,19 +47,11 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco211.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco211.outputs.coverage-changed-files }}"
-      - name: Fail PR if changed files coverage is less than 80%
-        if: ${{ steps.jacoco211.outputs.coverage-changed-files < 80.0 }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            core.setFailed('Changed files coverage is less than 80%!')
       - name: Add coverage to PR for scala 2.12 and spark 3.3
         id: jacoco212
         uses: madrapps/jacoco-report@v1.3
         with:
-          paths: >
-            ${{ github.workspace }}/spark-commons/target/spark3.3-jvm-2.12/jacoco/report/jacoco.xml,
-            ${{ github.workspace }}/spark-commons-test/target/jvm-2.12/jacoco/report/jacoco.xml
+          paths: ${{ github.workspace }}/spark-commons/target/spark3.3-jvm-2.12/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0.0
           min-coverage-changed-files: 80.0
@@ -71,6 +61,12 @@ jobs:
         run: |
           echo "Total coverage ${{ steps.jacoco212.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco212.outputs.coverage-changed-files }}"
+      - name: Fail PR if changed files coverage is less than 80%
+        if: ${{ steps.jacoco211.outputs.coverage-changed-files < 80.0 }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Changed files coverage is less than 80%!')
       - name: Fail PR if changed files coverage is less than 80%
         if: ${{ steps.jacoco212.outputs.coverage-changed-files < 80.0 }}
         uses: actions/github-script@v6

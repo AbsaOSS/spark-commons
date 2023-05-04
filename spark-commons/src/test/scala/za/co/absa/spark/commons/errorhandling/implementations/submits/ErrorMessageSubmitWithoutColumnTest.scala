@@ -42,6 +42,7 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
     result.errColsAndValues.column.expr
     expectedErrValuesCol assertTo result.errColsAndValues
     expectedAdditionalInfo assertTo result.additionalInfo
+
   }
 
   test("Apply function properly hands over data with additional info") {

@@ -66,5 +66,6 @@ class ErrorMessageSubmitJustErrorValueTest extends AnyFunSuite {
     expectedErrMsg assertTo result.errMessage
     expectedErrValuesCol assertTo result.errColsAndValues
     expectedAdditionalInfo assertTo result.additionalInfo
+
   }
 }

@@ -36,6 +36,7 @@ class ErrorMessageSubmitOnColumn (
                                    errSourceColName: ErrSourceColName,
                                    override val additionalInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
                                  ) extends ErrorMessageSubmitOnMoreColumns(errType, errCode, errMessage, Set(errSourceColName), additionalInfo) {
+
 }
 
 object ErrorMessageSubmitOnColumn {

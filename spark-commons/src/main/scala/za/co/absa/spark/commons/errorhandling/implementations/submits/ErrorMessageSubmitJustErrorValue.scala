@@ -22,7 +22,6 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitJustErrorValue.noColumnKey
 import za.co.absa.spark.commons.errorhandling.types._
 
-
 /**
  * [[za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit ErrorMessageSubmit]] subclass to represent an error not
  * bound to a particular column but still having a value that caused the error.
