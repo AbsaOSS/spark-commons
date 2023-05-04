@@ -28,7 +28,8 @@ import za.co.absa.spark.commons.errorhandling.types._
  * `DataFrame`. The trait should be an input parameter for such library, perhaps as an implicit.
  * On the other side the end application provides concrete `ErrorHandling` implementation, that does the actual error
  * handling by the application desire.
- * For easy to use ana as examples, a few general implementations are provided in the implementations sub-folder.
+ * For easy to use and as examples, a few general implementations are provided in the implementations sub-folder.
+ * Also for common, repeated implementations the folder `partials` offer some traits.
  */
 trait ErrorHandling {
   /**
