@@ -30,7 +30,11 @@ class ErrorMessageSubmitOnMoreColumns(
 }
 
 object ErrorMessageSubmitOnMoreColumns {
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errColNames: Set[ErrSourceColName], additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnMoreColumns = {
+  def apply(errType: ErrType,
+            errCode: ErrCode,
+            errMessage: ErrMsg,
+            errColNames: Set[ErrSourceColName],
+            additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnMoreColumns = {
     new ErrorMessageSubmitOnMoreColumns(
       ColumnOrValue.withValue(errType),
       ColumnOrValue.withValue(errCode),

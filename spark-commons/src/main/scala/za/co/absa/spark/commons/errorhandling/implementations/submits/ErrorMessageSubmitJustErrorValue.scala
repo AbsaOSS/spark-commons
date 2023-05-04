@@ -26,7 +26,7 @@ class ErrorMessageSubmitJustErrorValue(
                                         val errType: ColumnOrValue[ErrType],
                                         val errCode: ColumnOrValue[ErrCode],
                                         val errMsg: ColumnOrValue[ErrMsg],
-                                        errValue: ColumnOrValue[String],
+                                        errValue: ColumnOrValue[ErrValue],
                                         override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
                                       ) extends ErrorMessageSubmit {
   val errColsAndValues: ColumnOrValue[ErrColsAndValues] = ColumnOrValue(map(lit(noColumnKey), errValue.column.cast(StringType)))
@@ -35,7 +35,7 @@ class ErrorMessageSubmitJustErrorValue(
 object ErrorMessageSubmitJustErrorValue {
   val noColumnKey: ErrSourceColName = ""
 
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errValue: String, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitJustErrorValue = {
+  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errValue: ErrValue, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitJustErrorValue = {
     new ErrorMessageSubmitJustErrorValue(
       ColumnOrValue.withValue(errType),
       ColumnOrValue.withValue(errCode),

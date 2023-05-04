@@ -36,8 +36,12 @@ object ColumnOrValue {
   val CoV: ColumnOrValue.type = ColumnOrValue
 
   def apply[T](columnName: String): ColumnOrValue[T] = CoVNamedColumn(columnName)
+
   def apply[T](column: Column): ColumnOrValue[T] = CoVDefinedColumn(column)
-  def apply[T](mapColumnNames: Set[String], columnTransformer: ColumnTransformer): ColumnOrValue[Map[String, T]] = CoVMapColumn(mapColumnNames, columnTransformer) //should it be explicit function?
+
+  def apply[T](mapColumnNames: Set[String], columnTransformer: ColumnTransformer): ColumnOrValue[Map[String, T]] = {
+    CoVMapColumn(mapColumnNames, columnTransformer)
+  }
 
   def withOption(value: Option[String]): ColumnOrValue[Option[String]] = { // could be safely an apply, or done more generally
     value match {

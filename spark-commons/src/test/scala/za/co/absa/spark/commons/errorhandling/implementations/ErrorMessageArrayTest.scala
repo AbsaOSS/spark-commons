@@ -1,10 +1,17 @@
 /*
+<<<<<<< HEAD
  * Copyright 2021 ABSA Group Limited
+=======
+ * Copyright 2023 ABSA Group Limited
+>>>>>>> master
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
+<<<<<<< HEAD
  *
+=======
+>>>>>>> master
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -22,7 +29,12 @@ import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
 import za.co.absa.spark.commons.test.SparkTestBase
 import org.apache.spark.sql.functions.{col, length}
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
+<<<<<<< HEAD
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
+=======
+import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
+import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
+>>>>>>> master
 
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
@@ -36,7 +48,12 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     (None, ""),
     (Some(1), "a"),
     (Some(2), "bb"),
+<<<<<<< HEAD
     (Some(3), "ccc")
+=======
+    (Some(3), "ccc"),
+    (Some(0), "X")
+>>>>>>> master
   ).toDF(col1Name, col2Name)
 
   private type ResultDfRecordType = (Option[Integer], String, List[ErrorMessage])
@@ -52,6 +69,14 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
         ErrorMessage("Test error 2", 2, "This is a test error", Map("Col2" -> "")),
         ErrorMessage("Test error 3", 3, "This is a test error", Map.empty)
       )),
+<<<<<<< HEAD
+=======
+      (Some(0), "X", List(
+        ErrorMessage("Test error 1", 1, "This is a test error", Map("Col1" -> "0")),
+        ErrorMessage("Test error 2", 2, "This is a test error", Map("Col2" -> "X")),
+        ErrorMessage("Test error 3", 3, "This is a test error", Map.empty)
+      )),
+>>>>>>> master
       (Some(1), "a", List(
         ErrorMessage("Test error 1", 1, "This is a test error", Map("Col1" -> "1")),
         ErrorMessage("Test error 2", 2, "This is a test error", Map("Col2" -> "a")),
@@ -89,6 +114,10 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       (None, "", List(
         ErrorMessage("WrongLine", 0, "This line is wrong", Map.empty)
       )),
+<<<<<<< HEAD
+=======
+      (Some(0), "X", List.empty),
+>>>>>>> master
       (Some(1), "a", List.empty),
       (Some(2), "bb", List(
         ErrorMessage("ValueStillTooBig", 2, "The value of the field is too big", Map("Col1" -> "2"))
@@ -116,6 +145,10 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       (None, "", List(
         ErrorMessage("WrongLine", 0, "This line is wrong", Map.empty)
       )),
+<<<<<<< HEAD
+=======
+      (Some(0), "X", List.empty),
+>>>>>>> master
       (Some(1), "a", List.empty),
       (Some(2), "bb", List(
         ErrorMessage("ValueStillTooBig", 2, "The value of the field is too big", Map("Col1" -> "2"))
@@ -138,4 +171,55 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
     assert(result == expected)
   }
+<<<<<<< HEAD
+=======
+
+  test("Various error submits combined") {
+    val errorMessageArray = ErrorMessageArray("MyErrCol")
+
+
+    case class NullError(errColName: String) extends ErrorMessageSubmitOnColumn(
+      CoV.withValue("Null Error"),
+      CoV.withValue(1L),
+      CoV.withValue("Field should not be null"),
+      errColName)
+    case class CorrelationError(lengthColName: String, textColumnName: String) extends  ErrorMessageSubmitOnMoreColumns(
+      CoV.withValue("Columns not correlated"),
+      CoV.withValue(2),
+      CoV.withValue(s"Column '$textColumnName' doesn't have a length mentioned in column '$lengthColName'"),
+      Set(lengthColName, textColumnName)
+    )
+
+    val expected: List[ResultDfRecordType] = List(
+      (None, "", List(
+        ErrorMessage("Null Error", 1, "Field should not be null", Map(col1Name -> nullString))
+      )),
+      (Some(0), "X", List(
+        ErrorMessage(
+          "Columns not correlated",
+          2,
+          s"Column '$col2Name' doesn't have a length mentioned in column '$col1Name'",
+          Map(col1Name -> "0", col2Name -> "X"))
+      )),
+      (Some(1), "a", List.empty),
+      (Some(2), "bb", List(
+        ErrorMessage("ID is protected", 2, "The ID is too big", Map("" -> "2"))
+      )),
+      (Some(3), "ccc", List(
+        ErrorMessage("Ugly row", 3, "I don't like this row", Map.empty)
+      ))
+    )
+
+    val resultDf = errorMessageArray.putErrorsWithGrouping(srcDf)(Seq(
+      ErrorWhen(col(col1Name).isNull, NullError(col1Name)),
+      ErrorWhen(col(col1Name)  =!= length(col(col2Name)), CorrelationError(col1Name, col2Name)),
+      ErrorWhen(col(col1Name) === 2, ErrorMessageSubmitJustErrorValue("ID is protected", 2, "The ID is too big", "2")),
+      ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitWithoutColumn("Ugly row", 3, "I don't like this row"))
+    ))
+    val result = resultDfToResult(resultDf)
+
+    assert(result == expected)
+
+  }
+>>>>>>> master
 }

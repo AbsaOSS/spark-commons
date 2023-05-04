@@ -16,6 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling.implementations.submits
 
+import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.typedLit
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitWithoutColumn.emptyErrorColsAndValues
@@ -28,11 +29,12 @@ class ErrorMessageSubmitWithoutColumn(
                                        override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
                                      ) extends ErrorMessageSubmit {
 
-  val errColsAndValues: ColumnOrValue[ErrColsAndValues] =  ColumnOrValue(typedLit(emptyErrorColsAndValues))
+  val errColsAndValues: ColumnOrValue[ErrColsAndValues] =  ColumnOrValue(ErrorMessageSubmitWithoutColumn.emptyErrColsAndValues)
 }
 
 object ErrorMessageSubmitWithoutColumn {
   private val emptyErrorColsAndValues: ErrColsAndValues = Map.empty
+  val emptyErrColsAndValues: Column = typedLit(emptyErrorColsAndValues)
 
   def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitWithoutColumn = {
     new ErrorMessageSubmitWithoutColumn(
