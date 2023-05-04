@@ -35,7 +35,7 @@ class ErrorMessageSubmitJustErrorValue(
 object ErrorMessageSubmitJustErrorValue {
   val noColumnKey: ErrSourceColName = ""
 
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errValue: String, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitJustErrorValue = {
+  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errValue: ErrValue, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitJustErrorValue = {
     new ErrorMessageSubmitJustErrorValue(
       ColumnOrValue.withValue(errType),
       ColumnOrValue.withValue(errCode),
