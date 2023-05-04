@@ -17,7 +17,8 @@
 package za.co.absa.spark.commons.sql
 
 import org.apache.spark.sql.Column
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, lit}
+import org.apache.spark.sql.types.DataType
 import za.co.absa.spark.commons.utils.SchemaUtils
 
 import scala.util.{Success, Try}
@@ -52,6 +53,19 @@ object functions {
     segments.tail.foldLeft(segmentToColumn(col, segments.head)) {case(acc, columnSegment) =>
       segmentToColumn(acc.apply, columnSegment)
     }
+  }
+
+  /**
+   * Provides a column with NULL value.
+   *
+   * @return      The column of NULL values
+   */
+  def null_col:Column = {
+    lit(None.orNull)
+  }
+
+  def null_col(dataType: DataType):Column = {
+    lit(None.orNull).cast(dataType)
   }
 
 }
