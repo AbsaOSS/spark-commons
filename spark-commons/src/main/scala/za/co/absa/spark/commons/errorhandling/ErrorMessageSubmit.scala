@@ -25,4 +25,3 @@ trait ErrorMessageSubmit {
   def errColsAndValues: ColumnOrValue[ErrColsAndValues]
   def additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
 }
-
