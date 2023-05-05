@@ -21,8 +21,6 @@ import org.scalatest.Assertions
 
 case class ColumnOrValueForm[T] (
                                  column: Column,
-                                 isColumn: Boolean,
-                                 isValue: Boolean,
                                  columnNames: Set[String],
                                  value: Option[T]
                                ) extends Assertions {
