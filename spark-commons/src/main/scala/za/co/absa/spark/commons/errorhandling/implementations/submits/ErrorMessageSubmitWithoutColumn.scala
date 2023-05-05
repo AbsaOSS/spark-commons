@@ -19,7 +19,6 @@ package za.co.absa.spark.commons.errorhandling.implementations.submits
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.typedLit
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitWithoutColumn.emptyErrorColsAndValues
 import za.co.absa.spark.commons.errorhandling.types._
 
 /**

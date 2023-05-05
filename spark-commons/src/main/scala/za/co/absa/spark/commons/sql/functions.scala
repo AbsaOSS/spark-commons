@@ -57,13 +57,17 @@ object functions {
 
   /**
    * Provides a column with NULL value.
-   *
-   * @return      The column of NULL values
+   * @return - column of NULL values
    */
   def null_col:Column = {
     lit(None.orNull)
   }
 
+  /**
+   * Provides a column with NULL values, but the actual type is per specification
+   * @param dataType - the actual data type of the column that will contain NULLs
+   * @return - column of NULL values
+   */
   def null_col(dataType: DataType):Column = {
     null_col.cast(dataType)
   }
