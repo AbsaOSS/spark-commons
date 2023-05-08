@@ -37,4 +37,3 @@ trait ErrorHandling {
     putErrorToColumn(toSubmit)
   }
 }
-

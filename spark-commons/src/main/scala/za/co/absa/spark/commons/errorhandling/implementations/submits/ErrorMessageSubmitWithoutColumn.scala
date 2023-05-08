@@ -34,7 +34,6 @@ class ErrorMessageSubmitWithoutColumn(
 
 object ErrorMessageSubmitWithoutColumn {
   private val emptyErrorColsAndValues: ErrColsAndValues = Map.empty
-
   val emptyErrColsAndValues: Column = typedLit(emptyErrorColsAndValues)
 
   def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, additionalInfo: AdditionalInfo = None): ErrorMessageSubmitWithoutColumn = {

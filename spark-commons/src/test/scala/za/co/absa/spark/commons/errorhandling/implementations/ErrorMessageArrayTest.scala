@@ -1,9 +1,10 @@
 /*
- * Copyright 2023 ABSA Group Limited
+ * Copyright 2021 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -21,9 +22,14 @@ import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
 import za.co.absa.spark.commons.test.SparkTestBase
 import org.apache.spark.sql.functions.{col, length}
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
-import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
+import za.co.absa.spark.commons.errorhandling.implementations.submits
+.{
+  ErrorMessageSubmitJustErrorValue,
+  ErrorMessageSubmitOnColumn,
+  ErrorMessageSubmitOnMoreColumns,
+  ErrorMessageSubmitWithoutColumn
+}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
-
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
@@ -149,7 +155,6 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   test("Various error submits combined") {
     val errorMessageArray = ErrorMessageArray("MyErrCol")
-
 
     case class NullError(errColName: String) extends ErrorMessageSubmitOnColumn(
       CoV.withValue("Null Error"),

@@ -92,5 +92,4 @@ class ColumnOrValueTest extends AnyFunSuite {
     expected assertTo result
   }
 
-
 }
