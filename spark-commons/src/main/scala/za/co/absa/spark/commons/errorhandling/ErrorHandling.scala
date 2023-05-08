@@ -16,6 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling
 
+import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types._
@@ -36,4 +37,8 @@ trait ErrorHandling {
       .getOrElse(ErrorMessageSubmitWithoutColumn(errType, errCode, errMessage, additionalInfo))
     putErrorToColumn(toSubmit)
   }
+
+  def errorColumnType: DataType
+
+  def errorColumnAggregationType: Option[DataType]
 }
