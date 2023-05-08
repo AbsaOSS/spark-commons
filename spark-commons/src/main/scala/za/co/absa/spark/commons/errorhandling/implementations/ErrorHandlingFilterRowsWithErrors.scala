@@ -17,14 +17,13 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
-import org.apache.spark.sql.functions.{coalesce, col, lit}
+import org.apache.spark.sql.functions.{coalesce, lit}
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 
 /**
  * Class implement the functionality of filtering rows with columns.
  */
-
 object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
   /**

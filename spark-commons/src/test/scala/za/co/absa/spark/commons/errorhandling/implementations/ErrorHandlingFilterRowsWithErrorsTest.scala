@@ -15,9 +15,8 @@
 
 package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{col, column, length}
+import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
@@ -39,7 +38,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     resultDf.as[ResultDfRecordType].collect().sortBy(_._1).toList
   }
 
-  test("aggregateErrorColumns\" should \"return an empty list after error aggregation\"") {
+  test("aggregateErrorColumns should return an empty list after error aggregation") {
     val expectedResults: List[ResultDfRecordType] = List()
 
     val e1 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
@@ -49,15 +48,13 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val e3 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(errorSubmitB)
 
     val resultsDF = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(srcDf)(e1, e2, e3)
-    resultsDF.show()
-
     val results = resultDfToResult(resultsDF)
 
     assert(results.length == expectedResults.length)
     assert(results == expectedResults)
   }
 
-  test("aggregateErrorColumns\" should \"return  records whose don't have errors\"") {
+  test("aggregateErrorColumns should return  records whose don't have errors") {
     val expectedResults: List[ResultDfRecordType] = List(
       (Some(1),"a"),
       (Some(2),"bb")
@@ -71,15 +68,12 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val resultsDf = ErrorHandlingFilterRowsWithErrors.putErrorsWithGrouping(srcDf)(
       Seq(er1, er2, er3)
     )
-    resultsDf.show()
-
     val results = resultDfToResult(resultsDf)
 
     assert(results == expectedResults)
   }
 
   test("putError and putErrors does not group by together") {
-//    val errorMessageArray = ErrorMessageArray()
     val expected: List[ResultDfRecordType] = List((Some(1),"a"))
 
     val midDf = ErrorHandlingFilterRowsWithErrors.putError(srcDf)(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
