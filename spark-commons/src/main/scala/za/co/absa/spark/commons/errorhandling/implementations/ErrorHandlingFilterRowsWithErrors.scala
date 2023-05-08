@@ -18,20 +18,19 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{coalesce, lit}
-import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
+import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 
 /**
  * Class implement the functionality of filtering rows with columns.
  */
-object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
+object ErrorHandlingFilterRowsWithErrors extends ErrorHandling {
 
   /**
    * Creates a column with the error description, in this particular case actually only signals with a boolean flag there was an error in the row.
    * @param errorMessageSubmit - the description of the error
    * @return - A column with boolean value indicating there was an error on the row.
    */
-  override protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
+  override protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
     lit(true)
   }
 
@@ -41,7 +40,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
    * @param errCols - the error columns to signal if the row should be filtered or not
    * @return - returns the dataframe without rows with errors
    */
-  override protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
+  override protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val columns: Seq[Column] = errCols :+ lit(false)
     dataFrame.filter(!coalesce(columns: _*))
   }
