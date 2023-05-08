@@ -30,4 +30,3 @@ trait ErrorMessageSubmit {
   def errColsAndValues: ColumnOrValue[ErrColsAndValues]
   def additionalInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
 }
-

@@ -142,4 +142,3 @@ trait ErrorHandling {
     doApplyErrorColumnsToDataFrame(dataFrame, errCols.map(_.column): _*)
   }
 }
-

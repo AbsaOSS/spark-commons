@@ -164,14 +164,12 @@ object ColumnOrValue {
 
   private final case class CoVOption[T](value: T) extends ColumnOrValue[Option[T]] {
     val column: Column = lit(value)
-
     val columnNames: Set[String] = Set.empty
     val getValue: Option[Option[T]] = Some(Some(value))
   }
 
   private final case class CoVNull[T](dataType: DataType) extends ColumnOrValue[T] {
     val column: Column = null_col(dataType)
-
     val columnNames: Set[String] = Set.empty
     val getValue: Option[T] = None
   }
