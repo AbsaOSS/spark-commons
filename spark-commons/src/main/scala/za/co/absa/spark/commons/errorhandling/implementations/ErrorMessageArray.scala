@@ -26,7 +26,7 @@ import za.co.absa.spark.commons.sql.functions.null_col
 import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
 
 /**
- * An implementation of [[ErrorHandling]] the collects errors into columns of struct based on [[za.co.absa.spark.commons.errorhandling.ErrorMessage ErrorMessage]] case class.
+ * An implementation of [[ErrorHandling]] that collects errors into columns of struct based on [[za.co.absa.spark.commons.errorhandling.ErrorMessage ErrorMessage]] case class.
  * Upon applying  the non-NULL columns are aggregated into an array column which is attached to the [[org.apache.spark.sql.DataFrame spark.DataFrame]].
  * In case the column already exists in the DataFrame, the columns are appended to the column.
  * @param errorColumnName - the name of the array column aggregating all the errors
