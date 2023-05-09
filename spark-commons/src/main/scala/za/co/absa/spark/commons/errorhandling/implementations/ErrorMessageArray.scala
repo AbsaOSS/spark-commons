@@ -72,9 +72,17 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
     col(errorColumnName).expr.dataType
   }
 
-  override def errorColumnAggregationType: Option[DataType] = {
-    ???
+  override def errorColumnAggregationType(aggregatedDF: DataFrame): Option[DataType] = {
+    val hasErrorColumn = aggregatedDF.columns.contains(errorColumnName)
+
+    if (hasErrorColumn == true) {
+      val errorType = aggregatedDF.select(col(errorColumnName)).schema.fields.head.dataType
+      Some(errorType)
+    } else {
+      None
+    }
   }
+
 }
 
 object ErrorMessageArray {

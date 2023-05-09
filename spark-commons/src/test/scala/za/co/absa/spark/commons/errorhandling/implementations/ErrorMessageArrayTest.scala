@@ -199,4 +199,30 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     assert(result == expected)
 
   }
+
+  //////////////////////////////////////////////////
+  test("test errorColumnAggregationType with DataFrame without error column") {
+    val errorMessageArray = ErrorMessageArray("MyErrCol")
+
+    val expectedResults = None
+    val results = errorMessageArray.errorColumnAggregationType(srcDf)
+
+    assert(results == expectedResults)
+  }
+
+//  test("test errorColumnAggregationType with DataFrame with error column") {
+//    val errorMessageArray = ErrorMessageArray("errCol")
+//
+//    val col3Name = "errCol"
+//    val aggDF = Seq(
+//      (None, "", List()),
+//      (Some(1), "a", List())
+//    ).toDF(col1Name, col2Name, col3Name)
+//
+//    val expResults = Boolean
+//    val results = errorMessageArray.errorColumnAggregationType(aggDF)
+//
+//    assert(results == expResults)
+//  }
+
 }

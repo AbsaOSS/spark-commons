@@ -40,5 +40,5 @@ trait ErrorHandling {
 
   def errorColumnType: DataType
 
-  def errorColumnAggregationType: Option[DataType]
+  def errorColumnAggregationType (aggregateDF: DataFrame): Option[DataType]
 }

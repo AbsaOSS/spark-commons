@@ -20,7 +20,8 @@ import org.apache.spark.sql.catalyst.expressions.{CaseWhen, Expression}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 import za.co.absa.spark.commons.errorhandling.types._
-import org.apache.spark.sql.functions.when
+import org.apache.spark.sql.functions.{when}
+import org.apache.spark.sql.types.DataType
 
 trait ErrorHandlingCommon extends ErrorHandling {
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column
@@ -52,5 +53,9 @@ trait ErrorHandlingCommon extends ErrorHandling {
     val branches: Seq[(Expression, Expression)] = errorsWhen.map(errorWhen => (errorWhen.when.expr, evaluate(errorWhen.errorMessageSubmit).expr))
     new Column(CaseWhen(branches))
   }
+
+  override def errorColumnType: DataType = ???
+
+  override def errorColumnAggregationType(aggDF: DataFrame): Option[DataType] = ???
 
 }
