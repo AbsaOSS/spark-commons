@@ -56,7 +56,7 @@ object functions {
   }
 
   /**
-   * Provides a column with NULL value.
+   * Provides a column of NULL values.
    * @return - column of NULL values
    */
   def null_col:Column = {
@@ -64,7 +64,7 @@ object functions {
   }
 
   /**
-   * Provides a column with NULL values, but the actual type is per specification
+   * Provides a column of NULL values, but the actual type is per specification
    * @param dataType - the actual data type of the column that will contain NULLs
    * @return - column of NULL values
    */
