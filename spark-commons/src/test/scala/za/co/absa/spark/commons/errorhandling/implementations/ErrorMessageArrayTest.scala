@@ -22,8 +22,7 @@ import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
 import za.co.absa.spark.commons.test.SparkTestBase
 import org.apache.spark.sql.functions.{col, length}
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
-import za.co.absa.spark.commons.errorhandling.implementations.submits
-.{
+import za.co.absa.spark.commons.errorhandling.implementations.submits.{
   ErrorMessageSubmitJustErrorValue,
   ErrorMessageSubmitOnColumn,
   ErrorMessageSubmitOnMoreColumns,
