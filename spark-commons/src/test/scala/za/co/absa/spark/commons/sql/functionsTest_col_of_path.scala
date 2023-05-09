@@ -71,9 +71,6 @@ class functionsTest_col_of_path extends AnyFunSuite with SparkTestBase {
       .withColumn("new3", col_of_path("ar[2]"))
       .select("id", "new1", "new2", "new3")
 
-    resultDF.printSchema()
-    resultDF.show(false)
-
     val expected = Seq(
       (1, "One", 68, Option(Node("Three"))),
       (2, "Alpha", 42, None)

@@ -39,7 +39,7 @@ object DataFrameImplicits {
 
     //TODO  Fix ScalaDoc cross-module links #48 - Dataset.show()
     /**
-     * Get the string representation of the data in the format as Dataset.show() displays them
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.DataFrame spark.DataFrame]] displays them
      *
      * @return  The string representation of the data in the DataFrame
      * @since 0.2.0
