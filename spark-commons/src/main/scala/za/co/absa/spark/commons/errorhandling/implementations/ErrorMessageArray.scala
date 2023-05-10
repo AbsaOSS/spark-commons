@@ -69,7 +69,7 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
   }
 
   override def errorColumnType: DataType = {
-    col(errorColumnName).expr.dataType
+    decomposeMap(col(errorColumnName)).expr.dataType
   }
 
   override def errorColumnAggregationType(aggregatedDF: DataFrame): Option[DataType] = {
