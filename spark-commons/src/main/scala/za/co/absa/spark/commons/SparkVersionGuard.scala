@@ -66,7 +66,7 @@ case class SparkVersionGuard(minVersionInclusive: SemanticVersion, maxVersionExc
     ensureSparkVersionCompatibility(Version.asSemVer(yourVersion))
 
   /**
-   * Supplied version will be checked against the [[za.co.absa.commons.version.impl.SemVer20Impl SemanticVersion]]. Note, `yourVersion` is
+   * Supplied version will be checked against the [[SparkVersionGuard]]'s. Note, `yourVersion` is
    * finalized when comparing to max in order to warn about non-final versions against a final guard (3.0.0-rc.1
    * would issue a warning when 3.0.0 is the max bound)
    *
