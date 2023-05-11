@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling.implementations.submits
 
-import org.apache.spark.sql.functions.{lit, map, typedLit}
+import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.types.StringType
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ColumnOrValueForm, ErrColsAndValues}
@@ -50,7 +50,6 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
     val errCode = 201L
     val errMsg = "This is a test error"
     val additionalInfo = "{}"
-    val columnValue: ErrColsAndValues = Map.empty
 
     val result = ErrorMessageSubmitWithoutColumn(errType, errCode, errMsg, Some(additionalInfo))
 
