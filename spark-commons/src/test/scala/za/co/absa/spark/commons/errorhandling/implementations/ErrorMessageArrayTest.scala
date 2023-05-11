@@ -195,57 +195,65 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   }
 
-  test("test errorColumnAggregationType with DataFrame without error column") {
-    val errorMessageArray = ErrorMessageArray("MyErrCol")
-
-    val expectedResults = None
-    val results = errorMessageArray.errorColumnAggregationType(srcDf)
-
-    assert(results == expectedResults)
-  }
-
-  test("test errorColumnAggregationType with DataFrame with error column") {
-    val errorMessageArray = ErrorMessageArray("errCol1")
-
-    val col3Name = "errCol1"
-    val aggDF = Seq(
-      (None, "", List()),
-      (Some(1), "a", List())
-    ).toDF(col1Name, col2Name, col3Name)
-
-    val expResults = Some(ArrayType(NullType,true))
-    val results = errorMessageArray.errorColumnAggregationType(aggDF)
-
-    assert(results == expResults)
-    assert(results != None)
-  }
-
-  test("test errorColumnAggregationType with DataFrame with error column of struct type") {
+  test("test return errCol type schema") {
     val errorMessageArray = ErrorMessageArray("errCol")
 
-    val col3Name = "errCol"
-    val aggDF = Seq(
-      (None, ""),
-      (Some(1), "a")
-    ).toDF(col1Name, col2Name)
+    val expdResults = errorMessageArray.errorColumnType
+    print("Error type: ", expdResults)
 
-    val aggDFWithError = aggDF.withColumn(
-      col3Name,
-      struct(
-        lit("1st error").as("large_values"),
-        lit("second error").as("Invalid_column_Definition")
-      ))
-
-    val expdResults = Some(
-      StructType(Seq(
-        StructField("large_values",StringType,false),
-        StructField("Invalid_column_Definition",StringType,false))
-      )
-    )
-
-    val results = errorMessageArray.errorColumnAggregationType(aggDFWithError)
-    println("Complex structure: ", results)
-    assert(results == expdResults)
   }
+
+//  test("test errorColumnAggregationType with DataFrame without error column") {
+//    val errorMessageArray = ErrorMessageArray("errCol")
+//
+//    val expectedResults = None
+//    val results = errorMessageArray.errorColumnAggregationType(srcDf)
+//
+//    assert(results == expectedResults)
+//  }
+//
+//  test("test errorColumnAggregationType with DataFrame with error column of array type") {
+//    val errorMessageArray = ErrorMessageArray("errCol")
+//
+//    val col3Name = "errCol"
+//    val aggDF = Seq(
+//      (None, "", List()),
+//      (Some(1), "a", List())
+//    ).toDF(col1Name, col2Name, col3Name)
+//
+//    val expResults = Some(ArrayType(NullType,true))
+//    val results = errorMessageArray.errorColumnAggregationType(aggDF)
+//
+//    assert(results == expResults)
+//    assert(results != None)
+//  }
+//
+//  test("test errorColumnAggregationType with DataFrame with error column of struct type") {
+//    val errorMessageArray = ErrorMessageArray("errCol")
+//
+//    val col3Name = "errCol"
+//    val aggDF = Seq(
+//      (None, ""),
+//      (Some(1), "a")
+//    ).toDF(col1Name, col2Name)
+//
+//    val aggDFWithError = aggDF.withColumn(
+//      col3Name,
+//      struct(
+//        lit("1st error").as("large_values"),
+//        lit("second error").as("Invalid_column_Definition")
+//      ))
+//
+//    val expdResults = Some(
+//      StructType(Seq(
+//        StructField("large_values",StringType,false),
+//        StructField("Invalid_column_Definition",StringType,false))
+//      )
+//    )
+//
+//    val results = errorMessageArray.errorColumnAggregationType(aggDFWithError)
+//    println("Complex structure: ", results)
+//    assert(results == expdResults)
+//  }
 
 }

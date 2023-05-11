@@ -18,6 +18,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{coalesce, lit}
+import org.apache.spark.sql.types.DataType
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 
@@ -46,4 +47,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
     dataFrame.filter(!coalesce(columns: _*))
   }
 
+  override def errorColumnType: DataType = ???
+
+  override def errorColumnAggregationType: Option[DataType] = ???
 }
