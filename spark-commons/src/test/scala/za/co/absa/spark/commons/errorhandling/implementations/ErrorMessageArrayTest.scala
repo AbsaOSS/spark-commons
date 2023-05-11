@@ -16,16 +16,15 @@
 
 package za.co.absa.spark.commons.errorhandling.implementations
 
-import org.apache.parquet.filter2.predicate.Operators.Column
 import org.apache.spark.sql.DataFrame
-import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
-import za.co.absa.spark.commons.test.SparkTestBase
 import org.apache.spark.sql.functions.{col, length, lit, struct}
 import org.apache.spark.sql.types.{ArrayType, NullType, StringType, StructField, StructType}
+import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
+import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
+import za.co.absa.spark.commons.test.SparkTestBase
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
@@ -196,7 +195,6 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   }
 
-  //////////////////////////////////////////////////
   test("test errorColumnAggregationType with DataFrame without error column") {
     val errorMessageArray = ErrorMessageArray("MyErrCol")
 
@@ -234,14 +232,14 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     val aggDFWithError = aggDF.withColumn(
       col3Name,
       struct(
-        lit("1st error").as("value_too_large"),
-        lit("second error").as("Invalid_column")
+        lit("1st error").as("large_values"),
+        lit("second error").as("Invalid_column_Definition")
       ))
 
     val expdResults = Some(
-      StructType(
-        StructField("value_too_large",StringType,false),
-        StructField("Invalid_column",StringType,false)
+      StructType(Seq(
+        StructField("large_values",StringType,false),
+        StructField("Invalid_column_Definition",StringType,false))
       )
     )
 
