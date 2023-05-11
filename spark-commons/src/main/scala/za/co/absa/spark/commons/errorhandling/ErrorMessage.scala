@@ -16,9 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling
 
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.types.StructType
-import za.co.absa.spark.commons.errorhandling.ErrorMessage.Mapping
+import za.co.absa.spark.commons.errorhandling.types._
 
 /**
  * Case class to represent an error message
@@ -26,29 +24,14 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessage.Mapping
  * @param errType - Type or source of the error
  * @param errCode - Internal error code
  * @param errMsg - Textual description of the error
- * @param errCol - The name of the column where the error occurred
- * @param rawValues - Sequence of raw values (which are the potential culprits of the error)
- * @param mappings - Sequence of Mappings i.e Mapping Table Column -> Equivalent Mapped Dataset column
+ * @param errColsAndValues - The names of the columns where the error occurred and their raw values (which are the
+ *                         potential culprits of the error)
+ * @param additionInfo - any optional additional information in the form of a JSON string
  */
 case class ErrorMessage(
-                         errType: String,
-                         errCode: String,
-                         errMsg: String,
-                         errCol: String,
-                         rawValues: Seq[String],
-                         mappings: Seq[Mapping] = Seq()
+                         errType: ErrType,
+                         errCode: ErrCode,
+                         errMsg: ErrMsg,
+                         errColsAndValues: ErrColsAndValues,
+                         additionInfo: AdditionalInfo = None
                        )
-
-object ErrorMessage {
-  case class Mapping(
-                      mappingTableColumn: String,
-                      mappedDatasetColumn: String
-                    )
-
-  val errorColumnName = "errCol"
-  def errorColSchema(implicit spark: SparkSession): StructType = {
-    import spark.implicits._
-    spark.emptyDataset[ErrorMessage].schema
-  }
-}
-
