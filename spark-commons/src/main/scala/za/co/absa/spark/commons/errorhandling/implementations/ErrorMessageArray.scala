@@ -20,7 +20,6 @@ import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{array, array_except, array_union, col, map_from_arrays, map_keys, map_values, struct, when}
 import org.apache.spark.sql.types.{ArrayType, DataType}
 import za.co.absa.spark.commons.adapters.TransformAdapter
-import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitWithoutColumn.emptyErrColsAndValues.getField
 import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
 import za.co.absa.spark.commons.errorhandling.partials.{ErrorHandlingCommon, EvaluateIntoErrorMessage}
 import za.co.absa.spark.commons.sql.functions.null_col
