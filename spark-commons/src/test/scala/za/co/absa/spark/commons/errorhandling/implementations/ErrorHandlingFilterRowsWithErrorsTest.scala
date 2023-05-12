@@ -16,6 +16,7 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
+import org.apache.spark.sql.types.BooleanType
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
@@ -86,5 +87,12 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
+  }
+
+  test("errorColumnType should return a BooleanType") {
+    val expectedResults = BooleanType
+    val results = ErrorHandlingFilterRowsWithErrors.errorColumnType
+
+    assert(results == expectedResults)
   }
 }
