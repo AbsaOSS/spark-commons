@@ -67,6 +67,10 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
     dataFrame.withColumnIfDoesNotExist(joinToExisting)(errorColumnName, reMap(aggregatedWithoutNulls))
   }
 
+  /**
+   * errorColumnAggregationType returns an array of errorColumnType
+   * @return option type of ArrayType for added column
+   */
   override def errorColumnAggregationType: Option[DataType] = {
     Option(ArrayType(errorColumnType))
   }

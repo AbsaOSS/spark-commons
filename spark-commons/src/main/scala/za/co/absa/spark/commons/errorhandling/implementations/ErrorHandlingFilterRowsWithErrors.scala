@@ -23,7 +23,7 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 
 /**
- * Class implement the functionality of filtering rows with columns.
+ * Class implement the functionality of filtering rows with error columns.
  */
 object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
@@ -47,7 +47,13 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
     dataFrame.filter(!coalesce(columns: _*))
   }
 
+  /**
+   * @return BooleanType of Datatype object
+   */
   override def errorColumnType: DataType = BooleanType
 
+  /**
+   * @return None since no column added during the aggregation
+   */
   override def errorColumnAggregationType: Option[DataType] = None
 }
