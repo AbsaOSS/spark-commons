@@ -18,6 +18,7 @@ package za.co.absa.spark.commons.errorhandling.partials
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.struct
+import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
 
@@ -30,6 +31,16 @@ trait EvaluateIntoErrorMessage {
       errorMessageSubmit.errColsAndValues.column as errColsAndValues,
       errorMessageSubmit.additionInfo.column as additionInfo
     )
+  }
+
+  def errorColumnType: DataType = {
+    StructType(Seq(
+      StructField(errType, StringType, nullable = false),
+      StructField(errCode, LongType, nullable = false),
+      StructField(errMsg, StringType, nullable = false),
+      StructField(errColsAndValues, MapType(StringType, StringType, valueContainsNull = true), nullable = false),
+      StructField(additionInfo, StringType, nullable = true)
+    ))
   }
 }
 
