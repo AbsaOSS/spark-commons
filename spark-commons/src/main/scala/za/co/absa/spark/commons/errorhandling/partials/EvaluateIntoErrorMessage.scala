@@ -33,6 +33,10 @@ trait EvaluateIntoErrorMessage {
     )
   }
 
+  /**
+   * errorColumnType defines the structure of how the error column should be constructed
+   * @return StructType of DataType object
+   */
   def errorColumnType: DataType = {
     StructType(Seq(
       StructField(errType, StringType, nullable = false),
