@@ -95,4 +95,11 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
 
     assert(results == expectedResults)
   }
+
+  test("errorColumnAggregationType should return None since no column is added during the aggregation") {
+    val expectedResults = None
+    val results = ErrorHandlingFilterRowsWithErrors.errorColumnAggregationType
+
+    assert(results == expectedResults)
+  }
 }
