@@ -241,10 +241,19 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTe
   }
 
   test("it should return false if the field type is NullType") {
-    val path = "/some/path"
+    val path = "/some/path/field"
     val results = structTypeEnhancements.isOfType[NullType](path)
 
     assert(results == false)
+  }
+
+  test("it should return true for matching boolean type") {
+    val st: StructType = StructType(Seq(StructField("/some/path", BooleanType, true)))
+    val structTypeEnhancements = StructTypeEnhancements(st)
+    val path = "/some/path"
+    val results = structTypeEnhancements.isOfType[BooleanType](path)
+
+    assert(results == true)
   }
 
 }
