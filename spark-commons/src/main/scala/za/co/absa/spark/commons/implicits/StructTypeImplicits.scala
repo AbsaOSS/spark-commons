@@ -263,10 +263,16 @@ object StructTypeImplicits {
     def isOfType[T <: DataType](path: String)(implicit ev: ClassTag[T]): Boolean = {
       val fieldType = getFieldType(path).getOrElse(NullType)
 
-      fieldType match {
-        case _: T => true
-        case _ => false
+      if(getFieldType(path) == None) {
+        false
       }
+      else{
+        fieldType match {
+          case _: T => true
+          case _ => false
+        }
+      }
+
     }
 
 
