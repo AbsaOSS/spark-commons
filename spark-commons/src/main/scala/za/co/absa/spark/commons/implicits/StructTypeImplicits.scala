@@ -272,9 +272,7 @@ object StructTypeImplicits {
           case _ => false
         }
       }
-
     }
-
 
     protected def evaluateConditionsForField(structField: StructType, path: Seq[String], fieldPathName: String,
                                            applyArrayHelper: Boolean, applyLeafCondition: Boolean = false,
