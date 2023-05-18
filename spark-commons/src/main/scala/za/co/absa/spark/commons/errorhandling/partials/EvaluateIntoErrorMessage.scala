@@ -34,7 +34,7 @@ trait EvaluateIntoErrorMessage {
   }
 
   /**
-   * errorColumnType defines the structure of how the error column should be constructed
+   * errorColumnType describes what is the type of error columns
    * @return StructType of DataType object
    */
   def errorColumnType: DataType = {
