@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.Column
+import org.apache.spark.sql.{Column, functions}
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.adapters.TransformAdapter
@@ -261,16 +261,9 @@ object StructTypeImplicits {
     }
 
     def isOfType[T <: DataType](path: String)(implicit ev: ClassTag[T]): Boolean = {
-      val fieldType = getFieldType(path).getOrElse(NullType)
-
-      if(getFieldType(path) == None) {
-        false
-      }
-      else{
-        fieldType match {
-          case _: T => true
-          case _ => false
-        }
+      getFieldType(path) match {
+        case Some(fieldType: T) => true
+        case _ => false
       }
     }
 
