@@ -23,8 +23,12 @@ import za.co.absa.spark.commons.test.SparkTestBase
 
 class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTestData {
   // scalastyle:off magic.number
-  val st: StructType = StructType(Seq(StructField("/some/path", StringType, true)))
-  val structTypeEnhancements = StructTypeEnhancements(st)
+  private val st: StructType = StructType(Seq(
+      StructField("a", StringType, true),
+      StructField("b", StructType(Seq(
+      StructField("sub", LongType, true)
+    )), true)
+  ))
 
   test("Testing getFieldType") {
     import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
@@ -220,29 +224,29 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTe
 
 
   test("isOfType should return true if the field type matches the expected type") {
-    val path = "/some/path"
-    val results = structTypeEnhancements.isOfType[StringType](path)
+    val path = "a"
+    val results = StructTypeEnhancements(st).isOfType[StringType](path)
 
     assert(results == true)
   }
 
   test("it should return false if the field type does not match the expected type") {
-    val path = "/another/path"
-    val results = structTypeEnhancements.isOfType[StringType](path)
+    val path = "sub"
+    val results = StructTypeEnhancements(st).isOfType[StringType](path)
 
     assert(results == false)
   }
 
   test("it should return false if the path is invalid or does not exist") {
-    val path = "/nonexistent/path"
-    val results = structTypeEnhancements.isOfType[BooleanType](path)
+    val path = "bb"
+    val results = StructTypeEnhancements(st).isOfType[BooleanType](path)
 
     assert(results == false)
   }
 
   test("it should return false if the field type is NullType") {
-    val path = "/some/path/field"
-    val results = structTypeEnhancements.isOfType[NullType](path)
+    val path = "a"
+    val results = StructTypeEnhancements(st).isOfType[NullType](path)
 
     assert(results == false)
   }
