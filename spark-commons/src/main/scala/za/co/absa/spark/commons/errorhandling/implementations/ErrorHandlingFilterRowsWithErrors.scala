@@ -50,7 +50,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   /**
    * @return BooleanType of Datatype object
    */
-  override def errorColumnType: DataType = BooleanType
+  val errorColumnType: DataType = BooleanType
 
   /**
    * @return None since no column added during the aggregation
