@@ -54,8 +54,4 @@ trait ErrorHandlingCommon extends ErrorHandling {
     new Column(CaseWhen(branches))
   }
 
-  override def errorColumnType: DataType
-
-  override def errorColumnAggregationType: Option[DataType]
-
 }
