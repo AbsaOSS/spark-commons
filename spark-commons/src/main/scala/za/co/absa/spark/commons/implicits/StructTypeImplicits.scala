@@ -262,7 +262,7 @@ object StructTypeImplicits {
 
     def isOfType[T <: DataType](path: String)(implicit ev: ClassTag[T]): Boolean = {
       getFieldType(path) match {
-        case Some(fieldType: T) => true
+        case Some(_: T) => true
         case _ => false
       }
     }
