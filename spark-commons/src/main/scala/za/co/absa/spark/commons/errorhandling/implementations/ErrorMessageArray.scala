@@ -72,7 +72,7 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
    * @return option type of ArrayType for added column
    */
   override def errorColumnAggregationType: Option[DataType] = {
-    Option(ArrayType(errorColumnType))
+    Option(ArrayType(errorColumnType, containsNull = false))
   }
 
 }
