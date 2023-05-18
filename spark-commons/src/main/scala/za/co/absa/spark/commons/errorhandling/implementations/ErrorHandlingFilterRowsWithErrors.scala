@@ -23,7 +23,7 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 
 /**
- * Class implement the functionality of filtering rows with error columns.
+ * Class implements the functionality of filtering rows witch has some error (any of the error columns is not NULL).
  */
 object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
