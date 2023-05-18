@@ -55,5 +55,5 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   /**
    * @return None since no column added during the aggregation
    */
-  override def errorColumnAggregationType: Option[DataType] = None
+  val errorColumnAggregationType: Option[DataType] = None
 }
