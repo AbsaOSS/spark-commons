@@ -231,7 +231,7 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTe
   }
 
   test("isOfType should return true for matching sub-field types") {
-    val path = "b.sub" // To discus.....
+    val path = "b.sub"
     val results = st.isOfType[LongType](path)
 
     assert(results)
