@@ -23,7 +23,7 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 
 /**
- * Class implement the functionality of filtering rows with error columns.
+ * Class implements the functionality of filtering rows that have some error (any of the error columns is not NULL).
  */
 object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
@@ -50,10 +50,10 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   /**
    * @return BooleanType of Datatype object
    */
-  override def errorColumnType: DataType = BooleanType
+  val errorColumnType: DataType = BooleanType
 
   /**
-   * @return None since no column added during the aggregation
+   * @return None since no error-related column added during the aggregation
    */
-  override def errorColumnAggregationType: Option[DataType] = None
+  val errorColumnAggregationType: Option[DataType] = None
 }
