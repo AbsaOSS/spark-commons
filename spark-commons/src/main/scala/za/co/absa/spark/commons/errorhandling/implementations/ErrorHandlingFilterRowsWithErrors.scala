@@ -53,7 +53,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
   val errorColumnType: DataType = BooleanType
 
   /**
-   * @return None since no column added during the aggregation
+   * @return None since no error-related column added during the aggregation
    */
   val errorColumnAggregationType: Option[DataType] = None
 }
