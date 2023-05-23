@@ -219,11 +219,9 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
         StructField("errCode",LongType,false),
         StructField("errMsg",StringType,false),
         StructField("errColsAndValues",MapType(StringType,StringType,true),false),
-        StructField("additionInfo",StringType,true)
-      ))))
+        StructField("additionInfo",StringType,true))),false))
 
     val results = errorMessageArray.errorColumnAggregationType
-
     assert(results == expectedResults)
   }
 }
