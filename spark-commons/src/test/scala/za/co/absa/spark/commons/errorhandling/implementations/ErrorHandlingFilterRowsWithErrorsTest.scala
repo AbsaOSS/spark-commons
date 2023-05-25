@@ -20,7 +20,7 @@ import org.apache.spark.sql.types.BooleanType
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
-import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
+import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
 
 class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
@@ -90,7 +90,15 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   }
 
   test("errorColumnType should return a BooleanType") {
-    val expectedResults = BooleanType
+    val emptyDf = spark.emptyDataFrame
+
+    val errColName = "error_column"
+    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(
+      "Test error 1", 1, "This is a test error", Some(errColName))
+
+    val testDf = emptyDf.withColumn(errColName, errorColumn.column)
+    val expectedResults = testDf.col(errColName).expr.dataType
+
     val results = ErrorHandlingFilterRowsWithErrors.errorColumnType
 
     assert(results == expectedResults)
