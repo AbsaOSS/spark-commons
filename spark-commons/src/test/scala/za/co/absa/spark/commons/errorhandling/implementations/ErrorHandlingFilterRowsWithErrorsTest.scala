@@ -16,7 +16,6 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
-import org.apache.spark.sql.types.BooleanType
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
@@ -27,12 +26,14 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
+  private val errColName = "error_column"
   private val srcDf = Seq(
     (None, ""),
     (Some(1), "a"),
     (Some(2), "bb"),
     (Some(3), "ccc")
   ).toDF(col1Name, col2Name)
+  private val emptyDf = spark.emptyDataFrame
 
   private type ResultDfRecordType = (Option[Integer], String)
   private def resultDfToResult(resultDf: DataFrame): List[ResultDfRecordType] = {
@@ -90,24 +91,33 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   }
 
   test("errorColumnType should return a BooleanType") {
-    val emptyDf = spark.emptyDataFrame
-
-    val errColName = "error_column"
     val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(
       "Test error 1", 1, "This is a test error", Some(errColName))
 
     val testDf = emptyDf.withColumn(errColName, errorColumn.column)
     val expectedResults = testDf.col(errColName).expr.dataType
+    val expval = testDf.schema.fields
 
     val results = ErrorHandlingFilterRowsWithErrors.errorColumnType
 
+    assert(results.defaultSize == expval.length)
     assert(results == expectedResults)
   }
 
   test("errorColumnAggregationType should return None since no column is added during the aggregation") {
-    val expectedResults = None
+    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(
+      "1st error", 0, "This is an error", Some(errColName)
+    )
+
+    val testDf = emptyDf
+    val expVal = testDf.schema.fields.toList.headOption
+
+    val expectedAfterAgg = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(testDf)(errorColumn)
+    val expAggRes = expectedAfterAgg.schema.fields.headOption.headOption
+
     val results = ErrorHandlingFilterRowsWithErrors.errorColumnAggregationType
 
-    assert(results == expectedResults)
+    assert(results == expVal)
+    assert(results == expAggRes)
   }
 }
