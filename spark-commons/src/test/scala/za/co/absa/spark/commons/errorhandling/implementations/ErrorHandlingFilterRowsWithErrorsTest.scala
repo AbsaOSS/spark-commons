@@ -95,13 +95,13 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
       "Test error 1", 1, "This is a test error", Some(errColName))
 
     val testDf = emptyDf.withColumn(errColName, errorColumn.column)
-    val expectedResults = testDf.col(errColName).expr.dataType
-    val expval = testDf.schema.fields
+    val expectedType = testDf.col(errColName).expr.dataType
+    val expectedValue = testDf.schema.fields
 
-    val results = ErrorHandlingFilterRowsWithErrors.errorColumnType
+    val actualType = ErrorHandlingFilterRowsWithErrors.errorColumnType
 
-    assert(results.defaultSize == expval.length)
-    assert(results == expectedResults)
+    assert(actualType.defaultSize == expectedValue.length)
+    assert(actualType == expectedType)
   }
 
   test("errorColumnAggregationType should return None since no column is added during the aggregation") {
@@ -110,14 +110,14 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     )
 
     val testDf = emptyDf
-    val expVal = testDf.schema.fields.toList.headOption
+    val expectedType = testDf.schema.fields.toList.headOption
 
     val expectedAfterAgg = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(testDf)(errorColumn)
-    val expAggRes = expectedAfterAgg.schema.fields.headOption.headOption
+    val expectedTypeAfterAgg = expectedAfterAgg.schema.fields.headOption
 
-    val results = ErrorHandlingFilterRowsWithErrors.errorColumnAggregationType
+    val actualType = ErrorHandlingFilterRowsWithErrors.errorColumnAggregationType
 
-    assert(results == expVal)
-    assert(results == expAggRes)
+    assert(actualType == expectedType)
+    assert(actualType == expectedTypeAfterAgg)
   }
 }
