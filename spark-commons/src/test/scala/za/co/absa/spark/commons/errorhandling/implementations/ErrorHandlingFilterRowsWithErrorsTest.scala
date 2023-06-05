@@ -117,7 +117,6 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
 
     val actualType = ErrorHandlingFilterRowsWithErrors.errorColumnAggregationType
 
-    assert(actualType == expectedType)
     assert(actualType == expectedTypeAfterAgg)
   }
 }

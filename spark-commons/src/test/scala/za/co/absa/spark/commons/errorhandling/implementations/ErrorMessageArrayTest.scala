@@ -192,7 +192,6 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
-
   }
 
   test("test return errCol type schema") {
@@ -222,6 +221,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
         StructField("additionInfo",StringType,true))),false))
 
     val results = errorMessageArray.errorColumnAggregationType
+    val actualType = results.toList
     assert(results == expectedResults)
   }
 }
