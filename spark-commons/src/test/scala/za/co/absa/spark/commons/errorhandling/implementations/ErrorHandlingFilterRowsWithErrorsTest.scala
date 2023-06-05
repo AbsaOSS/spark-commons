@@ -110,7 +110,6 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     )
 
     val testDf = emptyDf
-    val expectedType = testDf.schema.fields.toList.headOption
 
     val expectedAfterAgg = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(testDf)(errorColumn)
     val expectedTypeAfterAgg = expectedAfterAgg.schema.fields.headOption
