@@ -23,11 +23,13 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
-import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
+import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
 import za.co.absa.spark.commons.test.SparkTestBase
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
+
+  private val emptyDf = spark.emptyDataFrame
 
   private val nullString = Option.empty[String].orNull
 
@@ -211,7 +213,18 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   test("errorColumnAggregationType should return an ArrayType structure for column added during the aggregation") {
     val errorMessageArray = ErrorMessageArray("errCol")
+    val errColName = "errCol"
 
+    val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
+    val e2 = errorMessageArray.putErrorToColumn(errorSubmitA)
+//    val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
+//    val e3 = errorMessageArray.putErrorToColumn(errorSubmitB)
+
+    val e4: ErrorColumn = errorMessageArray.putErrorToColumn(
+      "Test error 1", 1, "This is a test error", Some(col1Name))
+
+//    val testDf = emptyDf.withColumn(errColName, errorColumn.column)
     val expectedResults = Some(ArrayType(
       StructType(Seq(
         StructField("errType",StringType,false),
@@ -220,8 +233,16 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
         StructField("errColsAndValues",MapType(StringType,StringType,true),false),
         StructField("additionInfo",StringType,true))),false))
 
+    val dfAfterAgg = errorMessageArray.aggregateErrorColumns(srcDf)(e1, e2, e4)
     val results = errorMessageArray.errorColumnAggregationType
-    val actualType = results.toList
-    assert(results == expectedResults)
+
+    val addedColType = dfAfterAgg.select("errCol").schema.headOption
+    val actualResultsType = Option(StructField("errCol", results.toList.headOption.head))
+//    val actualResultsType = results.head
+
+    print(addedColType)
+    print(actualResultsType)
+    val expectedResults_ = addedColType.headOption
+    assert(actualResultsType.headOption == expectedResults_)
   }
 }
