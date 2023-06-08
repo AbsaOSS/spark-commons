@@ -197,6 +197,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   test("errorColumnType should return errCol type schema") {
     val errorMessageArray = ErrorMessageArray("errCol")
+    val errColName = "errCol"
 
     val expectedResults = StructType(Seq(
       StructField("errType", StringType, nullable = false),
