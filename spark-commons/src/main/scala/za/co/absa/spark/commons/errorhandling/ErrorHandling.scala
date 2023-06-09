@@ -21,7 +21,7 @@ import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMess
 import za.co.absa.spark.commons.errorhandling.types._
 
 trait ErrorHandling {
-  abstract class DataFrameErrorHandling(dataFrame: DataFrame)(implicit errorHandling: ErrorHandling) {
+  implicit class DataFrameErrorHandling(val dataFrame: DataFrame) extends AnyVal {
     def aggregateErrorColumns(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame
 
     def putError(dataFrame: DataFrame)(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
@@ -29,6 +29,7 @@ trait ErrorHandling {
     }
 
     def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame
+
   }
 
   implicit def errorColumnToColumn(errorColumn: ErrorColumn): Column = {
