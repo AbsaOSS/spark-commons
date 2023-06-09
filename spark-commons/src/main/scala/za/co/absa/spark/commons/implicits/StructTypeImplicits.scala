@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.implicits
 
-import org.apache.spark.sql.Column
+import org.apache.spark.sql.{Column}
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.adapters.TransformAdapter
@@ -32,10 +32,9 @@ import scala.util.Try
 object StructTypeImplicits {
 
   implicit class DataFrameSelector(schema: StructType) extends TransformAdapter {
-    //TODO  Fix ScalaDoc cross-module links #48 - DataFrameImplicits.DataFrameEnhancements.alignSchema
     /**
-     * Returns data selector that can be used to align utils of a data frame.
-     * You can use DataFrameImplicits.DataFrameEnhancements.alignSchema.
+     * Returns data selector that can be used to align utils of a data frame. You can use it
+     * in [[za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements.alignSchema(selector:List[org\.apache\.spark\.sql\.Column]* DataFrameEnhancements.alignSchema]].
      *
      * @return Sorted DF to conform to utils
      */
@@ -261,14 +260,11 @@ object StructTypeImplicits {
     }
 
     def isOfType[T <: DataType](path: String)(implicit ev: ClassTag[T]): Boolean = {
-      val fieldType = getFieldType(path).getOrElse(NullType)
-
-      fieldType match {
-        case _: T => true
+      getFieldType(path) match {
+        case Some(_: T) => true
         case _ => false
       }
     }
-
 
     protected def evaluateConditionsForField(structField: StructType, path: Seq[String], fieldPathName: String,
                                            applyArrayHelper: Boolean, applyLeafCondition: Boolean = false,
