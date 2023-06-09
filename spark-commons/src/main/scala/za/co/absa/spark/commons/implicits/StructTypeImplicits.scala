@@ -418,7 +418,8 @@ object StructTypeImplicits {
     }
   }
 
-  implicit class StructTypeComparisonWhileIgnoringNullability(val schema: StructType)(implicit errorColumnName: String = ErrorMessageArray.defaultErrorColumnName) {
+  implicit class StructTypeComparisonWhileIgnoringNullability(val schema: StructType) {
+    val errorColumnName = ErrorMessageArray.defaultErrorColumnName
     /**
      * Wraps an array of StructField with StructType
      *
