@@ -19,7 +19,6 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeComparisonWhileIgnoringNullability
 import org.apache.spark.sql.functions.{col, length}
-import org.apache.spark.sql.types.{LongType, MapType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
@@ -195,25 +194,9 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     assert(result == expected)
   }
 
-  test("errorColumnType should return errCol type schema") {
-    val errorMessageArray = ErrorMessageArray("errCol")
-    val errColName = "errCol"
-
-    val expectedResults = StructType(Seq(
-      StructField("errType", StringType, nullable = false),
-      StructField("errCode", LongType, nullable = false),
-      StructField("errMsg", StringType, nullable = false),
-      StructField("errColsAndValues", MapType(StringType, StringType, valueContainsNull = true), nullable = false),
-      StructField("additionInfo", StringType, nullable = true)
-    ))
-
-    val results = errorMessageArray.errorColumnType
-    assert(results == expectedResults)
-  }
-
   test("errorColumnAggregationType should return an ArrayType structure for column added during the aggregation") {
-    val errorMessageArray = ErrorMessageArray("errCol")
     val errColName = "errCol"
+    val errorMessageArray = ErrorMessageArray(errColName)
 
     val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)

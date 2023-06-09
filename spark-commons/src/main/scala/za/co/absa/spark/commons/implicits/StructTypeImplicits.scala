@@ -20,6 +20,7 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.adapters.TransformAdapter
+import za.co.absa.spark.commons.errorhandling.implementations.ErrorMessageArray
 import za.co.absa.spark.commons.implicits.DataTypeImplicits.DataTypeEnhancements
 import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
 import za.co.absa.spark.commons.utils.SchemaUtils
@@ -417,7 +418,7 @@ object StructTypeImplicits {
     }
   }
 
-  implicit class StructTypeComparisonWhileIgnoringNullability(val schema: StructType) {
+  implicit class StructTypeComparisonWhileIgnoringNullability(val schema: StructType)(implicit errorColumnName: String = ErrorMessageArray.defaultErrorColumnName) {
     /**
      * Wraps an array of StructField with StructType
      *
@@ -425,7 +426,7 @@ object StructTypeImplicits {
      * @return StructType containing the StructFields
      */
     def wrapStructFiledWithStructType(fieldSchema: Option[DataType]): Boolean = {
-      val st = StructType(Seq(StructField("errCol", fieldSchema.headOption.head)))
+      val st = StructType(Seq(StructField(errorColumnName, fieldSchema.head)))
       dataTypeEqualsIgnoreNullability(st, schema)
     }
 
