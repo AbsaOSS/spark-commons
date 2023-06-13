@@ -24,6 +24,7 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
+import za.co.absa.spark.commons.implicits.DataTypeImplicits
 import za.co.absa.spark.commons.test.SparkTestBase
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
@@ -208,7 +209,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     val addedColType = dfAfterAgg.select(errColName).schema
 
     val results = errorMessageArray.errorColumnAggregationType
-    val actualResultsType = StructTypeComparisonWhileIgnoringNullability(addedColType).wrapStructFiledWithStructType(results)
+    val actualResultsType = DataTypeImplicits.DataTypeEnhancements(addedColType).wrapStructFiledWithStructType(results, errColName)
 
     assert(actualResultsType)
   }

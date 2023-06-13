@@ -20,7 +20,6 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.types._
 import za.co.absa.spark.commons.adapters.TransformAdapter
-import za.co.absa.spark.commons.errorhandling.implementations.ErrorMessageArray
 import za.co.absa.spark.commons.implicits.DataTypeImplicits.DataTypeEnhancements
 import za.co.absa.spark.commons.implicits.StructFieldImplicits.StructFieldEnhancements
 import za.co.absa.spark.commons.utils.SchemaUtils
@@ -415,48 +414,6 @@ object StructTypeImplicits {
     def isNonNestedArray(path: String): Boolean = {
       val pathSegments = SchemaUtils.splitPath(path)
       evaluateConditionsForField(schema, pathSegments, path, applyArrayHelper = false)
-    }
-  }
-
-  implicit class StructTypeComparisonWhileIgnoringNullability(val schema: StructType) {
-    val errorColumnName = ErrorMessageArray.defaultErrorColumnName
-    /**
-     * Wraps an array of StructField with StructType
-     *
-     * @param fieldSchema is the actual schema to be wrapped
-     * @return StructType containing the StructFields
-     */
-    def wrapStructFiledWithStructType(fieldSchema: Option[DataType]): Boolean = {
-      val st = StructType(Seq(StructField(errorColumnName, fieldSchema.head)))
-      dataTypeEqualsIgnoreNullability(st, schema)
-    }
-
-    /**
-     * Compares two column schemas while ignoring nullability
-     *
-     * @param colSchema1 one of the column schema to be compared
-     * @param colSchema2 another column schema to be compared
-     * @return boolean type for compared column schemas/types
-     */
-    private def dataTypeEqualsIgnoreNullability(colSchema1: DataType, colSchema2: DataType): Boolean = {
-      (colSchema1, colSchema2) match {
-        case (st1: StructType, st2: StructType) =>
-          if (st1.fields.length != st2.fields.length) {
-            false
-          } else {
-            st1.fields.zip(st2.fields).forall {
-              case (f1, f2) =>
-                f1.name == f2.name && dataTypeEqualsIgnoreNullability(f1.dataType, f2.dataType)
-            }
-          }
-
-        case (ArrayType(et1, n1), ArrayType(et2, n2)) =>
-          dataTypeEqualsIgnoreNullability(et1, et2) && n1 == n2
-        case (MapType(kt1, vt1, n1), MapType(kt2, vt2, n2)) =>
-          dataTypeEqualsIgnoreNullability(kt1, kt2) && dataTypeEqualsIgnoreNullability(vt1, vt2) && n1 == n2
-        case (dt1, dt2) =>
-          dt1 == dt2 || (dt1.isInstanceOf[NumericType] && dt2.isInstanceOf[NumericType])
-      }
     }
   }
 
