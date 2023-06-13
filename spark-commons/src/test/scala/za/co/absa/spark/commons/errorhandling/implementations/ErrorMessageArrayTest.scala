@@ -17,7 +17,6 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.DataFrame
-import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeComparisonWhileIgnoringNullability
 import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
