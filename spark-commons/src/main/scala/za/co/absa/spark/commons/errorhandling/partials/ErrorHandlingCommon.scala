@@ -21,6 +21,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 import za.co.absa.spark.commons.errorhandling.types._
 import org.apache.spark.sql.functions.when
+import org.apache.spark.sql.types.DataType
 
 trait ErrorHandlingCommon extends ErrorHandling {
   protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column
