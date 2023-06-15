@@ -24,16 +24,6 @@ object DataTypeImplicits {
 
   implicit class DataTypeEnhancements(val dt: DataType) extends AnyVal {
     /**
-     * Wraps an array of StructField with StructType
-     *
-     * @param fieldSchema is the actual schema to be wrapped
-     * @return StructType containing the StructFields
-     */
-    def wrapStructFiledWithStructType(fieldSchema: Option[DataType], errorColumnName: String): Boolean = {
-      val st = StructType(Seq(StructField(errorColumnName, fieldSchema.head)))
-      isEquivalentDataType(st)
-    }
-    /**
      * Compares 2 fields of a dataframe utils.
      *
      * @param other The second field to compare

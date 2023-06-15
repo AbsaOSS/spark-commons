@@ -18,6 +18,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
+import org.apache.spark.sql.types.{DataType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
@@ -33,6 +34,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
+  private val errColName = "errCol"
   private val srcDf = Seq(
     (None, ""),
     (Some(1), "a"),
@@ -208,7 +210,8 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     val addedColType = dfAfterAgg.select(errColName).schema
 
     val results = errorMessageArray.errorColumnAggregationType
-    val actualResultsType = DataTypeImplicits.DataTypeEnhancements(addedColType).wrapStructFiledWithStructType(results, errColName)
+    val resultsAsSructType = StructType(Seq(StructField(errColName, results.head)))
+    val actualResultsType = DataTypeImplicits.DataTypeEnhancements(addedColType).isEquivalentDataType(resultsAsSructType)
 
     assert(actualResultsType)
   }
