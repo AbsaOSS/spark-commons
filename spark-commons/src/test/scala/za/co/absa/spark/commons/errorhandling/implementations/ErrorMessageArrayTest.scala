@@ -197,7 +197,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("errorColumnAggregationType should return an ArrayType structure for column added during the aggregation") {
-    val errColName = "errCol"
+    val errColName = "specialErrCol"
     val errorMessageArray = ErrorMessageArray(errColName)
 
     val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
