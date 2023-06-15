@@ -18,7 +18,6 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
-import org.apache.spark.sql.types.{DataType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.ErrorMessage
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
