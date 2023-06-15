@@ -197,7 +197,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("errorColumnAggregationType should return an ArrayType structure for column added during the aggregation") {
-    val errColName = "errCol"
+    val errColName = "specialErrCol"
     val errorMessageArray = ErrorMessageArray(errColName)
 
     val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
@@ -206,14 +206,17 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
     val e3 = errorMessageArray.putErrorToColumn(errorSubmitB)
 
+    val origSchemaSize = srcDf.schema.fieldNames.length
     val dfAfterAgg = errorMessageArray.aggregateErrorColumns(srcDf)(e1, e2, e3)
-    val addedColType = dfAfterAgg.select(errColName).schema
-
-    val results = errorMessageArray.errorColumnAggregationType
-    val resultsAsSructType = StructType(Seq(StructField(errColName, results.head)))
-    val actualResultsType = DataTypeImplicits.DataTypeEnhancements(addedColType).isEquivalentDataType(resultsAsSructType)
-
-    assert(actualResultsType)
+    assert(dfAfterAgg.schema.fieldNames.length == origSchemaSize + 1) // checkc only one field was added...
+    assert(dfAfterAgg.schema.fieldNames(origSchemaSize) == errColName) // and is of correct name...
+    //... and type
+    val addedColType = dfAfterAgg.schema.fields(origSchemaSize).dataType
+    // while using `get` in `Option` is discouraged, it's ok here, as it's expected the option to be non-empty; and if empty
+    // the test will fail, which is correct
+    val result = errorMessageArray.errorColumnAggregationType.get
+    import DataTypeImplicits.DataTypeEnhancements
+    assert(result.isEquivalentDataType(addedColType))
   }
 
 }
