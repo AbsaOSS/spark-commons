@@ -18,11 +18,12 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{coalesce, lit}
+import org.apache.spark.sql.types.{BooleanType, DataType}
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
 
 /**
- * Class implement the functionality of filtering rows with columns.
+ * Class implements the functionality of filtering rows that have some error (any of the error columns is not NULL).
  */
 object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
 
@@ -46,4 +47,13 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
     dataFrame.filter(!coalesce(columns: _*))
   }
 
+  /**
+   * @return BooleanType of Datatype object
+   */
+  val errorColumnType: DataType = BooleanType
+
+  /**
+   * @return None since no error-related column added during the aggregation
+   */
+  val errorColumnAggregationType: Option[DataType] = None
 }
