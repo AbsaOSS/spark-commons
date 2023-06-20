@@ -32,10 +32,9 @@ import scala.util.Try
 object StructTypeImplicits {
 
   implicit class DataFrameSelector(schema: StructType) extends TransformAdapter {
-    //TODO  Fix ScalaDoc cross-module links #48 - DataFrameImplicits.DataFrameEnhancements.alignSchema
     /**
-     * Returns data selector that can be used to align utils of a data frame.
-     * You can use DataFrameImplicits.DataFrameEnhancements.alignSchema.
+     * Returns data selector that can be used to align utils of a data frame. You can use it
+     * in [[za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements.alignSchema(selector:List[org\.apache\.spark\.sql\.Column]* DataFrameEnhancements.alignSchema]].
      *
      * @return Sorted DF to conform to utils
      */

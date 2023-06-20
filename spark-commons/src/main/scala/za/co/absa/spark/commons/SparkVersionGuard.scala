@@ -57,9 +57,8 @@ object SparkVersionGuard {
 case class SparkVersionGuard(minVersionInclusive: SemanticVersion, maxVersionExclusive: Option[SemanticVersion])
                             (implicit log:Logger = LoggerFactory.getLogger(SparkVersionGuard.getClass)) {
 
-  //TODO  Fix ScalaDoc cross-module links #48 - ensureSparkVersionCompatibility(SemanticVersion)
   /**
-   * String wrapper for ensureSparkVersionCompatibility(SemanticVersion)
+   * String wrapper for [[SparkVersionGuard#ensureSparkVersionCompatibility(yourVersion:za\.co\.absa\.commons\.version\.impl\.SemVer20Impl\.SemanticVersion* ensureSparkVersionCompatibility(yourVersion: SemanticVersion): Unit]]
    *
    * @param yourVersion provided spark version
    */

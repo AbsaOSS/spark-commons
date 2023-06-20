@@ -19,19 +19,21 @@ import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
-import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
+import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
 
 class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
+  private val errColName = "error_column"
   private val srcDf = Seq(
     (None, ""),
     (Some(1), "a"),
     (Some(2), "bb"),
     (Some(3), "ccc")
   ).toDF(col1Name, col2Name)
+  private val emptyDf = spark.emptyDataFrame
 
   private type ResultDfRecordType = (Option[Integer], String)
   private def resultDfToResult(resultDf: DataFrame): List[ResultDfRecordType] = {
@@ -86,5 +88,34 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
+  }
+
+  test("errorColumnType should return a BooleanType") {
+    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(
+      "Test error 1", 1, "This is a test error", Some(errColName))
+
+    val testDf = emptyDf.withColumn(errColName, errorColumn.column)
+    val expectedType = testDf.col(errColName).expr.dataType
+    val expectedValue = testDf.schema.fields
+
+    val actualType = ErrorHandlingFilterRowsWithErrors.errorColumnType
+
+    assert(actualType.defaultSize == expectedValue.length)
+    assert(actualType == expectedType)
+  }
+
+  test("dataFrameColumnType should return None since no column is added during the aggregation") {
+    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(
+      "1st error", 0, "This is an error", Some(errColName)
+    )
+
+    val testDf = emptyDf
+
+    val expectedAfterAgg = ErrorHandlingFilterRowsWithErrors.applyErrorColumnsToDataFrame(testDf)(errorColumn)
+    val expectedTypeAfterAgg = expectedAfterAgg.schema.fields.headOption
+
+    val actualType = ErrorHandlingFilterRowsWithErrors.dataFrameColumnType
+
+    assert(actualType == expectedTypeAfterAgg)
   }
 }

@@ -18,6 +18,7 @@ package za.co.absa.spark.commons.errorhandling
 
 import org.apache.spark.sql.catalyst.expressions.{CaseWhen, Expression}
 import org.apache.spark.sql.functions.when
+import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types._
@@ -129,6 +130,7 @@ trait ErrorHandling {
     createErrorAsColumn(toSubmit)
   }
 
+
   /**
    * Applies the earlier collected [[types.ErrorColumn ErrorColumns]] to the provided [[org.apache.spark.sql.DataFrame spark.DataFrame]].
    * See [[doApplyErrorColumnsToDataFrame]] for detailed functional explanation.
@@ -141,4 +143,18 @@ trait ErrorHandling {
   def applyErrorColumnsToDataFrame(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
     doApplyErrorColumnsToDataFrame(dataFrame, errCols.map(_.column): _*)
   }
+
+  /**
+   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * This function provides the information on the structure of single error column
+   * @return -  the DataType of the column returned from `createErrorAsColumn` function
+   */
+  def errorColumnType: DataType
+
+  /**
+   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
+   * @return - the DataType of the column containing the error info that is attached to the [[org.apache.spark.sql.DataFrame DataFrame]].
+   */
+  def dataFrameColumnType: Option[DataType]
 }

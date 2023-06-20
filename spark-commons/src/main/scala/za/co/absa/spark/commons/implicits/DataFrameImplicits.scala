@@ -37,9 +37,8 @@ object DataFrameImplicits {
       dfData
     }
 
-    //TODO  Fix ScalaDoc cross-module links #48 - Dataset.show()
     /**
-     * Get the string representation of the data in the format as Dataset.show() displays them
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset#show():Unit* spark.Dataset.show()]] displays them
      *
      * @return  The string representation of the data in the DataFrame
      * @since 0.2.0
@@ -49,21 +48,45 @@ object DataFrameImplicits {
       gatherData(showFnc)
     }
 
+    /**
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset#show(truncate:Boolean):Unit* spark.Dataset.show(truncate: Boolean)]] displays them
+     *
+     * @return  The string representation of the data in the DataFrame
+     * @since 0.2.0
+     */
     def dataAsString(truncate: Boolean): String = {
       val showFnc:  () => Unit = ()=>{df.show(truncate)}
       gatherData(showFnc)
     }
 
+    /**
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset#show(numRows:Int,truncate:Boolean):Unit* spark.Dataset.show(numRows: Int, truncate: Boolean)]] displays them
+     *
+     * @return  The string representation of the data in the DataFrame
+     * @since 0.2.0
+     */
     def dataAsString(numRows: Int, truncate: Boolean): String = {
       val showFnc: ()=>Unit = () => df.show(numRows, truncate)
       gatherData(showFnc)
     }
 
+    /**
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset#show(numRows:Int,truncate:Int):Unit* spark.Dataset.show(numRows: Int, truncate: Int)]] displays them
+     *
+     * @return  The string representation of the data in the DataFrame
+     * @since 0.2.0
+     */
     def dataAsString(numRows: Int, truncate: Int): String = {
       val showFnc: ()=>Unit = () => df.show(numRows, truncate)
       gatherData(showFnc)
     }
 
+    /**
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset#show(numRows:Int,truncate:Int,vertical:Boolean):Unit* spark.Dataset.show(numRows: Int, truncate: Int, vertical: Boolean)]] displays them
+     *
+     * @return  The string representation of the data in the DataFrame
+     * @since 0.2.0
+     */
     def dataAsString(numRows: Int, truncate: Int, vertical: Boolean): String = {
       val showFnc: ()=>Unit = () => df.show(numRows, truncate, vertical)
       gatherData(showFnc)
@@ -169,10 +192,9 @@ object DataFrameImplicits {
       alignSchema(structType.getDataFrameSelector())
     }
 
-    //TODO  Fix ScalaDoc cross-module links #48 - Dataset.cache()
     /**
      * Persist this Dataset with the default storage level (`MEMORY_AND_DISK`), the same way as
-     * Dataset.cache does. But does not throw a warning if the DataFrame has been cached before.
+     * [[org.apache.spark.sql.Dataset#cache* spark.Dataset.cache()]] does. But does not throw a warning if the DataFrame has been cached before.
      *
      * @return the DataFrame itself
      * @since 0.3.0
