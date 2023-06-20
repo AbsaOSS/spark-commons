@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ABSA Group Limited
+ * Copyright 2021 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling.implementations.submits
 
-import org.apache.spark.sql.functions.{lit, map, typedLit}
+import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.types.StringType
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ColumnOrValueForm, ErrColsAndValues}
@@ -38,10 +38,11 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
 
     expectedErrType assertTo result.errType
     expectedErrCode assertTo result.errCode
-    expectedErrMsg assertTo result.errMsg
+    expectedErrMsg assertTo result.errMessage
     result.errColsAndValues.column.expr
     expectedErrValuesCol assertTo result.errColsAndValues
-    expectedAdditionalInfo assertTo result.additionInfo
+    expectedAdditionalInfo assertTo result.additionalInfo
+
   }
 
   test("Apply function properly hands over data with additional info") {
@@ -49,7 +50,6 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
     val errCode = 201L
     val errMsg = "This is a test error"
     val additionalInfo = "{}"
-    val columnValue: ErrColsAndValues = Map.empty
 
     val result = ErrorMessageSubmitWithoutColumn(errType, errCode, errMsg, Some(additionalInfo))
 
@@ -61,8 +61,8 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
 
     expectedErrType assertTo result.errType
     expectedErrCode assertTo result.errCode
-    expectedErrMsg assertTo result.errMsg
+    expectedErrMsg assertTo result.errMessage
     expectedErrValuesCol assertTo result.errColsAndValues
-    expectedAdditionalInfo assertTo result.additionInfo
+    expectedAdditionalInfo assertTo result.additionalInfo
   }
 }

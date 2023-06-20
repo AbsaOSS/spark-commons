@@ -20,23 +20,23 @@ import org.apache.spark.sql.{Column, SparkSession}
 import za.co.absa.spark.commons.OncePerSparkSession
 import za.co.absa.spark.commons.adapters.CallUdfAdapter
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.partials.EvaluateViaUdf.ErrorMessageFunction
+import za.co.absa.spark.commons.errorhandling.partials.TransformViaUdf.ErrorMessageFunction
 import za.co.absa.spark.commons.errorhandling.types._
 
-trait EvaluateViaUdf[T] extends OncePerSparkSession with CallUdfAdapter {
-  def evaluationUdfName: String
-  protected def evaluationUdf: ErrorMessageFunction[T]
+trait TransformViaUdf[T] extends OncePerSparkSession with CallUdfAdapter {
+  def transformationUdfName: String
+  protected def transformationUdf: ErrorMessageFunction[T]
 
-  protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
-   call_udf(evaluationUdfName,
+  protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
+   call_udf(transformationUdfName,
             errorMessageSubmit.errType.column,
             errorMessageSubmit.errCode.column,
-            errorMessageSubmit.errMsg.column,
+            errorMessageSubmit.errMessage.column,
             errorMessageSubmit.errColsAndValues.column,
-            errorMessageSubmit.additionInfo.column)
+            errorMessageSubmit.additionalInfo.column)
   }
 }
 
-object EvaluateViaUdf {
+object TransformViaUdf {
   type ErrorMessageFunction[T] = (ErrType, ErrCode, ErrMsg, ErrColsAndValues, AdditionalInfo) => T //TODO needed?
 }

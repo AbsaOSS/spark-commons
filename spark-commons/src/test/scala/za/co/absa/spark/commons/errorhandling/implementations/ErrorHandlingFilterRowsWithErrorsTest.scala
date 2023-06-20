@@ -43,13 +43,13 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   test("aggregateErrorColumns should return an empty list after error aggregation") {
     val expectedResults: List[ResultDfRecordType] = List()
 
-    val e1 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val e1 = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
-    val e2 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(errorSubmitA)
+    val e2 = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(errorSubmitA)
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
-    val e3 = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(errorSubmitB)
+    val e3 = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(errorSubmitB)
 
-    val resultsDF = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(srcDf)(e1, e2, e3)
+    val resultsDF = ErrorHandlingFilterRowsWithErrors.applyErrorColumnsToDataFrame(srcDf)(e1, e2, e3)
     val results = resultDfToResult(resultsDF)
 
     assert(results.length == expectedResults.length)
@@ -91,7 +91,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   }
 
   test("errorColumnType should return a BooleanType") {
-    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(
+    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(
       "Test error 1", 1, "This is a test error", Some(errColName))
 
     val testDf = emptyDf.withColumn(errColName, errorColumn.column)
@@ -104,17 +104,17 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     assert(actualType == expectedType)
   }
 
-  test("errorColumnAggregationType should return None since no column is added during the aggregation") {
-    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.putErrorToColumn(
+  test("dataFrameColumnType should return None since no column is added during the aggregation") {
+    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(
       "1st error", 0, "This is an error", Some(errColName)
     )
 
     val testDf = emptyDf
 
-    val expectedAfterAgg = ErrorHandlingFilterRowsWithErrors.aggregateErrorColumns(testDf)(errorColumn)
+    val expectedAfterAgg = ErrorHandlingFilterRowsWithErrors.applyErrorColumnsToDataFrame(testDf)(errorColumn)
     val expectedTypeAfterAgg = expectedAfterAgg.schema.fields.headOption
 
-    val actualType = ErrorHandlingFilterRowsWithErrors.errorColumnAggregationType
+    val actualType = ErrorHandlingFilterRowsWithErrors.dataFrameColumnType
 
     assert(actualType == expectedTypeAfterAgg)
   }

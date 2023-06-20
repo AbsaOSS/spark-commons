@@ -18,23 +18,46 @@ package za.co.absa.spark.commons.errorhandling.implementations.submits
 
 import za.co.absa.spark.commons.errorhandling.types._
 
+/**
+ * [[za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit ErrorMessageSubmit]] subclass to represent an error bound to exactly one
+ * column.
+ * @param errType - error type
+ * @param errCode - error code
+ * @param errMessage - error message
+ * @param errSourceColName - the name of the column the error was detected on
+ * @param additionalInfo - optional additional info in form of JSON
+ * @group Error Handling
+ * @since 0.6.0
+ */
 class ErrorMessageSubmitOnColumn (
                                    errType: ColumnOrValue[ErrType],
                                    errCode: ColumnOrValue[ErrCode],
-                                   errMsg: ColumnOrValue[ErrMsg],
-                                   errColName: ErrSourceColName,
-                                   override val additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
-                                 ) extends ErrorMessageSubmitOnMoreColumns(errType, errCode, errMsg, Set(errColName), additionInfo) {
+                                   errMessage: ColumnOrValue[ErrMsg],
+                                   errSourceColName: ErrSourceColName,
+                                   override val additionalInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
+                                 ) extends ErrorMessageSubmitOnMoreColumns(errType, errCode, errMessage, Set(errSourceColName), additionalInfo) {
+
 }
 
 object ErrorMessageSubmitOnColumn {
 
-  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errColName: ErrSourceColName, additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnColumn = {
+  /**
+   * Convenient apply function
+   * @param errType - error type
+   * @param errCode - error code
+   * @param errMessage - error message
+   * @param errSourceColName - the name of the column the error was detected on
+   * @param additionalInfo - optional additional info in form of JSON
+   * @return - instance of [[ErrorMessageSubmitOnColumn]]
+   * @group Error Handling
+   * @since 0.6.0
+   */
+  def apply(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: ErrSourceColName, additionalInfo: AdditionalInfo= None): ErrorMessageSubmitOnColumn = {
     new ErrorMessageSubmitOnColumn(
       ColumnOrValue.withValue(errType),
       ColumnOrValue.withValue(errCode),
       ColumnOrValue.withValue(errMessage),
-      errColName,
+      errSourceColName,
       ColumnOrValue.withOption(additionalInfo)
     )
   }

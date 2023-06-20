@@ -23,36 +23,117 @@ import za.co.absa.spark.commons.sql.functions.null_col
 
 import scala.language.higherKinds
 
+/**
+ * Class to unify a representation of a [[za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit ErrorMessageSubmit]] segments.
+ * It can be build from `column`,column name or a set of column names, a constant value and others.
+ * The class then provides the ability to express each option as a Spark column used in other [[za.co.absa.spark.commons.errorhandling.ErrorHandling ErrorHandling]]
+ * classes and methods.
+ * @tparam T - The type of the value and the Scala equivalent of the column DataType
+ * @group Error Handling
+ * @since 0.6.0
+ */
 trait ColumnOrValue[T] {
+  /**
+   * @return `column` expression representing the input
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def column: Column
+
+  /**
+   * @return the name or names if columns are directly referenced.
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def columnNames: Set[String]
+
+  /**
+   * @return the constant value if entity was build from one, otherwise `None`
+   * @group Error Handling
+   * @since 0.6.0
+   */
+
   def getValue: Option[T]
 }
 
 object ColumnOrValue {
+  /**
+   * Just a shorthand alias of [[ColumnOrValue]], for less typying
+   * @tparam T - The type of the value and the Scala equivalent of the column DataType
+   * @group Error Handling
+   * @since 0.6.0
+   */
   type CoV[T] = ColumnOrValue[T] //just a shorthand
   val CoV: ColumnOrValue.type = ColumnOrValue
 
+  /**
+   * Referencing exactly one column, by its name
+   * @param columnName - the column name
+   * @tparam T - The Scala type equivalent to the column `DataType`
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def apply[T](columnName: String): ColumnOrValue[T] = CoVNamedColumn(columnName)
 
+  /**
+   * Referencing a column by its expression
+   * @param column - the column expression
+   * @tparam T - The Scala type equivalent to the column `DataType`
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def apply[T](column: Column): ColumnOrValue[T] = CoVDefinedColumn(column)
 
+  /**
+   * Referencing a column which is a map of column names and their values transformed by the transformer
+   * @param mapColumnNames - the column names in the map
+   * @param columnTransformer - function to tranform the column values with
+   * @tparam T - The Scala type equivalent to the column `DataType`
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def apply[T](mapColumnNames: Set[String], columnTransformer: ColumnTransformer): ColumnOrValue[Map[String, T]] = {
     CoVMapColumn(mapColumnNames, columnTransformer)
   }
 
+  /**
+   * Representing and optional string value - String or NULL
+   * @param value - the value to represent in the constant column or NULL if None
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def withOption(value: Option[String]): ColumnOrValue[Option[String]] = { // could be safely an apply, or done more generally
     value match {
       case None => CoVNull(StringType)
       case Some(x) => CoVOption(x)
     }
   }
+
+  /**
+   * Referencing a constant value
+   * @param value - the constant the column to represent
+   * @tparam T - The Scala type equivalent to the column `DataType`
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def withValue[T](value: T): ColumnOrValue[T] = CoVValue(value)
 
+  /**
+   * @return - column of NULL values as StringType
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def asEmpty: ColumnOrValue[Option[String]] = CoVNull(StringType)
+
+  /**
+   * Referencing a column which is a map of column names and their values casted to string
+   * @param mapColumnNames - the column names in the map
+   * @group Error Handling
+   * @since 0.6.0
+   */
   def asMapOfStringColumns(mapColumnNames: Set[String]): ColumnOrValue[Map[String, String]] = CoVMapColumn(mapColumnNames, columnNameToItsStringValue)
 
-  def columnNameToItsStringValue(colName: String): Column = col(colName).cast(StringType)
+  private def columnNameToItsStringValue(colName: String): Column = col(colName).cast(StringType)
 
   private final case class CoVNamedColumn[T](columnName: String) extends ColumnOrValue[T] {
     val column: Column = col(columnName)

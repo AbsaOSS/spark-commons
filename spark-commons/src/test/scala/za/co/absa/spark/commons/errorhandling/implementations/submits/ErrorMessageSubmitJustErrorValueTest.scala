@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 ABSA Group Limited
+ * Copyright 2021 ABSA Group Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,9 @@ class ErrorMessageSubmitJustErrorValueTest extends AnyFunSuite {
 
     expectedErrType assertTo result.errType
     expectedErrCode assertTo result.errCode
-    expectedErrMsg assertTo result.errMsg
+    expectedErrMsg assertTo result.errMessage
     expectedErrValuesCol assertTo result.errColsAndValues
-    expectedAdditionalInfo assertTo result.additionInfo
+    expectedAdditionalInfo assertTo result.additionalInfo
   }
 
   test("Apply function properly hands over data with additional info") {
@@ -63,8 +63,9 @@ class ErrorMessageSubmitJustErrorValueTest extends AnyFunSuite {
 
     expectedErrType assertTo result.errType
     expectedErrCode assertTo result.errCode
-    expectedErrMsg assertTo result.errMsg
+    expectedErrMsg assertTo result.errMessage
     expectedErrValuesCol assertTo result.errColsAndValues
-    expectedAdditionalInfo assertTo result.additionInfo
+    expectedAdditionalInfo assertTo result.additionalInfo
+
   }
 }

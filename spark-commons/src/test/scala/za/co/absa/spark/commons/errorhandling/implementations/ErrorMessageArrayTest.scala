@@ -33,7 +33,6 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
-  private val errColName = "errCol"
   private val srcDf = Seq(
     (None, ""),
     (Some(1), "a"),
@@ -79,13 +78,13 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
     val errorMessageArray = ErrorMessageArray()
 
-    val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val e1 = errorMessageArray.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
-    val e2 = errorMessageArray.putErrorToColumn(errorSubmitA)
+    val e2 = errorMessageArray.createErrorAsColumn(errorSubmitA)
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
-    val e3 = errorMessageArray.putErrorToColumn(errorSubmitB)
+    val e3 = errorMessageArray.createErrorAsColumn(errorSubmitB)
 
-    val resultDf = errorMessageArray.aggregateErrorColumns(srcDf)(e1, e2, e3)
+    val resultDf = errorMessageArray.applyErrorColumnsToDataFrame(srcDf)(e1, e2, e3)
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
@@ -193,27 +192,27 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
+    assert(resultDf.columns.contains("MyErrCol"))
   }
-
-  test("errorColumnAggregationType should return an ArrayType structure for column added during the aggregation") {
+  test("dataFrameColumnType should return an ArrayType structure for column added during the aggregation") {
     val errColName = "specialErrCol"
     val errorMessageArray = ErrorMessageArray(errColName)
 
-    val e1 = errorMessageArray.putErrorToColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val e1 = errorMessageArray.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
-    val e2 = errorMessageArray.putErrorToColumn(errorSubmitA)
+    val e2 = errorMessageArray.createErrorAsColumn(errorSubmitA)
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
-    val e3 = errorMessageArray.putErrorToColumn(errorSubmitB)
+    val e3 = errorMessageArray.createErrorAsColumn(errorSubmitB)
 
     val origSchemaSize = srcDf.schema.fieldNames.length
-    val dfAfterAgg = errorMessageArray.aggregateErrorColumns(srcDf)(e1, e2, e3)
+    val dfAfterAgg = errorMessageArray.applyErrorColumnsToDataFrame(srcDf)(e1, e2, e3)
     assert(dfAfterAgg.schema.fieldNames.length == origSchemaSize + 1) // checkc only one field was added...
     assert(dfAfterAgg.schema.fieldNames(origSchemaSize) == errColName) // and is of correct name...
     //... and type
     val addedColType = dfAfterAgg.schema.fields(origSchemaSize).dataType
     // while using `get` in `Option` is discouraged, it's ok here, as it's expected the option to be non-empty; and if empty
     // the test will fail, which is correct
-    val result = errorMessageArray.errorColumnAggregationType.get
+    val result = errorMessageArray.dataFrameColumnType.get
     import DataTypeImplicits.DataTypeEnhancements
     assert(result.isEquivalentDataType(addedColType))
   }

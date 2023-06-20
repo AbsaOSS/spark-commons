@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap
  * instantiated classes thus not running the method [[register]] again on them.
  *
  * Usage: extend this abstract class and implement the method [[register]]. On initialization the
- * [[register]] method gets called by the [[za.co.absa.spark.commons.OncePerSparkSession$.registerMe]] method if the class + spark session
+ * [[register]] method gets called by the [[za.co.absa.spark.commons.OncePerSparkSession$.registerMe OncePerSparkSession.registerMe()]] method if the class + spark session
  * combination is unique. If it is not unique [[register]] will not get called again.
  * This way we ensure only single registration per spark session.
  *

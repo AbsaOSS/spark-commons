@@ -19,6 +19,14 @@ package za.co.absa.spark.commons.errorhandling.types
 import org.apache.spark.sql.Column
 import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 
+/**
+ * A case class that puts together an error specification and the condition to identify it.
+ * The primary usage is in [[za.co.absa.spark.commons.errorhandling.ErrorHandling.putErrorsWithGrouping ErrorHandling.putErrorsWithGrouping()]]
+ * @param when - boolean column expression that should evaluate to true on and only on the error detection
+ * @param errorMessageSubmit - the error specification
+ * @group Error Handling
+ * @since 0.6.0
+ */
 case class ErrorWhen (
                      when: Column,
                      errorMessageSubmit: ErrorMessageSubmit

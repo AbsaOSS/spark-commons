@@ -411,7 +411,24 @@ path even of nested fields. It also evaluates arrays and maps where the array in
        def col_of_path(fullColName: String): Column
    ```
 
+2. Provides a column of NULL values.
+
+   ```scala
+       def nul_coll(): Column
+   ```
+
+
+3. Provides a column of NULL values, but the actual type is per specification
+
+   ```scala
+       def nul_coll(dataType: DataType): Column
+   ```
    
+## Error Handling
+
+A `trait` and a set of supporting classes and other traits to enable errrors channeling between libraries and 
+application during Spark data processing. 
+
 ## Spark Commons Test
 
 ### Usage:

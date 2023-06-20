@@ -36,6 +36,15 @@ lazy val commonSettings = Seq(
   Test / parallelExecution := false
 )
 
+/**
+ * add "za.co.absa.spark.commons.utils.ExplodeTools" to filter a class
+ * or "za.co.absa.spark.commons.utils.JsonUtils*" to filter the class and all related objects
+ */
+lazy val commonJacocoExcludes: Seq[String] = Seq(
+  "za.co.absa.spark.commons.adapters.CallUdfAdapter",
+  "za.co.absa.spark.commons.adapters.TransformAdapter"
+)
+
 lazy val parent = (project in file("."))
   .aggregate(sparkCommons.projectRefs ++ sparkCommonsTest.projectRefs: _*)
   .settings(

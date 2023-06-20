@@ -19,20 +19,19 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{coalesce, lit}
 import org.apache.spark.sql.types.{BooleanType, DataType}
-import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
-import za.co.absa.spark.commons.errorhandling.partials.ErrorHandlingCommon
+import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 
 /**
  * Class implements the functionality of filtering rows that have some error (any of the error columns is not NULL).
  */
-object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
+object ErrorHandlingFilterRowsWithErrors extends ErrorHandling {
 
   /**
    * Creates a column with the error description, in this particular case actually only signals with a boolean flag there was an error in the row.
    * @param errorMessageSubmit - the description of the error
    * @return - A column with boolean value indicating there was an error on the row.
    */
-  override protected def evaluate(errorMessageSubmit: ErrorMessageSubmit): Column = {
+  override protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
     lit(true)
   }
 
@@ -42,18 +41,22 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandlingCommon {
    * @param errCols - the error columns to signal if the row should be filtered or not
    * @return - returns the dataframe without rows with errors
    */
-  override protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
+  override protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val columns: Seq[Column] = errCols :+ lit(false)
     dataFrame.filter(!coalesce(columns: _*))
   }
 
   /**
-   * @return BooleanType of Datatype object
+   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * This function provides the information on the structure of single error column
+   * @return - `BooleanType`, as all what is needed is a true flag if error was present
    */
   val errorColumnType: DataType = BooleanType
 
   /**
-   * @return None since no error-related column added during the aggregation
+   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
+   * @return  - `None` since no error-related column is added
    */
-  val errorColumnAggregationType: Option[DataType] = None
+  val dataFrameColumnType: Option[DataType] = None
 }
