@@ -16,10 +16,21 @@
 
 package za.co.absa.spark.commons.errorhandling
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Column, DataFrame}
+import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
 
 object DataFrameImplicits {
-  implicit class ErrorHandlingDataFrameImplicit(df: DataFrame)(implicit errorHandling: ErrorHandling){
+  implicit class ErrorHandlingDataFrameImplicit(dataFrame: DataFrame)(implicit errorHandling: ErrorHandling){
+    def aggregateErrorColumns(errCols: ErrorColumn*): DataFrame = {
+      errorHandling.aggregateErrorColumns(dataFrame)(errCols: _*)
+    }
 
+    def putError(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
+      errorHandling.putError(dataFrame)(when)(errorMessageSubmit)
+    }
+
+    def putErrorsWithGrouping(errorsWhen: Seq[ErrorWhen]): DataFrame = {
+      errorHandling.putErrorsWithGrouping(dataFrame)(errorsWhen)
+    }
   }
 }
