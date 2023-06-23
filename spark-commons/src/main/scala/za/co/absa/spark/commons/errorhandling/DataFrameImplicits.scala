@@ -22,7 +22,7 @@ import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
 object DataFrameImplicits {
   implicit class ErrorHandlingDataFrameImplicit(dataFrame: DataFrame)(implicit errorHandling: ErrorHandling){
     def aggregateErrorColumns(errCols: ErrorColumn*): DataFrame = {
-      errorHandling.aggregateErrorColumns(dataFrame)(errCols: _*)
+      errorHandling.applyErrorColumnsToDataFrame(dataFrame)(errCols: _*)
     }
 
     def putError(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
