@@ -18,15 +18,23 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{array, array_except, array_union, col, map_from_arrays, map_keys, map_values, struct, when}
+import org.apache.spark.sql.types.{ArrayType, DataType}
 import za.co.absa.spark.commons.adapters.TransformAdapter
-import za.co.absa.spark.commons.errorhandling.partials.EvaluateIntoErrorMessage.FieldNames._
-import za.co.absa.spark.commons.errorhandling.partials.{ErrorHandlingCommon, EvaluateIntoErrorMessage}
+import za.co.absa.spark.commons.errorhandling.ErrorHandling
+import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage.FieldNames._
+import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage
 import za.co.absa.spark.commons.sql.functions.null_col
 import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
 
+/**
+ * An implementation of [[ErrorHandling]] that collects errors into columns of struct based on [[za.co.absa.spark.commons.errorhandling.ErrorMessage ErrorMessage]] case class.
+ * Upon applying  the non-NULL columns are aggregated into an array column which is attached to the [[org.apache.spark.sql.DataFrame spark.DataFrame]].
+ * In case the column already exists in the DataFrame, the columns are appended to the column.
+ * @param errorColumnName - the name of the array column aggregating all the errors
+ */
 case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.defaultErrorColumnName)
-  extends ErrorHandlingCommon
-  with EvaluateIntoErrorMessage
+  extends ErrorHandling
+  with TransformIntoErrorMessage
   with TransformAdapter {
 
   private def decomposeMap(errorMessageColumn: Column): Column = {
@@ -35,7 +43,7 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
         errorMessageColumn.getField(errType) as errType,
         errorMessageColumn.getField(errCode) as errCode,
         errorMessageColumn.getField(errMsg) as errMsg,
-        map_keys(errorMessageColumn.getField(errColsAndValues)) as errCols,
+        map_keys(errorMessageColumn.getField(errColsAndValues)) as errSourceCols,
         map_values(errorMessageColumn.getField(errColsAndValues)) as errValues,
         errorMessageColumn.getField(additionInfo) as additionInfo
       )
@@ -47,7 +55,7 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
       errorMessageColumn.getField(errType) as errType,
       errorMessageColumn.getField(errCode) as errCode,
       errorMessageColumn.getField(errMsg) as errMsg,
-      map_from_arrays(errorMessageColumn.getField(errCols), errorMessageColumn.getField(errValues)) as errColsAndValues,
+      map_from_arrays(errorMessageColumn.getField(errSourceCols), errorMessageColumn.getField(errValues)) as errColsAndValues,
       errorMessageColumn.getField(additionInfo) as additionInfo
     )
   }
@@ -59,11 +67,20 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
     dataFrame.withColumn(errorColName, reMap(array_union(deMap(col(errorColName)), colToUnion)))
   }
 
-  protected def doTheColumnsAggregation(dataFrame: DataFrame, errCols: Column*): DataFrame = {
+  protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     val aggregated = array(errCols.map(decomposeMap): _*) //need to decompose the map field, as it's not supported in array functions
     val aggregatedWithoutNulls = array_except(aggregated, array(null_col))
     val joinToExisting: (DataFrame, String) => DataFrame = appendToErrCol(_, _, aggregatedWithoutNulls)
     dataFrame.withColumnIfDoesNotExist(joinToExisting)(errorColumnName, reMap(aggregatedWithoutNulls))
+  }
+
+  /**
+   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
+   * @return - the aggregated [[za.co.absa.spark.commons.errorhandling.ErrorHandling.errorColumnType ErrorHandling.errorColumnType]] into an ArrayType
+   */
+  override def dataFrameColumnType: Option[DataType] = {
+    Option(ArrayType(errorColumnType, containsNull = false))
   }
 
 }

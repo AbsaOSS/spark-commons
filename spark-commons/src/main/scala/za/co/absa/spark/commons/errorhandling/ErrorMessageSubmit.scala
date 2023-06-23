@@ -18,10 +18,15 @@ package za.co.absa.spark.commons.errorhandling
 
 import za.co.absa.spark.commons.errorhandling.types._
 
+/**
+ * Trait collecting error definition in a format usable during Spark data processing
+ * @group Error Handling
+ * @since 0.6.0
+ */
 trait ErrorMessageSubmit {
   def errType: ColumnOrValue[ErrType]
   def errCode: ColumnOrValue[ErrCode]
-  def errMsg: ColumnOrValue[ErrMsg]
+  def errMessage: ColumnOrValue[ErrMsg]
   def errColsAndValues: ColumnOrValue[ErrColsAndValues]
-  def additionInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
+  def additionalInfo: ColumnOrValue[AdditionalInfo] = ColumnOrValue.asEmpty
 }
