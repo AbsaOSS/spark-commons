@@ -19,7 +19,7 @@ package za.co.absa.spark.commons.errorhandling
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
 
-object DataFrameImplicits {
+object ErrorHandlingDataFrameImplicits {
   implicit class ErrorHandlingDataFrameImplicit(dataFrame: DataFrame)(implicit errorHandling: ErrorHandling){
 
     /**
