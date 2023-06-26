@@ -40,5 +40,9 @@ object DataFrameImplicits {
     def createErrorAsColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None): ErrorColumn = {
       errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
+
+    implicit def convertErrorColumnToColumn(errorColumn: ErrorColumn): Column = {
+      errorColumn.column
+    }
   }
 }
