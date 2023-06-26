@@ -17,7 +17,7 @@
 package za.co.absa.spark.commons.errorhandling
 
 import org.apache.spark.sql.{Column, DataFrame}
-import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
+import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
 
 object DataFrameImplicits {
   implicit class ErrorHandlingDataFrameImplicit(dataFrame: DataFrame)(implicit errorHandling: ErrorHandling){
@@ -31,6 +31,14 @@ object DataFrameImplicits {
 
     def putErrorsWithGrouping(errorsWhen: Seq[ErrorWhen]): DataFrame = {
       errorHandling.putErrorsWithGrouping(dataFrame)(errorsWhen)
+    }
+
+    def createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn = {
+      errorHandling.createErrorAsColumn(errorMessageSubmit)
+    }
+
+    def createErrorAsColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None): ErrorColumn = {
+      errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
   }
 }
