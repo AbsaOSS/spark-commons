@@ -98,6 +98,13 @@ object DataFrameImplicits {
       errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
 
+    /**
+     * This method implicitly convert an errorColumn to a normal Column
+     * @param errorColumn error message details
+     * @tparam ErrorColumn The column type that need to be converted
+     * @tparam Column The type of the value that will returned
+     * @return the converted value as a column
+     */
     implicit def convertErrorColumnToColumn[ErrorColumn, Column](errorColumn: ErrorColumn): Column = {
       val column: Column = errorColumn[ErrorColumn]
       column
