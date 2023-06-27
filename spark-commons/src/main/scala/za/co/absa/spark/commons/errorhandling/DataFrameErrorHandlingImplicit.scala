@@ -19,8 +19,21 @@ package za.co.absa.spark.commons.errorhandling
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
 
-object ErrorHandlingDataFrameImplicits {
-  implicit class ErrorHandlingDataFrameImplicit(dataFrame: DataFrame)(implicit errorHandling: ErrorHandling){
+object DataFrameErrorHandlingImplicit {
+  import scala.language.implicitConversions
+
+  /**
+   * This method implicitly convert an errorColumn to a normal Column
+   *
+   * @param errorColumn error message details
+   * @tparam ErrorColumn The column type that need to be converted
+   * @tparam Column      The type of the value that will returned
+   * @return the errorColumn details as a normal column
+   */
+  implicit def convertErrorColumnToColumn(errorColumn: ErrorColumn): Column = {
+    errorColumn.column
+  }
+  implicit class DataFrameEnhancedWithErrorHandling(val dataFrame: DataFrame) extends AnyVal {
 
     /**
      * Applies the earlier collected [[types.ErrorColumn ErrorColumns]] to the provided [[org.apache.spark.sql.DataFrame spark.DataFrame]].
@@ -32,7 +45,7 @@ object ErrorHandlingDataFrameImplicits {
      * @group Error Handling
      * @since 0.6.0
      */
-    def applyErrorColumnsToDataFrame(errCols: ErrorColumn*): DataFrame = {
+    def applyErrorColumnsToDataFrame(errCols: ErrorColumn*)(implicit errorHandling: ErrorHandling): DataFrame = {
       errorHandling.applyErrorColumnsToDataFrame(dataFrame)(errCols: _*)
     }
 
@@ -48,7 +61,7 @@ object ErrorHandlingDataFrameImplicits {
      * @group Error Handling
      * @since 0.6.0
      */
-    def putError(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
+    def putError(when: Column)(errorMessageSubmit: ErrorMessageSubmit)(implicit errorHandling: ErrorHandling): DataFrame = {
       errorHandling.putError(dataFrame)(when)(errorMessageSubmit)
     }
 
@@ -63,7 +76,7 @@ object ErrorHandlingDataFrameImplicits {
      * @group Error Handling
      * @since 0.6.0
      */
-    def putErrorsWithGrouping(errorsWhen: Seq[ErrorWhen]): DataFrame = {
+    def putErrorsWithGrouping(errorsWhen: Seq[ErrorWhen])(implicit errorHandling: ErrorHandling): DataFrame = {
       errorHandling.putErrorsWithGrouping(dataFrame)(errorsWhen)
     }
 
@@ -77,7 +90,7 @@ object ErrorHandlingDataFrameImplicits {
      * @group Error Handling
      * @since 0.6.0
      */
-    def createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn = {
+    def createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)(implicit errorHandling: ErrorHandling): ErrorColumn = {
       errorHandling.createErrorAsColumn(errorMessageSubmit)
     }
 
@@ -94,20 +107,11 @@ object ErrorHandlingDataFrameImplicits {
      * @group Error Handling
      * @since 0.6.0
      */
-    def createErrorAsColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None): ErrorColumn = {
+    def createErrorAsColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None)
+                           (implicit errorHandling: ErrorHandling): ErrorColumn = {
       errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
-
-    /**
-     * This method implicitly convert an errorColumn to a normal Column
-     * @param errorColumn error message details
-     * @tparam ErrorColumn The column type that need to be converted
-     * @tparam Column The type of the value that will returned
-     * @return the converted value as a column
-     */
-    implicit def convertErrorColumnToColumn[ErrorColumn, Column](errorColumn: ErrorColumn): Column = {
-      val column: Column = errorColumn[ErrorColumn]
-      column
-    }
   }
+
+
 }
