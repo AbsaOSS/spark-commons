@@ -25,6 +25,8 @@ import za.co.absa.spark.commons.errorhandling.implementations.{ErrorHandlingFilt
 import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage.FieldNames.{additionInfo, errCode, errColsAndValues, errMsg, errType}
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
 
+import scala.collection.JavaConverters._
+
 class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase {
   import DataFrameErrorHandlingImplicit._
   import spark.implicits._
@@ -50,16 +52,16 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
   test("putError should add error based on condition") {
     val expectedColumns = Seq("id", "name", "errColumn")
     val expectedSchema = StructType(Seq(
-      StructField("id",IntegerType,false),
-      StructField("name",StringType,true),
+      StructField("id",IntegerType,nullable = false),
+      StructField("name",StringType,nullable = true),
       StructField("errColumn",ArrayType(
         StructType(Seq(
-          StructField(errType,StringType,true),
-          StructField(errCode,LongType,true),
-          StructField(errMsg,StringType,true),
-          StructField(errColsAndValues,MapType(StringType,StringType,true),true),
-          StructField(additionInfo,StringType,true))),false
-      ),false))
+          StructField(errType, StringType, nullable = true),
+          StructField(errCode, LongType, nullable = true),
+          StructField(errMsg, StringType, nullable = true),
+          StructField(errColsAndValues, MapType(StringType, StringType, valueContainsNull = true), nullable = true),
+          StructField(additionInfo, StringType, nullable = true)).asJava),containsNull = false
+      ),nullable = false))
     )
 
     val resultDf = df.putError(col("id") > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", "id"))
@@ -75,16 +77,16 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
     val expectedErrOnJohn = "List()"
     val expectedErrOnAlice = "List([Invalid name,1,The value of the column is too big,Map(name -> Jane),null])"
     val expectedDfSchema = StructType(Seq(
-      StructField("id", IntegerType, false),
-      StructField("name", StringType, true),
+      StructField("id", IntegerType, nullable = false),
+      StructField("name", StringType, nullable = true),
       StructField("errColumn", ArrayType(
         StructType(Seq(
-          StructField(errType, StringType, true),
-          StructField(errCode, LongType, true),
-          StructField(errMsg, StringType, true),
-          StructField(errColsAndValues, MapType(StringType, StringType, true), true),
-          StructField(additionInfo, StringType, true))), false
-      ), false))
+          StructField(errType, StringType, nullable = true),
+          StructField(errCode, LongType, nullable = true),
+          StructField(errMsg, StringType, nullable = true),
+          StructField(errColsAndValues, MapType(StringType, StringType, valueContainsNull = true), nullable = true),
+          StructField(additionInfo, StringType, nullable = true))), containsNull = false
+      ), nullable = false))
     )
 
     val errorConditions = Seq(
