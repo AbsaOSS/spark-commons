@@ -16,6 +16,7 @@
 
 package za.co.absa.spark.commons.errorhandling
 
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
 import org.apache.spark.sql.types.{ArrayType, IntegerType, LongType, MapType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
@@ -38,6 +39,12 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
   private val col2Name = "name"
   private val errColName = "errColumn"
   private val df = Seq((1, "John"), (2, "Jane"), (3, "Alice")).toDF(col1Name, col2Name)
+
+  private type ResultDfRecordType = (Option[Integer], String)
+
+  private def resultDfToResult(resultDf: DataFrame): List[ResultDfRecordType] = {
+    resultDf.as[ResultDfRecordType].collect().sortBy(_._1).toList
+  }
 
   test("applyErrorColumnsToDataFrame should apply error columns to DataFrame") {
 //    implicit val errorHandling: ErrorHandling = new ErrorMessageArray("errColumn")
@@ -70,6 +77,22 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
     assert(resultDf.schema == expectedSchema)
   }
 
+  test("putError and putErrors does not group by together") {
+    implicit val errorHandling: ErrorHandling = ErrorHandlingFilterRowsWithErrors
+
+    val expected: List[ResultDfRecordType] = List()
+
+    val midDf = df.putError(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
+
+    val resultDf = midDf.putErrorsWithGrouping(Seq(
+      ErrorWhen(col(col1Name).isNull, ErrorMessageSubmitWithoutColumn("WrongLine", 0, "This line is wrong")),
+      ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the field is too big", col1Name)),
+      ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitOnColumn("String too long", 10, "The text in the field is too long", col2Name))
+    ))
+    val result = resultDfToResult(resultDf)
+
+    assert(result == expected)
+  }
 
   test("putErrorsWithGrouping should add errors to DataFrame based on conditions") {
     // Define multiple error conditions and their corresponding error message submits
