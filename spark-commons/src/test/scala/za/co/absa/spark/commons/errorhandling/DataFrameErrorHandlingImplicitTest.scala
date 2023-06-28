@@ -16,9 +16,10 @@
 
 package za.co.absa.spark.commons.errorhandling
 
+import org.apache.parquet.filter2.predicate.Operators.Column
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
-import org.apache.spark.sql.types.{ArrayType, IntegerType, LongType, MapType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{ArrayType, BooleanType, IntegerType, LongType, MapType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.test.SparkTestBase
@@ -32,12 +33,10 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
   import DataFrameErrorHandlingImplicit._
   import spark.implicits._
 
-//  implicit private val errorHandling: ErrorHandling = ErrorHandlingFilterRowsWithErrors
-  implicit private val errorHandling: ErrorHandling = new ErrorMessageArray("errColumn")
+  implicit private val errorHandling: ErrorHandling = ErrorHandlingFilterRowsWithErrors
 
   private val col1Name = "id"
   private val col2Name = "name"
-  private val errColName = "errColumn"
   private val df = Seq((1, "John"), (2, "Jane"), (3, "Alice")).toDF(col1Name, col2Name)
 
   private type ResultDfRecordType = (Option[Integer], String)
@@ -46,45 +45,44 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
     resultDf.as[ResultDfRecordType].collect().sortBy(_._1).toList
   }
 
-  test("applyErrorColumnsToDataFrame should apply error columns to DataFrame") {
-//    implicit val errorHandling: ErrorHandling = new ErrorMessageArray("errColumn")
+  test("applyErrorColumnsToDataFrame should return DataFrame with records that don't have errors on them") {
+    val expectedResults: List[ResultDfRecordType] = List(
+      (Some(1),"John"), (Some(2),"Jane")
+    )
 
-    val errorColumn = df.createErrorAsColumn("Test error 1", 1, "This is a test error", None)
-    val result = df.applyErrorColumnsToDataFrame(errorColumn)
+    val er1 = ErrorWhen(col(col1Name).isNull, ErrorMessageSubmitWithoutColumn("Id cannot be null", 0, "This is a test error"))
+    val er2 = ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the column is too big", col1Name))
+    val er3 = ErrorWhen(length(col(col2Name)) > 4, ErrorMessageSubmitOnColumn("String too long", 5, "The text in the field is too long", col2Name))
 
-    assert(result.columns.contains(errColName))
-    assert(result.count() == df.count())
+    // The putErrorsWithGrouping calls the doAggregationErrorColumns method implemented in ErrorHandlingFilterRowsWithErrors object
+    val resultsDf = df.putErrorsWithGrouping(Seq(
+      er1, er2, er3)
+    )
+    val results = resultDfToResult(resultsDf)
+
+    assert(results == expectedResults)
   }
 
   test("putError should add error based on condition") {
-    val expectedColumns = Seq("id", "name", "errColumn")
+    val expectedColumns = Seq("id", "name")
     val expectedSchema = StructType(Seq(
       StructField("id",IntegerType,nullable = false),
-      StructField("name",StringType,nullable = true),
-      StructField("errColumn",ArrayType(
-        StructType(Seq(
-          StructField(errType, StringType, nullable = true),
-          StructField(errCode, LongType, nullable = true),
-          StructField(errMsg, StringType, nullable = true),
-          StructField(errColsAndValues, MapType(StringType, StringType, valueContainsNull = true), nullable = true),
-          StructField(additionInfo, StringType, nullable = true)).asJava),containsNull = false
-      ),nullable = false))
+      StructField("name",StringType,nullable = true))
     )
 
     val resultDf = df.putError(col("id") > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", "id"))
+    val resultsSchema = resultDf.schema
 
     assert(resultDf.columns.toSeq == expectedColumns)
-    assert(resultDf.schema == expectedSchema)
+    assert(resultsSchema == expectedSchema)
   }
 
   test("putError and putErrors does not group by together") {
-    implicit val errorHandling: ErrorHandling = ErrorHandlingFilterRowsWithErrors
-
     val expected: List[ResultDfRecordType] = List()
 
-    val midDf = df.putError(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
+    df.putError(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
 
-    val resultDf = midDf.putErrorsWithGrouping(Seq(
+    val resultDf = df.putErrorsWithGrouping(Seq(
       ErrorWhen(col(col1Name).isNull, ErrorMessageSubmitWithoutColumn("WrongLine", 0, "This line is wrong")),
       ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the field is too big", col1Name)),
       ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitOnColumn("String too long", 10, "The text in the field is too long", col2Name))
@@ -95,23 +93,11 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
   }
 
   test("putErrorsWithGrouping should add errors to DataFrame based on conditions") {
-    // Define multiple error conditions and their corresponding error message submits
-    val expectedErrOnJane = "List([Invalid name,1,The value of the column is too big,Map(name -> Jane),null])"
-    val expectedErrOnJohn = "List()"
-    val expectedErrOnAlice = "List([Invalid name,1,The value of the column is too big,Map(name -> Jane),null])"
-    val expectedDfSchema = StructType(Seq(
-      StructField("id", IntegerType, nullable = false),
-      StructField("name", StringType, nullable = true),
-      StructField("errColumn", ArrayType(
-        StructType(Seq(
-          StructField(errType, StringType, nullable = true),
-          StructField(errCode, LongType, nullable = true),
-          StructField(errMsg, StringType, nullable = true),
-          StructField(errColsAndValues, MapType(StringType, StringType, valueContainsNull = true), nullable = true),
-          StructField(additionInfo, StringType, nullable = true))), containsNull = false
-      ), nullable = false))
+    val expectedResults: List[ResultDfRecordType] = List(
+      (Some(1), "John")
     )
 
+    // Define multiple error conditions and their corresponding error message submits
     val errorConditions = Seq(
       ErrorWhen(df(col2Name).isNull, ErrorMessageSubmitWithoutColumn("Test error 3", 0, "This is a test error")),
       ErrorWhen(df(col2Name) === "Jane", ErrorMessageSubmitOnColumn("Invalid name", 1, "The value of the column is too big", col2Name)),
@@ -120,26 +106,24 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
 
     // Add errors to the DataFrame based on the conditions
     val resultDf = df.putErrorsWithGrouping(errorConditions)
+    val actualResults = resultDfToResult(resultDf)
 
-    val actualErrOnJane = resultDf.select("errColumn").filter("name = 'Jane'").first().getSeq(0).toList
-    val actualErrOnJohn = resultDf.select("errColumn").filter("name = 'John'").first().getSeq(0).toList
-    val actualErrOnAlice = resultDf.select("errColumn").filter("name = 'Jane'").first().getSeq(0).toList
-
-    // Verify that the errors are correctly added to the DataFrame
-    assert(actualErrOnJane.toString() == expectedErrOnJane)
-    assert(actualErrOnJohn.toString == expectedErrOnJohn)
-    assert(actualErrOnAlice.toString() == expectedErrOnAlice)
-    assert(resultDf.schema == expectedDfSchema)
+    assert(actualResults == expectedResults)
+    assert(actualResults.head == expectedResults.head)
   }
 
   test("convertErrorColumnToColumn should convert ErrorColumn to Column") {
-    implicit val errorHandling: ErrorHandling = ErrorHandlingFilterRowsWithErrors
-
     // Create an ErrorColumn
     val errorColumn = df.createErrorAsColumn("Test error 1", 1, "This is a test error", Some("newColumn"))
     val result = df.withColumn("newColumn", errorColumn)
+    val expectedType = StructType(Seq(
+      StructField("id",IntegerType,nullable = false),
+      StructField("name",StringType,nullable = true),
+      StructField("newColumn",BooleanType,nullable = false))
+    )
 
     assert(result.columns.contains("newColumn"))
+    assert(result.schema == expectedType)
   }
 
 }
