@@ -130,7 +130,6 @@ trait ErrorHandling {
     createErrorAsColumn(toSubmit)
   }
 
-
   /**
    * Applies the earlier collected [[types.ErrorColumn ErrorColumns]] to the provided [[org.apache.spark.sql.DataFrame spark.DataFrame]].
    * See [[doApplyErrorColumnsToDataFrame]] for detailed functional explanation.
