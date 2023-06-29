@@ -17,13 +17,13 @@
 package za.co.absa.spark.commons.errorhandling
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{col, length}
-import org.apache.spark.sql.types.{ BooleanType, IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.functions.{col, column, length}
+import org.apache.spark.sql.types.{BooleanType, IntegerType, StringType, StructField, StructType}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.ErrorHandlingFilterRowsWithErrors
-import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
+import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
 
 class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase {
   import DataFrameErrorHandlingImplicit._
@@ -41,6 +41,20 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
     resultDf.as[ResultDfRecordType].collect().sortBy(_._1).toList
   }
 
+  test("convertErrorColumnToColumn should convert ErrorColumn to Column") {
+    // Create an ErrorColumn
+    val errorColumn = df.createErrorAsColumn("Test error 1", 1, "This is a test error", Some("newColumn"))
+    val result = df.withColumn("newColumn", errorColumn)
+    val expectedType = StructType(Seq(
+      StructField("id", IntegerType, nullable = false),
+      StructField("name", StringType, nullable = true),
+      StructField("newColumn", BooleanType, nullable = false))
+    )
+
+    assert(result.columns.contains("newColumn"))
+    assert(result.schema == expectedType)
+  }
+
   test("applyErrorColumnsToDataFrame should return DataFrame with records that don't have errors on them") {
     val expectedResults: List[ResultDfRecordType] = List(
       (Some(1),"John"), (Some(2),"Jane")
@@ -51,9 +65,7 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
     val er3 = ErrorWhen(length(col(col2Name)) > 4, ErrorMessageSubmitOnColumn("String too long", 5, "The text in the field is too long", col2Name))
 
     // The putErrorsWithGrouping calls the doAggregationErrorColumns method implemented in ErrorHandlingFilterRowsWithErrors object
-    val resultsDf = df.putErrorsWithGrouping(Seq(
-      er1, er2, er3)
-    )
+    val resultsDf = df.putErrorsWithGrouping(List(er1, er2, er3))
     val results = resultDfToResult(resultsDf)
 
     assert(results == expectedResults)
@@ -108,18 +120,26 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
     assert(actualResults.head == expectedResults.head)
   }
 
-  test("convertErrorColumnToColumn should convert ErrorColumn to Column") {
-    // Create an ErrorColumn
-    val errorColumn = df.createErrorAsColumn("Test error 1", 1, "This is a test error", Some("newColumn"))
-    val result = df.withColumn("newColumn", errorColumn)
-    val expectedType = StructType(Seq(
-      StructField("id",IntegerType,nullable = false),
-      StructField("name",StringType,nullable = true),
-      StructField("newColumn",BooleanType,nullable = false))
-    )
+  test("createErrorAsColumn should return an ErrorColumn with the specified error message") {
+    val errorMessageSubmit: ErrorMessageSubmit = ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the field is too big", col1Name)
+    val expectedResults = ErrorColumn(column("true")).toString
 
-    assert(result.columns.contains("newColumn"))
-    assert(result.schema == expectedType)
+    val result = df.createErrorAsColumn(errorMessageSubmit)
+
+    assert(result.toString == expectedResults)
+  }
+
+  test("createErrorAsColumn should return an ErrorColumn with the specified error details") {
+    val errType: ErrType = "Test error"
+    val errCode: ErrCode = 2
+    val errMessage: ErrMsg = "Error message"
+    val errSourceColName: Option[ErrSourceColName] = Option("name")
+    val additionalInfo: AdditionalInfo = None
+    val expectedResults = "ErrorColumn(true)"
+
+    val result = df.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
+
+    assert(result.toString == expectedResults)
   }
 
 }
