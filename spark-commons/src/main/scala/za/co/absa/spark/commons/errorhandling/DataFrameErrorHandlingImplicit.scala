@@ -18,10 +18,9 @@ package za.co.absa.spark.commons.errorhandling
 
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
+import scala.language.implicitConversions
 
 object DataFrameErrorHandlingImplicit {
-  import scala.language.implicitConversions
-
   /**
    * This method implicitly convert an errorColumn to a normal Column
    *
@@ -33,6 +32,7 @@ object DataFrameErrorHandlingImplicit {
   implicit def convertErrorColumnToColumn(errorColumn: ErrorColumn): Column = {
     errorColumn.column
   }
+
   implicit class DataFrameEnhancedWithErrorHandling(val dataFrame: DataFrame) extends AnyVal {
 
     /**
@@ -112,6 +112,5 @@ object DataFrameErrorHandlingImplicit {
       errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
   }
-
 
 }

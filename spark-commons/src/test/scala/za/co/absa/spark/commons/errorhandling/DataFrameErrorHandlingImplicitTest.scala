@@ -33,7 +33,7 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
 
   private val col1Name = "id"
   private val col2Name = "name"
-  private val df = Seq((1, "John"), (2, "Jane"), (3, "Alice")).toDF(col1Name, col2Name)
+  implicit private val df = Seq((1, "John"), (2, "Jane"), (3, "Alice")).toDF(col1Name, col2Name)
 
   private type ResultDfRecordType = (Option[Integer], String)
 
