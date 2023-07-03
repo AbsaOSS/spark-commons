@@ -1,10 +1,11 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 
-import org.apache.spark.sql.types.DataType
+import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.types.{BooleanType, DataType}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 
-object PutInfoIntoDevNull extends ErrorHandling {
+object ErrorHandlingIgnoringErrors extends ErrorHandling {
 
   /**
    * First of the few methods that needs to be coded in the trait implementation
@@ -15,7 +16,9 @@ object PutInfoIntoDevNull extends ErrorHandling {
    * @group Error Handling
    * @since 0.6.0
    */
-  override protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = ???
+  override protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
+    lit(true)
+  }
 
   /**
    * Applies the provided columns to the incoming [[org.apache.spark.sql.DataFrame spark.DataFrame]]. Usually they might be aggregated in some way and attached
@@ -28,7 +31,7 @@ object PutInfoIntoDevNull extends ErrorHandling {
    *
    * @param dataFrame - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to apply the error columns to
    * @param errCols   - the list of error columns to apply
-   * @return - data frame with the error columns applied (aggregated and attached or done otherwise)
+   * @return - the original data frame passed for aggregation
    */
   override protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     dataFrame
@@ -40,7 +43,7 @@ object PutInfoIntoDevNull extends ErrorHandling {
    *
    * @return -  the DataType of the column returned from `createErrorAsColumn` function
    */
-override def errorColumnType: DataType = ???
+override def errorColumnType: DataType = BooleanType
 
   /**
    * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
@@ -48,5 +51,5 @@ override def errorColumnType: DataType = ???
    *
    * @return - the DataType of the column containing the error info that is attached to the [[org.apache.spark.sql.DataFrame DataFrame]].
    */
-  override def dataFrameColumnType: Option[DataType] = ???
+  override def dataFrameColumnType: Option[DataType] = None
 }
