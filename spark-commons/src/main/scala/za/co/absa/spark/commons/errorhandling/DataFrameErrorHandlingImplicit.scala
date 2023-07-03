@@ -28,9 +28,7 @@ object DataFrameErrorHandlingImplicit {
   /**
    * This method implicitly convert an errorColumn to a normal Column
    *
-   * @param errorColumn error message details
-   * @tparam ErrorColumn The column type that need to be converted
-   * @tparam Column      The type of the value that will returned
+   * @param errorColumn error column that has to be converted to column
    * @return the errorColumn details as a normal column
    */
   implicit def convertErrorColumnToColumn(errorColumn: ErrorColumn): Column = {
@@ -41,9 +39,7 @@ object DataFrameErrorHandlingImplicit {
 
     /**
      * Applies the earlier collected [[types.ErrorColumn ErrorColumns]] to the provided [[org.apache.spark.sql.DataFrame spark.DataFrame]].
-     * See [[doApplyErrorColumnsToDataFrame]] for detailed functional explanation.
      *
-     * @param dataFrame - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to operate on
      * @param errCols   - a list of [[types.ErrorColumn]] returned by previous calls of [[ErrorHandling!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandling\.ErrorMessageSubmit)* createErrorAsColumn]]
      * @return - the original data frame with the error detection applied
      * @group Error Handling
@@ -55,10 +51,9 @@ object DataFrameErrorHandlingImplicit {
 
     /**
      * The idea of this function is: "Put the error specified to the provided dataframe if the condition is true on the row."
-     * The error is transformed to a column using the [[transformErrorSubmitToColumn]] method and applied to the data frame
-     * if the "when" condition is true using the [[doApplyErrorColumnsToDataFrame]] method.
+     * The error is transformed to a column using the [[ErrorHandling.transformErrorSubmitToColumn]] method and applied to the data frame
+     * if the "when" condition is true using the [[ErrorHandling.doApplyErrorColumnsToDataFrame]] method.
      *
-     * @param dataFrame          - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to operate on
      * @param when               - the condition that defines the error occurred on the row
      * @param errorMessageSubmit - the detected error specification
      * @return - the original [[org.apache.spark.sql.DataFrame spark.DataFrame]] with the error detection applied
@@ -74,7 +69,6 @@ object DataFrameErrorHandlingImplicit {
      * It should be noted, that once an error has been identified for a field on the row, no more conditions bound to that
      * field are evaluated.
      *
-     * @param dataFrame  - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to operate on
      * @param errorsWhen - the list of condition-error pairs, the condition are grouped by the field of the error submissions
      * @return - the original data frame with the error detection applied
      * @group Error Handling
@@ -116,5 +110,5 @@ object DataFrameErrorHandlingImplicit {
       errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
   }
-  val arr = [[3,3,4], [3.4,4,5,6]]
+
 }
