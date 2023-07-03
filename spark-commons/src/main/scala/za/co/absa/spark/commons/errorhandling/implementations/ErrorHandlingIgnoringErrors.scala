@@ -43,7 +43,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandling {
    *
    * @return -  the DataType of the column returned from `createErrorAsColumn` function
    */
-override def errorColumnType: DataType = BooleanType
+  override def errorColumnType: DataType = BooleanType
 
   /**
    * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
