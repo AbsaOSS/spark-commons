@@ -20,6 +20,10 @@ import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
 import scala.language.implicitConversions
 
+/**
+ * Class implement the functionality of implicit ErrorHandling trait to DataFrame. This implementation take ErrorHandling trait as an
+ * implicit which will allow easier usage for ErrorHandling trait.
+ */
 object DataFrameErrorHandlingImplicit {
   /**
    * This method implicitly convert an errorColumn to a normal Column
@@ -112,5 +116,5 @@ object DataFrameErrorHandlingImplicit {
       errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
   }
-
+  val arr = [[3,3,4], [3.4,4,5,6]]
 }
