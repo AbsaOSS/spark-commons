@@ -19,7 +19,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.errorhandling.ErrorMessage
+import za.co.absa.spark.commons.errorhandling.{DataFrameErrorHandlingImplicit, ErrorHandling, ErrorMessage}
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
@@ -28,9 +28,9 @@ import za.co.absa.spark.commons.test.SparkTestBase
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
+  import DataFrameErrorHandlingImplicit._
 
   private val nullString = Option.empty[String].orNull
-
   private val col1Name = "Col1"
   private val col2Name = "Col2"
   private val srcDf = Seq(
@@ -48,6 +48,8 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("Collect columns and aggregate them explicitly") {
+    implicit val errorHandling: ErrorHandling = new ErrorMessageArray()
+
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
         ErrorMessage("Test error 1", 1, "This is a test error", Map("Col1" -> nullString)),
@@ -76,22 +78,21 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       ))
     )
 
-    val errorMessageArray = ErrorMessageArray()
-
-    val e1 = errorMessageArray.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val e1 = srcDf.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
-    val e2 = errorMessageArray.createErrorAsColumn(errorSubmitA)
+    val e2 = srcDf.createErrorAsColumn(errorSubmitA)
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
-    val e3 = errorMessageArray.createErrorAsColumn(errorSubmitB)
+    val e3 = srcDf.createErrorAsColumn(errorSubmitB)
 
-    val resultDf = errorMessageArray.applyErrorColumnsToDataFrame(srcDf)(e1, e2, e3)
+    val resultDf = srcDf.applyErrorColumnsToDataFrame(e1, e2, e3)
     val result = resultDfToResult(resultDf)
 
     assert(result == expected)
   }
 
   test("putErrors groups conditions by source column"){
-    val errorMessageArray = ErrorMessageArray()
+    implicit val errorHandling: ErrorHandling = new ErrorMessageArray()
+
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
         ErrorMessage("WrongLine", 0, "This line is wrong", Map.empty)
@@ -107,7 +108,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       ))
     )
 
-    val resultDf = errorMessageArray.putErrorsWithGrouping(srcDf)(Seq(
+    val resultDf = srcDf.putErrorsWithGrouping(Seq(
       ErrorWhen(col(col1Name).isNull, ErrorMessageSubmitWithoutColumn("WrongLine", 0, "This line is wrong")),
       ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the field is too big", col1Name)),
       ErrorWhen(col(col1Name) > 1, ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name)),
@@ -119,7 +120,8 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("putError and putErrors does not group by together"){
-    val errorMessageArray = ErrorMessageArray()
+    implicit val errorHandling: ErrorHandling = new ErrorMessageArray()
+
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
         ErrorMessage("WrongLine", 0, "This line is wrong", Map.empty)
@@ -136,9 +138,9 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       ))
     )
 
-    val midDf = errorMessageArray.putError(srcDf)(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
+    val midDf = srcDf.putError(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
 
-    val resultDf = errorMessageArray.putErrorsWithGrouping(midDf)(Seq(
+    val resultDf = midDf.putErrorsWithGrouping(Seq(
       ErrorWhen(col(col1Name).isNull, ErrorMessageSubmitWithoutColumn("WrongLine", 0, "This line is wrong")),
       ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the field is too big", col1Name)),
       ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitOnColumn("String too long", 10, "The text in the field is too long", col2Name))
@@ -149,7 +151,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("Various error submits combined") {
-    val errorMessageArray = ErrorMessageArray("MyErrCol")
+    implicit val errorHandling: ErrorHandling = new ErrorMessageArray("MyErrCol")
 
     case class NullError(errColName: String) extends ErrorMessageSubmitOnColumn(
       CoV.withValue("Null Error"),
@@ -183,7 +185,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
       ))
     )
 
-    val resultDf = errorMessageArray.putErrorsWithGrouping(srcDf)(Seq(
+    val resultDf = srcDf.putErrorsWithGrouping(Seq(
       ErrorWhen(col(col1Name).isNull, NullError(col1Name)),
       ErrorWhen(col(col1Name)  =!= length(col(col2Name)), CorrelationError(col1Name, col2Name)),
       ErrorWhen(col(col1Name) === 2, ErrorMessageSubmitJustErrorValue("ID is protected", 2, "The ID is too big", "2")),
@@ -194,25 +196,26 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     assert(result == expected)
     assert(resultDf.columns.contains("MyErrCol"))
   }
+
   test("dataFrameColumnType should return an ArrayType structure for column added during the aggregation") {
     val errColName = "specialErrCol"
-    val errorMessageArray = ErrorMessageArray(errColName)
+    implicit val errorHandling: ErrorHandling = new ErrorMessageArray(errColName)
 
-    val e1 = errorMessageArray.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val e1 = srcDf.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
-    val e2 = errorMessageArray.createErrorAsColumn(errorSubmitA)
+    val e2 = srcDf.createErrorAsColumn(errorSubmitA)
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
-    val e3 = errorMessageArray.createErrorAsColumn(errorSubmitB)
+    val e3 = srcDf.createErrorAsColumn(errorSubmitB)
 
     val origSchemaSize = srcDf.schema.fieldNames.length
-    val dfAfterAgg = errorMessageArray.applyErrorColumnsToDataFrame(srcDf)(e1, e2, e3)
+    val dfAfterAgg = srcDf.applyErrorColumnsToDataFrame(e1, e2, e3)
     assert(dfAfterAgg.schema.fieldNames.length == origSchemaSize + 1) // checkc only one field was added...
     assert(dfAfterAgg.schema.fieldNames(origSchemaSize) == errColName) // and is of correct name...
     //... and type
     val addedColType = dfAfterAgg.schema.fields(origSchemaSize).dataType
     // while using `get` in `Option` is discouraged, it's ok here, as it's expected the option to be non-empty; and if empty
     // the test will fail, which is correct
-    val result = errorMessageArray.dataFrameColumnType.get
+    val result = errorHandling.dataFrameColumnType.get
     import DataTypeImplicits.DataTypeEnhancements
     assert(result.isEquivalentDataType(addedColType))
   }

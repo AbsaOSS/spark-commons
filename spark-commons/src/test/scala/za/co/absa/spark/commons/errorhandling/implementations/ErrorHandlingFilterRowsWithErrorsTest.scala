@@ -17,12 +17,16 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.spark.commons.errorhandling.{DataFrameErrorHandlingImplicit, ErrorHandling}
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
 
 class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
+  import DataFrameErrorHandlingImplicit._
+
+  implicit private val errorHandling: ErrorHandling = ErrorHandlingFilterRowsWithErrors
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
@@ -43,13 +47,13 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   test("aggregateErrorColumns should return an empty list after error aggregation") {
     val expectedResults: List[ResultDfRecordType] = List()
 
-    val e1 = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
+    val e1 = srcDf.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
-    val e2 = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(errorSubmitA)
+    val e2 = srcDf.createErrorAsColumn(errorSubmitA)
     val errorSubmitB = ErrorMessageSubmitWithoutColumn("Test error 3", 3, "This is a test error")
-    val e3 = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(errorSubmitB)
+    val e3 = srcDf.createErrorAsColumn(errorSubmitB)
 
-    val resultsDF = ErrorHandlingFilterRowsWithErrors.applyErrorColumnsToDataFrame(srcDf)(e1, e2, e3)
+    val resultsDF = srcDf.applyErrorColumnsToDataFrame(e1, e2, e3)
     val results = resultDfToResult(resultsDF)
 
     assert(results.length == expectedResults.length)
@@ -67,9 +71,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val er3 = ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitOnColumn("String too long", 5, "The text in the field is too long", col2Name))
 
     // The putErrorsWithGrouping calls the doAggregationErrorColumns method implemented in ErrorHandlingFilterRowsWithErrors object
-    val resultsDf = ErrorHandlingFilterRowsWithErrors.putErrorsWithGrouping(srcDf)(
-      Seq(er1, er2, er3)
-    )
+    val resultsDf = srcDf.putErrorsWithGrouping(Seq(er1, er2, er3))
     val results = resultDfToResult(resultsDf)
 
     assert(results == expectedResults)
@@ -78,9 +80,9 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   test("putError and putErrors does not group by together") {
     val expected: List[ResultDfRecordType] = List((Some(1),"a"))
 
-    val midDf = ErrorHandlingFilterRowsWithErrors.putError(srcDf)(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
+    val midDf = srcDf.putError(col(col1Name) > 1)(ErrorMessageSubmitOnColumn("ValueStillTooBig", 2, "The value of the field is too big", col1Name))
 
-    val resultDf = ErrorHandlingFilterRowsWithErrors.putErrorsWithGrouping(midDf)(Seq(
+    val resultDf = midDf.putErrorsWithGrouping(Seq(
       ErrorWhen(col(col1Name).isNull, ErrorMessageSubmitWithoutColumn("WrongLine", 0, "This line is wrong")),
       ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the field is too big", col1Name)),
       ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitOnColumn("String too long", 10, "The text in the field is too long", col2Name))
@@ -91,7 +93,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   }
 
   test("errorColumnType should return a BooleanType") {
-    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(
+    val errorColumn: ErrorColumn = srcDf.createErrorAsColumn(
       "Test error 1", 1, "This is a test error", Some(errColName))
 
     val testDf = emptyDf.withColumn(errColName, errorColumn.column)
@@ -105,13 +107,13 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
   }
 
   test("dataFrameColumnType should return None since no column is added during the aggregation") {
-    val errorColumn: ErrorColumn = ErrorHandlingFilterRowsWithErrors.createErrorAsColumn(
+    val errorColumn: ErrorColumn = srcDf.createErrorAsColumn(
       "1st error", 0, "This is an error", Some(errColName)
     )
 
     val testDf = emptyDf
 
-    val expectedAfterAgg = ErrorHandlingFilterRowsWithErrors.applyErrorColumnsToDataFrame(testDf)(errorColumn)
+    val expectedAfterAgg = testDf.applyErrorColumnsToDataFrame(errorColumn)
     val expectedTypeAfterAgg = expectedAfterAgg.schema.fields.headOption
 
     val actualType = ErrorHandlingFilterRowsWithErrors.dataFrameColumnType
