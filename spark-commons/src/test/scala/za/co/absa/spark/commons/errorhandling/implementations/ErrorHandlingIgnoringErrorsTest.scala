@@ -17,7 +17,7 @@ class ErrorHandlingIgnoringErrorsTest extends AnyFunSuite with SparkTestBase {
     (Some(3), "ccc")
   ).toDF(col1Name, col2Name)
 
-  test("aggregateErrorColumns should return an empty list after error aggregation") {
+  test("aggregateErrorColumns should return the original dataFrame after error aggregation") {
     val e1 = ErrorHandlingIgnoringErrors.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)
     val e2 = ErrorHandlingIgnoringErrors.createErrorAsColumn(errorSubmitA)
@@ -29,4 +29,6 @@ class ErrorHandlingIgnoringErrorsTest extends AnyFunSuite with SparkTestBase {
     assert(resultsDF.count() == srcDf.count())
     assert(resultsDF == srcDf)
   }
+
+
 }
