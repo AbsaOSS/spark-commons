@@ -30,7 +30,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandling {
    * the same result (with the exception of order of errors in the aggregation).
    *
    * @param dataFrame - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to apply the error columns to
-   * @param errCols   - the list of error columns to apply
+   * @param errCols   - the list of error columns to be applied to the dataFrame
    * @return - the original data frame passed for aggregation
    */
   override protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
