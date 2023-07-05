@@ -194,6 +194,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
     assert(result == expected)
     assert(resultDf.columns.contains("MyErrCol"))
   }
+
   test("dataFrameColumnType should return an ArrayType structure for column added during the aggregation") {
     val errColName = "specialErrCol"
     val errorMessageArray = ErrorMessageArray(errColName)
