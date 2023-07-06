@@ -18,7 +18,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{coalesce, lit}
-import org.apache.spark.sql.types.{ DataType, NullType}
+import org.apache.spark.sql.types.{BooleanType, DataType}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 
 /**
@@ -51,7 +51,7 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandling {
    * This function provides the information on the structure of single error column
    * @return - `BooleanType`, as all what is needed is a true flag if error was present
    */
-  val errorColumnType: DataType = NullType
+  val errorColumnType: DataType = BooleanType
 
   /**
    * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
