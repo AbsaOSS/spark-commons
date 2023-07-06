@@ -11,7 +11,7 @@ class ErrorHandlingIgnoringErrorsTest extends AnyFunSuite with SparkTestBase {
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
-  private val errColName = "errColumn"
+  private val errColName = "Null_col"
   private val srcDf = Seq(
     (None, ""),
     (Some(1), "a"),

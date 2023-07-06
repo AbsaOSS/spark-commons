@@ -1,7 +1,7 @@
 package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.functions.lit
-import org.apache.spark.sql.types.{BooleanType, DataType}
+import org.apache.spark.sql.types.{ DataType, NullType}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
 
@@ -17,7 +17,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandling {
    * @since 0.6.0
    */
   override protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
-    lit(true)
+    lit(null)
   }
 
   /**
@@ -43,7 +43,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandling {
    *
    * @return -  the DataType of the column returned from `createErrorAsColumn` function
    */
-  override def errorColumnType: DataType = BooleanType
+  override def errorColumnType: DataType = NullType
 
   /**
    * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
