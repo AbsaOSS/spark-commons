@@ -24,7 +24,7 @@ import za.co.absa.spark.commons.sql.functions.null_col
 import scala.language.higherKinds
 
 /**
- * +Class to unify a representation of a [[za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit ErrorMessageSubmit]] segments.
+ * Class to unify a representation of a [[za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit ErrorMessageSubmit]] segments.
  * It can be build from `column`,column name or a set of column names, a constant value and others.
  * The class then provides the ability to express each option as a Spark column used in other [[za.co.absa.spark.commons.errorhandling.ErrorHandling ErrorHandling]]
  * classes and methods.
