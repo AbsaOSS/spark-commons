@@ -16,7 +16,6 @@
 
 package za.co.absa.spark.commons.errorhandling.implementations
 
-import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.types.{DataType, NullType}
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
