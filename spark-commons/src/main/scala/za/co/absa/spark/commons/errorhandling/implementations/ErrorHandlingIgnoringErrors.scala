@@ -34,7 +34,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandling {
    * @since 0.6.0
    */
   override protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
-    lit(null_col)
+    null_col
   }
 
   /**
