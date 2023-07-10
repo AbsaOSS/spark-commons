@@ -35,7 +35,7 @@ object ErrorHandlerThrowingException extends ErrorHandling with TransformIntoErr
     val errorColumn= coalesce(errCols: _*)
     val errColName = dataFrame.schema.getClosestUniqueName("_1")
     dataFrame.withColumn(errColName, when(errorColumn.isNull, null_col).otherwise(throwError(
-      //the values have to be sent decomposed, sending the whoel struct field fails the udf function
+      //the values have to be sent decomposed, sending the whole struct field fails the udf function
       errorColumn.getField(errType),
       errorColumn.getField(errCode),
       errorColumn.getField(errMsg),
@@ -53,7 +53,6 @@ object ErrorHandlerThrowingException extends ErrorHandling with TransformIntoErr
     (errType: String, errCode: Long, errMsg: String, errColsAndValues: Map[String, String], additionInfo: String) => {
       val error = ErrorMessage(errType, errCode, errMsg, errColsAndValues, Option(additionInfo))
       throw ErrorHandlerException(error)
-
     }
   })
 
