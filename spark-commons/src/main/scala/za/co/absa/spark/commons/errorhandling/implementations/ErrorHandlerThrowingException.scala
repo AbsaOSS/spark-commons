@@ -28,17 +28,7 @@ object ErrorHandlerThrowingException extends ErrorHandling with TransformIntoErr
   case class ErrorHandlerException(error: ErrorMessage) extends Exception(error.errMsg)
 
   /**
-   * Applies the provided columns to the incoming [[org.apache.spark.sql.DataFrame spark.DataFrame]]. Usually they might be aggregated in some way and attached
-   * to the [[org.apache.spark.sql.DataFrame spark.DataFrame]], but any other operations are imaginable. Unless really bent, the incoming columns are those
-   * produced by [[transformErrorSubmitToColumn]].
-   * The idea here is that the error column contains information of the error that occurred on the row or is empty (NULL)
-   * otherwise.
-   * In each implementation calling the function to each column separately or in any grouping of columns should produce
-   * the same result (with the exception of order of errors in the aggregation).
-   *
-   * @param dataFrame - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to apply the error columns to
-   * @param errCols   - the list of error columns to apply
-   * @return - data frame with the error columns applied (aggregated and attached or done otherwise)
+   * @see [[ErrorHandling.doApplyErrorColumnsToDataFrame]]
    */
   override protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
@@ -55,10 +45,7 @@ object ErrorHandlerThrowingException extends ErrorHandling with TransformIntoErr
   }
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
-   * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
-   *
-   * @return - the DataType of the column containing the error info that is attached to the [[org.apache.spark.sql.DataFrame DataFrame]].
+   * @see [[ErrorHandling.dataFrameColumnType]]
    */
   override def dataFrameColumnType: Option[DataType] = None
 
