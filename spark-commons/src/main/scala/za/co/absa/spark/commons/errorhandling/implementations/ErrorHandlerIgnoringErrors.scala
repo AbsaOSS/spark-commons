@@ -21,7 +21,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandling.{ErrorHandler, ErrorMessageSubmit}
 import za.co.absa.spark.commons.sql.functions.null_col
 
-object ErrorHandlingIgnoringErrors extends ErrorHandler {
+object ErrorHandlerIgnoringErrors extends ErrorHandler {
 
   /**
    * First of the few methods that needs to be coded in the trait implementation
@@ -29,7 +29,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandler {
    *
    * @param errorMessageSubmit - the error specification
    * @return - the error specification transformed into a column expression
-   * @group Error Handling
+   * @group Error Handler
    * @since 0.6.0
    */
   override protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column = {
