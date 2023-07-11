@@ -22,11 +22,11 @@ import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.{ErrorColumn, ErrorWhen}
 
-class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBase {
+class ErrorHandlerFilteringErrorRowsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
   import DataFrameErrorHandlingImplicit._
 
-  implicit private val errorHandling: ErrorHandler = ErrorHandlingFilterRowsWithErrors
+  implicit private val errorHandling: ErrorHandler = ErrorHandlerFilteringErrorRows
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
@@ -70,7 +70,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val er2 = ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the column is too big", col1Name))
     val er3 = ErrorWhen(length(col(col2Name)) > 2, ErrorMessageSubmitOnColumn("String too long", 5, "The text in the field is too long", col2Name))
 
-    // The putErrorsWithGrouping calls the doAggregationErrorColumns method implemented in ErrorHandlingFilterRowsWithErrors object
+    // The putErrorsWithGrouping calls the doAggregationErrorColumns method implemented in ErrorHandlerFilteringErrorRows object
     val resultsDf = srcDf.putErrorsWithGrouping(Seq(er1, er2, er3))
     val results = resultDfToResult(resultsDf)
 
@@ -100,7 +100,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val expectedType = testDf.col(errColName).expr.dataType
     val expectedValue = testDf.schema.fields
 
-    val actualType = ErrorHandlingFilterRowsWithErrors.errorColumnType
+    val actualType = ErrorHandlerFilteringErrorRows.errorColumnType
 
     assert(actualType.defaultSize == expectedValue.length)
     assert(actualType == expectedType)
@@ -116,7 +116,7 @@ class ErrorHandlingFilterRowsWithErrorsTest extends AnyFunSuite with SparkTestBa
     val expectedAfterAgg = testDf.applyErrorColumnsToDataFrame(errorColumn)
     val expectedTypeAfterAgg = expectedAfterAgg.schema.fields.headOption
 
-    val actualType = ErrorHandlingFilterRowsWithErrors.dataFrameColumnType
+    val actualType = ErrorHandlerFilteringErrorRows.dataFrameColumnType
 
     assert(actualType == expectedTypeAfterAgg)
   }

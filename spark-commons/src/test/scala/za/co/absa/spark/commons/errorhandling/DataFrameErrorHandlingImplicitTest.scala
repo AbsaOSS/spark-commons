@@ -22,14 +22,14 @@ import org.apache.spark.sql.types.{BooleanType, IntegerType, StringType, StructF
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.test.SparkTestBase
-import za.co.absa.spark.commons.errorhandling.implementations.ErrorHandlingFilterRowsWithErrors
+import za.co.absa.spark.commons.errorhandling.implementations.ErrorHandlerFilteringErrorRows
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
 
 class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase {
   import DataFrameErrorHandlingImplicit._
   import spark.implicits._
 
-  implicit private val errorHandling: ErrorHandler = ErrorHandlingFilterRowsWithErrors
+  implicit private val errorHandling: ErrorHandler = ErrorHandlerFilteringErrorRows
 
   private val col1Name = "id"
   private val col2Name = "name"
@@ -64,7 +64,7 @@ class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase 
     val er2 = ErrorWhen(col(col1Name) > 2, ErrorMessageSubmitOnColumn("ValueTooBig", 1, "The value of the column is too big", col1Name))
     val er3 = ErrorWhen(length(col(col2Name)) > 4, ErrorMessageSubmitOnColumn("String too long", 5, "The text in the field is too long", col2Name))
 
-    // The putErrorsWithGrouping calls the doAggregationErrorColumns method implemented in ErrorHandlingFilterRowsWithErrors object
+    // The putErrorsWithGrouping calls the doAggregationErrorColumns method implemented in ErrorHandlerFilteringErrorRows object
     val resultsDf = df.putErrorsWithGrouping(List(er1, er2, er3))
     val results = resultDfToResult(resultsDf)
 
