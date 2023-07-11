@@ -24,7 +24,7 @@ import scala.language.implicitConversions
  * Class implement the functionality of implicit ErrorHandler trait to DataFrame. This implementation take ErrorHandler trait as an
  * implicit which will allow easier usage for ErrorHandler trait.
  */
-object ErrorHandlerFilteringErrorRows {
+object DataFrameErrorHandlingImplicit {
   /**
    * This method implicitly convert an errorColumn to a normal Column
    *
@@ -40,7 +40,7 @@ object ErrorHandlerFilteringErrorRows {
     /**
      * Applies the earlier collected [[types.ErrorColumn ErrorColumns]] to the provided [[org.apache.spark.sql.DataFrame spark.DataFrame]].
      *
-     * @param errCols   - a list of [[types.ErrorColumn]] returned by previous calls of [[ErrorHandler!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandling\.ErrorMessageSubmit)* createErrorAsColumn]]
+     * @param errCols   - a list of [[types.ErrorColumn]] returned by previous calls of [[ErrorHandler!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandler\.ErrorMessageSubmit)* createErrorAsColumn]]
      * @return - the original data frame with the error detection applied
      * @group Error Handler
      * @since 0.6.0

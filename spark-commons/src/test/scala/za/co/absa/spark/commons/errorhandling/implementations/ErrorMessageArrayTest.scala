@@ -19,7 +19,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.errorhandling.{ErrorHandlerFilteringErrorRows, ErrorHandler, ErrorMessage}
+import za.co.absa.spark.commons.errorhandling.{DataFrameErrorHandlingImplicit, ErrorHandler, ErrorMessage}
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
@@ -28,7 +28,7 @@ import za.co.absa.spark.commons.test.SparkTestBase
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
-  import ErrorHandlerFilteringErrorRows._
+  import DataFrameErrorHandlingImplicit._
 
   private val nullString = Option.empty[String].orNull
   private val col1Name = "Col1"

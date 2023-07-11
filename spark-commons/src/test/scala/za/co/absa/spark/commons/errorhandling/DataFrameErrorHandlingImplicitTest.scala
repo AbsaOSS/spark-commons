@@ -26,7 +26,7 @@ import za.co.absa.spark.commons.errorhandling.implementations.ErrorHandlingFilte
 import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, ErrMsg, ErrSourceColName, ErrType, ErrorColumn, ErrorWhen}
 
 class DataFrameErrorHandlingImplicitTest extends AnyFunSuite with SparkTestBase {
-  import ErrorHandlerFilteringErrorRows._
+  import DataFrameErrorHandlingImplicit._
   import spark.implicits._
 
   implicit private val errorHandling: ErrorHandler = ErrorHandlingFilterRowsWithErrors
