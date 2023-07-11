@@ -17,14 +17,14 @@ package za.co.absa.spark.commons.errorhandler.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.errorhandler.{DataFrameErrorHandlingImplicit, ErrorHandler}
+import za.co.absa.spark.commons.errorhandler.{DataFrameErrorHandlerImplicit, ErrorHandler}
 import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.errorhandler.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandler.types.{ErrorColumn, ErrorWhen}
 
 class ErrorHandlerFilteringErrorRowsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
-  import DataFrameErrorHandlingImplicit._
+  import DataFrameErrorHandlerImplicit._
 
   implicit private val errorHandling: ErrorHandler = ErrorHandlerFilteringErrorRows
 
