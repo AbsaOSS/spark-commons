@@ -26,7 +26,7 @@ import scala.language.higherKinds
 /**
  * Class to unify a representation of a [[za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit ErrorMessageSubmit]] segments.
  * It can be build from `column`,column name or a set of column names, a constant value and others.
- * The class then provides the ability to express each option as a Spark column used in other [[za.co.absa.spark.commons.errorhandling.ErrorHandling ErrorHandling]]
+ * The class then provides the ability to express each option as a Spark column used in other [[za.co.absa.spark.commons.errorhandling.ErrorHandler ErrorHandler]]
  * classes and methods.
  * @tparam T - The type of the value and the Scala equivalent of the column DataType
  * @group Error Handling

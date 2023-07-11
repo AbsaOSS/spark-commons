@@ -18,7 +18,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.functions.col
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.errorhandling.{DataFrameErrorHandlingImplicit, ErrorHandling, ErrorMessage}
+import za.co.absa.spark.commons.errorhandling.{ErrorHandlerFilteringErrorRows, ErrorHandler, ErrorMessage}
 import za.co.absa.spark.commons.errorhandling.implementations.submits.ErrorMessageSubmitOnColumn
 import za.co.absa.spark.commons.test.SparkTestBase
 import ErrorHandlerThrowingException.ErrorHandlerException
@@ -26,8 +26,8 @@ import org.apache.spark.SparkException
 
 class ErrorHandlerThrowingExceptionTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
-  import DataFrameErrorHandlingImplicit._
-  private implicit val errorHandlerThrowingException: ErrorHandling = ErrorHandlerThrowingException
+  import ErrorHandlerFilteringErrorRows._
+  private implicit val errorHandlerThrowingException: ErrorHandler = ErrorHandlerThrowingException
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"

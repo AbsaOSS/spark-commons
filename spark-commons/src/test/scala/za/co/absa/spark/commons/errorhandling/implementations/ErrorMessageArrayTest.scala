@@ -19,7 +19,7 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, length}
 import org.scalatest.funsuite.AnyFunSuite
-import za.co.absa.spark.commons.errorhandling.{DataFrameErrorHandlingImplicit, ErrorHandling, ErrorMessage}
+import za.co.absa.spark.commons.errorhandling.{ErrorHandlerFilteringErrorRows, ErrorHandler, ErrorMessage}
 import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMessageSubmitJustErrorValue, ErrorMessageSubmitOnColumn, ErrorMessageSubmitOnMoreColumns, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandling.types.ColumnOrValue.CoV
 import za.co.absa.spark.commons.errorhandling.types.ErrorWhen
@@ -28,7 +28,7 @@ import za.co.absa.spark.commons.test.SparkTestBase
 
 class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
-  import DataFrameErrorHandlingImplicit._
+  import ErrorHandlerFilteringErrorRows._
 
   private val nullString = Option.empty[String].orNull
   private val col1Name = "Col1"
@@ -48,7 +48,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("Collect columns and aggregate them explicitly") {
-    implicit val errorHandling: ErrorHandling = new ErrorMessageArray()
+    implicit val errorHandling: ErrorHandler = new ErrorMessageArray()
 
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
@@ -91,7 +91,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("putErrors groups conditions by source column"){
-    implicit val errorHandling: ErrorHandling = new ErrorMessageArray()
+    implicit val errorHandling: ErrorHandler = new ErrorMessageArray()
 
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
@@ -120,7 +120,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("putError and putErrors does not group by together"){
-    implicit val errorHandling: ErrorHandling = new ErrorMessageArray()
+    implicit val errorHandling: ErrorHandler = new ErrorMessageArray()
 
     val expected: List[ResultDfRecordType] = List(
       (None, "", List(
@@ -151,7 +151,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
   }
 
   test("Various error submits combined") {
-    implicit val errorHandling: ErrorHandling = new ErrorMessageArray("MyErrCol")
+    implicit val errorHandling: ErrorHandler = new ErrorMessageArray("MyErrCol")
 
     case class NullError(errColName: String) extends ErrorMessageSubmitOnColumn(
       CoV.withValue("Null Error"),
@@ -199,7 +199,7 @@ class ErrorMessageArrayTest extends AnyFunSuite with SparkTestBase {
 
   test("dataFrameColumnType should return an ArrayType structure for column added during the aggregation") {
     val errColName = "specialErrCol"
-    implicit val errorHandling: ErrorHandling = new ErrorMessageArray(errColName)
+    implicit val errorHandling: ErrorHandler = new ErrorMessageArray(errColName)
 
     val e1 = srcDf.createErrorAsColumn("Test error 1", 1, "This is a test error", Some(col1Name))
     val errorSubmitA = ErrorMessageSubmitOnColumn("Test error 2", 2, "This is a test error", col2Name)

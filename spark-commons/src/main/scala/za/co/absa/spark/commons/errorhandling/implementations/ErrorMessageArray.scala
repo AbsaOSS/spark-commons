@@ -20,20 +20,21 @@ import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{array, array_except, array_union, col, map_from_arrays, map_keys, map_values, struct, when}
 import org.apache.spark.sql.types.{ArrayType, DataType}
 import za.co.absa.spark.commons.adapters.TransformAdapter
-import za.co.absa.spark.commons.errorhandling.ErrorHandling
+import za.co.absa.spark.commons.errorhandling.ErrorHandler
 import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage.FieldNames._
 import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage
 import za.co.absa.spark.commons.sql.functions.null_col
 import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancements
 
 /**
- * An implementation of [[ErrorHandling]] that collects errors into columns of struct based on [[za.co.absa.spark.commons.errorhandling.ErrorMessage ErrorMessage]] case class.
+ * An implementation of [[ErrorHandler]] that collects errors into columns of struct based on [[za.co.absa.spark.commons.errorhandling.ErrorMessage ErrorMessage]] case class.
  * Upon applying  the non-NULL columns are aggregated into an array column which is attached to the [[org.apache.spark.sql.DataFrame spark.DataFrame]].
  * In case the column already exists in the DataFrame, the columns are appended to the column.
+ *
  * @param errorColumnName - the name of the array column aggregating all the errors
  */
 case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.defaultErrorColumnName)
-  extends ErrorHandling
+  extends ErrorHandler
   with TransformIntoErrorMessage
   with TransformAdapter {
 
@@ -75,9 +76,10 @@ case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.default
   }
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * Provides the library some information about how the actual implementation of [[ErrorHandler]] is structured.
    * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
-   * @return - the aggregated [[za.co.absa.spark.commons.errorhandling.ErrorHandling.errorColumnType ErrorHandling.errorColumnType]] into an ArrayType
+   *
+   * @return - the aggregated [[za.co.absa.spark.commons.errorhandling.ErrorHandler.errorColumnType ErrorHandler.errorColumnType]] into an ArrayType
    */
   override def dataFrameColumnType: Option[DataType] = {
     Option(ArrayType(errorColumnType, containsNull = false))

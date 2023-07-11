@@ -21,10 +21,10 @@ import za.co.absa.spark.commons.errorhandling.types.{AdditionalInfo, ErrCode, Er
 import scala.language.implicitConversions
 
 /**
- * Class implement the functionality of implicit ErrorHandling trait to DataFrame. This implementation take ErrorHandling trait as an
- * implicit which will allow easier usage for ErrorHandling trait.
+ * Class implement the functionality of implicit ErrorHandler trait to DataFrame. This implementation take ErrorHandler trait as an
+ * implicit which will allow easier usage for ErrorHandler trait.
  */
-object DataFrameErrorHandlingImplicit {
+object ErrorHandlerFilteringErrorRows {
   /**
    * This method implicitly convert an errorColumn to a normal Column
    *
@@ -40,28 +40,28 @@ object DataFrameErrorHandlingImplicit {
     /**
      * Applies the earlier collected [[types.ErrorColumn ErrorColumns]] to the provided [[org.apache.spark.sql.DataFrame spark.DataFrame]].
      *
-     * @param errCols   - a list of [[types.ErrorColumn]] returned by previous calls of [[ErrorHandling!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandling\.ErrorMessageSubmit)* createErrorAsColumn]]
+     * @param errCols   - a list of [[types.ErrorColumn]] returned by previous calls of [[ErrorHandler!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandling\.ErrorMessageSubmit)* createErrorAsColumn]]
      * @return - the original data frame with the error detection applied
-     * @group Error Handling
+     * @group Error Handler
      * @since 0.6.0
      */
-    def applyErrorColumnsToDataFrame(errCols: ErrorColumn*)(implicit errorHandling: ErrorHandling): DataFrame = {
-      errorHandling.applyErrorColumnsToDataFrame(dataFrame)(errCols: _*)
+    def applyErrorColumnsToDataFrame(errCols: ErrorColumn*)(implicit errorHandler: ErrorHandler): DataFrame = {
+      errorHandler.applyErrorColumnsToDataFrame(dataFrame)(errCols: _*)
     }
 
     /**
      * The idea of this function is: "Put the error specified to the provided dataframe if the condition is true on the row."
-     * The error is transformed to a column using the [[ErrorHandling.transformErrorSubmitToColumn]] method and applied to the data frame
-     * if the "when" condition is true using the [[ErrorHandling.doApplyErrorColumnsToDataFrame]] method.
+     * The error is transformed to a column using the [[ErrorHandler.transformErrorSubmitToColumn]] method and applied to the data frame
+     * if the "when" condition is true using the [[ErrorHandler.doApplyErrorColumnsToDataFrame]] method.
      *
      * @param when               - the condition that defines the error occurred on the row
      * @param errorMessageSubmit - the detected error specification
      * @return - the original [[org.apache.spark.sql.DataFrame spark.DataFrame]] with the error detection applied
-     * @group Error Handling
+     * @group Error Handler
      * @since 0.6.0
      */
-    def putError(when: Column)(errorMessageSubmit: ErrorMessageSubmit)(implicit errorHandling: ErrorHandling): DataFrame = {
-      errorHandling.putError(dataFrame)(when)(errorMessageSubmit)
+    def putError(when: Column)(errorMessageSubmit: ErrorMessageSubmit)(implicit errorHandler: ErrorHandler): DataFrame = {
+      errorHandler.putError(dataFrame)(when)(errorMessageSubmit)
     }
 
     /**
@@ -71,11 +71,11 @@ object DataFrameErrorHandlingImplicit {
      *
      * @param errorsWhen - the list of condition-error pairs, the condition are grouped by the field of the error submissions
      * @return - the original data frame with the error detection applied
-     * @group Error Handling
+     * @group Error Handler
      * @since 0.6.0
      */
-    def putErrorsWithGrouping(errorsWhen: Seq[ErrorWhen])(implicit errorHandling: ErrorHandling): DataFrame = {
-      errorHandling.putErrorsWithGrouping(dataFrame)(errorsWhen)
+    def putErrorsWithGrouping(errorsWhen: Seq[ErrorWhen])(implicit errorHandler: ErrorHandler): DataFrame = {
+      errorHandler.putErrorsWithGrouping(dataFrame)(errorsWhen)
     }
 
     /**
@@ -85,15 +85,15 @@ object DataFrameErrorHandlingImplicit {
      *
      * @param errorMessageSubmit - the error specification
      * @return - [[types.ErrorColumn]] expression containing the error specification
-     * @group Error Handling
+     * @group Error Handler
      * @since 0.6.0
      */
-    def createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)(implicit errorHandling: ErrorHandling): ErrorColumn = {
-      errorHandling.createErrorAsColumn(errorMessageSubmit)
+    def createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)(implicit errorHandler: ErrorHandler): ErrorColumn = {
+      errorHandler.createErrorAsColumn(errorMessageSubmit)
     }
 
     /**
-     * Same as the other [[ErrorHandling!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandling\.ErrorMessageSubmit)* createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)]], only providing the error specification
+     * Same as the other [[ErrorHandler!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorHandler\.ErrorMessageSubmit)* createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)]], only providing the error specification
      * in decomposed state, not in the [[ErrorMessageSubmit]] trait form.
      *
      * @param errType          - word description of the type of the error
@@ -102,12 +102,12 @@ object DataFrameErrorHandlingImplicit {
      * @param errSourceColName - the name of the column the error happened at
      * @param additionalInfo   - any optional additional info in JSON format
      * @return - [[types.ErrorColumn]] expression containing the error specification
-     * @group Error Handling
+     * @group Error Handler
      * @since 0.6.0
      */
     def createErrorAsColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None)
-                           (implicit errorHandling: ErrorHandling): ErrorColumn = {
-      errorHandling.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
+                           (implicit errorHandler: ErrorHandler): ErrorColumn = {
+      errorHandler.createErrorAsColumn(errType, errCode, errMessage, errSourceColName, additionalInfo)
     }
   }
 

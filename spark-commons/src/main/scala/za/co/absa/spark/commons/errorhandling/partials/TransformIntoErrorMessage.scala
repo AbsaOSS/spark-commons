@@ -23,7 +23,7 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage.FieldNames._
 
 /**
- * Trait offers a presumably very common implementation of [[za.co.absa.spark.commons.errorhandling.ErrorHandling.transformErrorSubmitToColumn ErrorHandling.transformErrorSubmitToColumn()]],
+ * Trait offers a presumably very common implementation of [[za.co.absa.spark.commons.errorhandling.ErrorHandler.transformErrorSubmitToColumn ErrorHandler.transformErrorSubmitToColumn()]],
  * where the error is transformed into the struct of [[za.co.absa.spark.commons.errorhandling.ErrorMessage ErrorMessage]].
  * @group Error Handling
  * @since 0.6.0

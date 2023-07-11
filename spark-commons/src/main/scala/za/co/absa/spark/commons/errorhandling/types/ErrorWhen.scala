@@ -21,7 +21,7 @@ import za.co.absa.spark.commons.errorhandling.ErrorMessageSubmit
 
 /**
  * A case class that puts together an error specification and the condition to identify it.
- * The primary usage is in [[za.co.absa.spark.commons.errorhandling.ErrorHandling.putErrorsWithGrouping ErrorHandling.putErrorsWithGrouping()]]
+ * The primary usage is in [[za.co.absa.spark.commons.errorhandling.ErrorHandler.putErrorsWithGrouping ErrorHandler.putErrorsWithGrouping()]]
  * @param when - boolean column expression that should evaluate to true on and only on the error detection
  * @param errorMessageSubmit - the error specification
  * @group Error Handling

@@ -20,15 +20,15 @@ import org.apache.spark.sql.functions.{coalesce, udf, when}
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.types.DataType
 import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage.FieldNames._
-import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessage}
+import za.co.absa.spark.commons.errorhandling.{ErrorHandler, ErrorMessage}
 import za.co.absa.spark.commons.errorhandling.partials.TransformIntoErrorMessage
 import za.co.absa.spark.commons.sql.functions.null_col
 
-object ErrorHandlerThrowingException extends ErrorHandling with TransformIntoErrorMessage {
+object ErrorHandlerThrowingException extends ErrorHandler with TransformIntoErrorMessage {
   case class ErrorHandlerException(error: ErrorMessage) extends Exception(error.errMsg)
 
   /**
-   * @see [[ErrorHandling.doApplyErrorColumnsToDataFrame]]
+   * @see [[ErrorHandler.doApplyErrorColumnsToDataFrame]]
    */
   override protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
@@ -45,7 +45,7 @@ object ErrorHandlerThrowingException extends ErrorHandling with TransformIntoErr
   }
 
   /**
-   * @see [[ErrorHandling.dataFrameColumnType]]
+   * @see [[ErrorHandler.dataFrameColumnType]]
    */
   override def dataFrameColumnType: Option[DataType] = None
 

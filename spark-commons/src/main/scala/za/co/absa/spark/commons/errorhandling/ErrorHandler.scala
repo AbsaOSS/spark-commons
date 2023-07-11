@@ -24,21 +24,21 @@ import za.co.absa.spark.commons.errorhandling.implementations.submits.{ErrorMess
 import za.co.absa.spark.commons.errorhandling.types._
 
 /**
- * The basic class of error handling component. Every library that wants to use the component during Spark data
+ * The basic class of error handler component. Every library that wants to use the component during Spark data
  * processing should utilize this trait and its methods. The methods serve to record the errors and attach them to the
  * [[org.apache.spark.sql.DataFrame spark.DataFrame]]. The trait should be an input parameter for such library, perhaps as an implicit.
- * On the other side the end application provides concrete [[ErrorHandling]] implementation, that does the actual error
+ * On the other side the end application provides concrete [[ErrorHandler]] implementation, that does the actual error
  * handling by the application desire.
  * For easy to use and as examples, a few general implementations are provided in the implementations sub-folder.
  * Also for common, repeated implementations the folder `partials` offer some traits.
  */
-trait ErrorHandling {
+trait ErrorHandler {
   /**
    * First of the few methods that needs to be coded in the trait implementation
    * The purpose of this method is to convert the error specification into a [[org.apache.spark.sql.Column spark.Column]] expression
    * @param errorMessageSubmit - the error specification
    * @return - the error specification transformed into a column expression
-   * @group Error Handling
+   * @group Error Handler
    * @since 0.6.0
    */
   protected def transformErrorSubmitToColumn(errorMessageSubmit: ErrorMessageSubmit): Column
@@ -65,7 +65,7 @@ trait ErrorHandling {
    * @param when - the condition that defines the error occurred on the row
    * @param errorMessageSubmit - the detected error specification
    * @return - the original [[org.apache.spark.sql.DataFrame spark.DataFrame]] with the error detection applied
-   * @group Error Handling
+   * @group Error Handler
    * @since 0.6.0
    */
   def putError(dataFrame: DataFrame)(when: Column)(errorMessageSubmit: ErrorMessageSubmit): DataFrame = {
@@ -79,7 +79,7 @@ trait ErrorHandling {
    * @param dataFrame - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to operate on
    * @param errorsWhen - the list of condition-error pairs, the condition are grouped by the field of the error submissions
    * @return - the original data frame with the error detection applied
-   * @group Error Handling
+   * @group Error Handler
    * @since 0.6.0
    */
   def putErrorsWithGrouping(dataFrame: DataFrame)(errorsWhen: Seq[ErrorWhen]): DataFrame = {
@@ -104,7 +104,7 @@ trait ErrorHandling {
    * The returned [[types.ErrorColumn]] should then be used in [[applyErrorColumnsToDataFrame]].
    * @param errorMessageSubmit - the error specification
    * @return - [[types.ErrorColumn]] expression containing the error specification
-   * @group Error Handling
+   * @group Error Handler
    * @since 0.6.0
    */
   def createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit): ErrorColumn = {
@@ -112,15 +112,16 @@ trait ErrorHandling {
   }
 
   /**
-   * Same as the other [[ErrorHandling!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandling\.ErrorMessageSubmit)* createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)]], only providing the error specification
+   * Same as the other [[ErrorHandler!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandler\.ErrorMessageSubmit)* createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)]], only providing the error specification
    * in decomposed state, not in the [[ErrorMessageSubmit]] trait form.
+   *
    * @param errType - word description of the type of the error
    * @param errCode - number designation of the type of the error
    * @param errMessage - human friendly description of the error
    * @param errSourceColName - the name of the column the error happened at
    * @param additionalInfo - any optional additional info in JSON format
    * @return - [[types.ErrorColumn]] expression containing the error specification
-   * @group Error Handling
+   * @group Error Handler
    * @since 0.6.0
    */
   def createErrorAsColumn(errType: ErrType, errCode: ErrCode, errMessage: ErrMsg, errSourceColName: Option[ErrSourceColName], additionalInfo: AdditionalInfo = None): ErrorColumn = {
@@ -133,10 +134,11 @@ trait ErrorHandling {
   /**
    * Applies the earlier collected [[types.ErrorColumn ErrorColumns]] to the provided [[org.apache.spark.sql.DataFrame spark.DataFrame]].
    * See [[doApplyErrorColumnsToDataFrame]] for detailed functional explanation.
+   *
    * @param dataFrame - the [[org.apache.spark.sql.DataFrame spark.DataFrame]] to operate on
-   * @param errCols - a list of [[types.ErrorColumn]] returned by previous calls of [[ErrorHandling!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandling\.ErrorMessageSubmit)* createErrorAsColumn]]
+   * @param errCols   - a list of [[types.ErrorColumn]] returned by previous calls of [[ErrorHandler!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandler\.ErrorMessageSubmit)* createErrorAsColumn]]
    * @return - the original data frame with the error detection applied
-   * @group Error Handling
+   * @group Error Handler
    * @since 0.6.0
    */
   def applyErrorColumnsToDataFrame(dataFrame: DataFrame)(errCols: ErrorColumn*): DataFrame = {
@@ -144,15 +146,17 @@ trait ErrorHandling {
   }
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * Provides the library some information about how the actual implementation of [[ErrorHandler]] is structured.
    * This function provides the information on the structure of single error column
+   *
    * @return -  the DataType of the column returned from `createErrorAsColumn` function
    */
   def errorColumnType: DataType
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * Provides the library some information about how the actual implementation of [[ErrorHandler]] is structured.
    * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
+ *
    * @return - the DataType of the column containing the error info that is attached to the [[org.apache.spark.sql.DataFrame DataFrame]].
    */
   def dataFrameColumnType: Option[DataType]

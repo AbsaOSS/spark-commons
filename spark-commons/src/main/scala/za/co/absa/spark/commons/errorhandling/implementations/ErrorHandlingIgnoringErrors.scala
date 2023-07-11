@@ -18,10 +18,10 @@ package za.co.absa.spark.commons.errorhandling.implementations
 
 import org.apache.spark.sql.types.{DataType, NullType}
 import org.apache.spark.sql.{Column, DataFrame}
-import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
+import za.co.absa.spark.commons.errorhandling.{ErrorHandler, ErrorMessageSubmit}
 import za.co.absa.spark.commons.sql.functions.null_col
 
-object ErrorHandlingIgnoringErrors extends ErrorHandling {
+object ErrorHandlingIgnoringErrors extends ErrorHandler {
 
   /**
    * First of the few methods that needs to be coded in the trait implementation
@@ -54,7 +54,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandling {
   }
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * Provides the library some information about how the actual implementation of [[ErrorHandler]] is structured.
    * This function provides the information on the structure of single error column
    *
    * @return -  the DataType of the column returned from `createErrorAsColumn` function
@@ -62,7 +62,7 @@ object ErrorHandlingIgnoringErrors extends ErrorHandling {
   override def errorColumnType: DataType = NullType
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * Provides the library some information about how the actual implementation of [[ErrorHandler]] is structured.
    * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
    *
    * @return - the DataType of the column containing the error info that is attached to the [[org.apache.spark.sql.DataFrame DataFrame]].

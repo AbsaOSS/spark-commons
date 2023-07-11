@@ -19,12 +19,12 @@ package za.co.absa.spark.commons.errorhandling.implementations
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.{coalesce, lit}
 import org.apache.spark.sql.types.{BooleanType, DataType}
-import za.co.absa.spark.commons.errorhandling.{ErrorHandling, ErrorMessageSubmit}
+import za.co.absa.spark.commons.errorhandling.{ErrorHandler, ErrorMessageSubmit}
 
 /**
  * Class implements the functionality of filtering rows that have some error (any of the error columns is not NULL).
  */
-object ErrorHandlingFilterRowsWithErrors extends ErrorHandling {
+object ErrorHandlingFilterRowsWithErrors extends ErrorHandler {
 
   /**
    * Creates a column with the error description, in this particular case actually only signals with a boolean flag there was an error in the row.
@@ -47,15 +47,17 @@ object ErrorHandlingFilterRowsWithErrors extends ErrorHandling {
   }
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * Provides the library some information about how the actual implementation of [[ErrorHandler]] is structured.
    * This function provides the information on the structure of single error column
+ *
    * @return - `BooleanType`, as all what is needed is a true flag if error was present
    */
   val errorColumnType: DataType = BooleanType
 
   /**
-   * Provides the library some information about how the actual implementation of [[ErrorHandling]] is structured.
+   * Provides the library some information about how the actual implementation of [[ErrorHandler]] is structured.
    * This function describes what is the type of the column attached (if it didn't exists before) to the [[org.apache.spark.sql.DataFrame DataFrame]]
+ *
    * @return  - `None` since no error-related column is added
    */
   val dataFrameColumnType: Option[DataType] = None
