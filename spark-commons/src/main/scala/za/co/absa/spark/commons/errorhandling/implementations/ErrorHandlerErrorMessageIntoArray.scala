@@ -33,7 +33,7 @@ import za.co.absa.spark.commons.implicits.DataFrameImplicits.DataFrameEnhancemen
  *
  * @param errorColumnName - the name of the array column aggregating all the errors
  */
-case class ErrorMessageArray(errorColumnName: String = ErrorMessageArray.defaultErrorColumnName)
+case class ErrorHandlerErrorMessageIntoArray(errorColumnName: String = ErrorMessageArray.defaultErrorColumnName)
   extends ErrorHandler
   with TransformIntoErrorMessage
   with TransformAdapter {
