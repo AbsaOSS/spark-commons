@@ -93,7 +93,7 @@ object DataFrameErrorHandlerImplicit {
     }
 
     /**
-     * Same as the other [[ErrorHandler.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorHandler\.ErrorMessageSubmit)* createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)]], only providing the error specification
+     * Same as the other [[ErrorHandler!.createErrorAsColumn(errorMessageSubmit:za\.co\.absa\.spark\.commons\.errorhandler\.ErrorMessageSubmit)* createErrorAsColumn(errorMessageSubmit: ErrorMessageSubmit)]], only providing the error specification
      * in decomposed state, not in the [[ErrorMessageSubmit]] trait form.
      *
      * @param errType          - word description of the type of the error
