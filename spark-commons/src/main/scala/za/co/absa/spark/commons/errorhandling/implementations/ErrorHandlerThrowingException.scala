@@ -33,7 +33,7 @@ object ErrorHandlerThrowingException extends ErrorHandling with TransformIntoErr
   override protected def doApplyErrorColumnsToDataFrame(dataFrame: DataFrame, errCols: Column*): DataFrame = {
     import za.co.absa.spark.commons.implicits.StructTypeImplicits.StructTypeEnhancements
     val errorColumn= coalesce(errCols: _*)
-    val errColName = dataFrame.schema.getClosestUniqueName("_1")
+    val errColName = dataFrame.schema.getClosestUniqueName("_temporary_err_col")
     dataFrame.withColumn(errColName, when(errorColumn.isNull, null_col).otherwise(throwError(
       //the values have to be sent decomposed, sending the whole struct field fails the udf function
       errorColumn.getField(errType),
