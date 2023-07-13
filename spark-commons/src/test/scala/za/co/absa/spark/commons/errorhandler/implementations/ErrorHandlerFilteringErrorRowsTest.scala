@@ -26,7 +26,7 @@ class ErrorHandlerFilteringErrorRowsTest extends AnyFunSuite with SparkTestBase 
   import spark.implicits._
   import DataFrameErrorHandlerImplicit._
 
-  implicit private val errorHandling: ErrorHandler = ErrorHandlerFilteringErrorRows
+  implicit private val errorHandler: ErrorHandler = ErrorHandlerFilteringErrorRows
 
   private val col1Name = "Col1"
   private val col2Name = "Col2"
