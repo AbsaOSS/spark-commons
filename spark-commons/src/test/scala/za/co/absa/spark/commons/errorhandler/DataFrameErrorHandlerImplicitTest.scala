@@ -29,7 +29,7 @@ class DataFrameErrorHandlerImplicitTest extends AnyFunSuite with SparkTestBase {
   import DataFrameErrorHandlerImplicit._
   import spark.implicits._
 
-  implicit private val errorHandling: ErrorHandler = ErrorHandlerFilteringErrorRows
+  implicit private val errorHander: ErrorHandler = ErrorHandlerFilteringErrorRows
 
   private val col1Name = "id"
   private val col2Name = "name"
