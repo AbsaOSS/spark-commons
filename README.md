@@ -104,7 +104,7 @@ _Json Utils_ provides methods for working with Json, both on input and output.
 
 _ColumnImplicits_ provide implicit methods for transforming Spark Columns
 
-1. Transforms the column into a booleaan column, checking if values are negative or positive infinity
+1. Transforms the column into a boolean column, checking if values are negative or positive infinity
 
     ```scala
       column.isInfinite()
@@ -424,10 +424,18 @@ path even of nested fields. It also evaluates arrays and maps where the array in
        def nul_coll(dataType: DataType): Column
    ```
    
-## Error Handling
+## Error Handler
 
-A `trait` and a set of supporting classes and other traits to enable errrors channeling between libraries and 
-application during Spark data processing. 
+A `trait` and a set of supporting classes and other traits to enable errors channeling between libraries and 
+application during Spark data processing.
+
+1. It has an [implicit dataFrame](https://github.com/AbsaOSS/spark-commons/blob/113-Rename-ErrorHandling-to-ErrorHandler/spark-commons/src/main/scala/za/co/absa/spark/commons/errorhandler/DataFrameErrorHandlerImplicit.scala) for easier usage of the methods provided by the error handler trait.
+
+2. It provides four basic implementations
+   * [ErrorHandlerErrorMessageIntoArray](https://github.com/AbsaOSS/spark-commons/blob/113-Rename-ErrorHandling-to-ErrorHandler/spark-commons/src/main/scala/za/co/absa/spark/commons/errorhandler/implementations/ErrorHandlerErrorMessageIntoArray.scala) - An implementation of error handler trait that collects errors into columns of struct based on [za.co.absa.spark.commons.errorhandler.ErrorMessage ErrorMessage] case class.
+   * [ErrorHandlerFilteringErrorRows](https://github.com/AbsaOSS/spark-commons/blob/113-Rename-ErrorHandling-to-ErrorHandler/spark-commons/src/main/scala/za/co/absa/spark/commons/errorhandler/implementations/ErrorHandlerFilteringErrorRows.scala) - An implementation of error handler that implements the functionality of filtering rows that have some error (any of the error columns is not NULL).
+   * [ErrorHandlerIgnoringErrors](https://github.com/AbsaOSS/spark-commons/blob/113-Rename-ErrorHandling-to-ErrorHandler/spark-commons/src/main/scala/za/co/absa/spark/commons/errorhandler/implementations/ErrorHandlerIgnoringErrors.scala) -  An implementation of error handler trait that ignores the errors detected during the dataFrame error aggregation
+   * [ErrorHandlerThrowingException](https://github.com/AbsaOSS/spark-commons/blob/113-Rename-ErrorHandling-to-ErrorHandler/spark-commons/src/main/scala/za/co/absa/spark/commons/errorhandler/implementations/ErrorHandlerThrowingException.scala) - An implementation of error handler trait that throws an exception on error detected.
 
 ## Spark Commons Test
 
