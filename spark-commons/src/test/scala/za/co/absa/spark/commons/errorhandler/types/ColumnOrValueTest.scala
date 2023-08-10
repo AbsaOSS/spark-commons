@@ -31,7 +31,7 @@ class ColumnOrValueTest extends AnyFunSuite {
   }
 
   test("Creation of column based on its definition") {
-    val myColumn = current_date
+    val myColumn = current_date()
     val expected = ColumnOrValueForm(myColumn, Set(), None)
     val result = ColumnOrValue(myColumn)
     expected assertTo result

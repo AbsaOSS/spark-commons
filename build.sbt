@@ -17,15 +17,16 @@ ThisBuild / organization := "za.co.absa"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.12"
-lazy val spark2   = "2.4.7"
-lazy val spark32   = "3.2.1"
-lazy val spark33   = "3.3.1"
+lazy val scala213 = "2.13.11"
+lazy val spark2   = "2.4.8"
+lazy val spark32   = "3.2.4"
+lazy val spark33   = "3.3.2"
 
 import Dependencies._
 import SparkVersionAxis._
 
-ThisBuild / scalaVersion := scala211
-ThisBuild / crossScalaVersions := Seq(scala211, scala212)
+ThisBuild / scalaVersion := scala213
+ThisBuild / crossScalaVersions := Seq(scala211, scala212, scala213)
 
 ThisBuild / versionScheme := Some("early-semver")
 
@@ -55,15 +56,15 @@ lazy val parent = (project in file("."))
 lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
-  .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212))
-  .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212))
+  .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
+  .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
   .dependsOn(sparkCommonsTest % "test")
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
     commonSettings ++ Seq(
     name := "spark-commons-test",
-    libraryDependencies ++= sparkDependencies(spark2)
+    libraryDependencies ++= sparkDependencies(if (scalaVersion.value == scala211) spark2 else spark32)
     ): _*
   )
-  .jvmPlatform(scalaVersions = Seq(scala211, scala212))
+  .jvmPlatform(scalaVersions = Seq(scala211, scala212, scala213))

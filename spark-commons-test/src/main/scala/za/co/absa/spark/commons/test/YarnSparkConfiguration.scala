@@ -23,7 +23,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import za.co.absa.spark.commons.test.YarnSparkConfiguration._
 
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+//import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+import JDKCollectionConvertersCompat.Converters._
+
 
 class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends SparkTestConfig {
 
@@ -88,7 +90,7 @@ object YarnSparkConfiguration {
    */
   def getDepsFromClassPath(inclPattern: String): Seq[String] = {
     val cl = this.getClass.getClassLoader
-    cl.asInstanceOf[java.net.URLClassLoader].getURLs.filter(c => c.toString.contains(inclPattern)).map(_.toString())
+    cl.asInstanceOf[java.net.URLClassLoader].getURLs.toSeq.filter(c => c.toString.contains(inclPattern)).map(_.toString())
   }
 
   /**
@@ -98,6 +100,7 @@ object YarnSparkConfiguration {
     val targetDir = new File(s"${System.getProperty("user.dir")}/target")
     targetDir
       .listFiles()
+      .toSeq
       .filter(f => f.getName.split("\\.").last.toLowerCase() == "jar" && f.getName.contains("original"))
       .map(_.getAbsolutePath)
   }

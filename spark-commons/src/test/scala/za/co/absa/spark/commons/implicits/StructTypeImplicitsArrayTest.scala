@@ -24,10 +24,10 @@ import za.co.absa.spark.commons.test.SparkTestBase
 class StructTypeImplicitsArrayTest extends AnyFunSuite with SparkTestBase with JsonTestData {
 
   import spark.implicits._
-  val df = spark.read.json(sample.toDS)
+  val df = spark.read.json(sample.toDS())
 
-  val dfA = spark.read.json(sampleA.toDS)
-  val dfE = spark.read.json(sampleE.toDS)
+  val dfA = spark.read.json(sampleA.toDS())
+  val dfE = spark.read.json(sampleE.toDS())
 
   test("Testing getFirstArrayPath") {
     assertResult("f.g")(schema.getFirstArrayPath("f.g.h"))

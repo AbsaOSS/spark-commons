@@ -58,7 +58,7 @@ object JsonUtils {
    */
   def getDataFrameFromJson(json: Seq[String])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    spark.read.json(json.toDS)
+    spark.read.json(json.toDS())
   }
 
   /**
@@ -71,7 +71,7 @@ object JsonUtils {
    */
   def getDataFrameFromJson(json: Seq[String], schema: StructType)(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
-    spark.read.schema(schema).json(json.toDS)
+    spark.read.schema(schema).json(json.toDS())
   }
 
   /**

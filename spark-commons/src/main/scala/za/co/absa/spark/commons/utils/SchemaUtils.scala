@@ -52,7 +52,7 @@ object SchemaUtils {
   def getAllArraySubPaths(path: String, name: String, dt: DataType): Seq[String] = {
     val currPath = appendPath(path, name)
     dt match {
-      case s: StructType => s.fields.flatMap(f => getAllArraySubPaths(currPath, f.name, f.dataType))
+      case s: StructType => s.fields.toSeq.flatMap(f => getAllArraySubPaths(currPath, f.name, f.dataType))
       case _@ArrayType(elType, _) => getAllArraySubPaths(path, name, elType) :+ currPath
       case _ => Seq()
     }

@@ -229,7 +229,7 @@ object ExplodeTools {
     def processStruct(schema: StructType, path: Seq[String], parentCol: Option[Column]): Seq[Column] = {
       val currentField = path.head
       val isLeaf = path.lengthCompare(1) <= 0
-      val newFields = schema.fields.flatMap(field => {
+      val newFields = schema.fields.toSeq.flatMap(field => {
         if (field.name != currentField) {
           Seq(getFullFieldPath(parentCol, field.name).as(field.name))
         } else {
@@ -286,7 +286,7 @@ object ExplodeTools {
         }
       )
       val newFields2 = if (isColumnToFound) newFields else newFields :+ col(columnFrom).as(columnTo)
-      inputDf.select(newFields2: _*)
+      inputDf.select(newFields2.toSeq: _*)
     } else {
       putFieldIntoNestedStruct(inputDf, columnFrom, SchemaUtils.splitPath(columnTo), positionColumn)
     }
@@ -301,7 +301,7 @@ object ExplodeTools {
       val isLeaf = path.lengthCompare(1) <= 0
       var isFound = false
 
-      val newFields = schema.fields.flatMap(field => {
+      val newFields = schema.fields.toSeq.flatMap(field => {
         if (field.name == columnFrom) {
           // This removes the original column name (if any) and the transient column
           Nil

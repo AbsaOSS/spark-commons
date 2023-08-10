@@ -243,8 +243,8 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
   }
 
   test("order schemas for equal schemas") {
-    val dfA = spark.read.json(Seq(jsonA).toDS)
-    val dfC = spark.read.json(Seq(jsonC).toDS).select("legs", "id", "key")
+    val dfA = spark.read.json(Seq(jsonA).toDS())
+    val dfC = spark.read.json(Seq(jsonC).toDS()).select("legs", "id", "key")
 
     val dfA2Aligned = dfC.alignSchema(dfA.schema)
 
@@ -253,8 +253,8 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
   }
 
   test("throw an error for DataFrames with different schemas") {
-    val dfA = spark.read.json(Seq(jsonA).toDS)
-    val dfB = spark.read.json(Seq(jsonB).toDS)
+    val dfA = spark.read.json(Seq(jsonA).toDS())
+    val dfB = spark.read.json(Seq(jsonB).toDS())
 
     assertThrows[AnalysisException]{
       dfA.alignSchema(dfB.schema)
@@ -262,7 +262,7 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
   }
 
   test("cast NullTypes to corresponding types by enforceTypeOnNullTypeFields") {
-    val dfWithComplexTypes = spark.read.json(Seq(jsonF).toDS)
+    val dfWithComplexTypes = spark.read.json(Seq(jsonF).toDS())
       .withColumn("nullShouldBeString", lit(null))
       .withColumn("nullShouldBeInteger", lit(null))
       .withColumn("nullShouldBeArrayOfIntegers", lit(null))
@@ -454,12 +454,12 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
 
   test("Check that cacheIfNotCachedYet caches the data") {
     //Verify  check test procedure
-    val dfA = spark.read.json(Seq(jsonA).toDS)
+    val dfA = spark.read.json(Seq(jsonA).toDS())
     assert(!isCached(dfA))
     dfA.cache()
     assert(isCached(dfA))
     //Do the test
-    val dfB = spark.read.json(Seq(jsonB).toDS)
+    val dfB = spark.read.json(Seq(jsonB).toDS())
     assert(!isCached(dfB))
     dfB.cacheIfNotCachedYet()
     assert(isCached(dfB))
