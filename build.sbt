@@ -25,7 +25,7 @@ lazy val spark33   = "3.3.2"
 import Dependencies._
 import SparkVersionAxis._
 
-ThisBuild / scalaVersion := scala212
+ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212, scala213)
 
 ThisBuild / versionScheme := Some("early-semver")
@@ -63,8 +63,16 @@ lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
     commonSettings ++ Seq(
-    name := "spark-commons-test",
-    libraryDependencies ++= sparkDependencies(if (scalaVersion.value == scala211) spark2 else spark32)
+      name := "spark-commons-test",
+      libraryDependencies ++= sparkDependencies(if (scalaVersion.value == scala211) spark2 else spark32),
+      Compile / unmanagedSourceDirectories += {
+        val sourceDir = (Compile / sourceDirectory).value
+        if (scalaVersion.value.startsWith("2.13")) {
+          sourceDir / "scala_2.13+"
+        } else {
+          sourceDir / "scala_2.13-"
+        }
+      }
     ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212, scala213))

@@ -16,24 +16,10 @@
 
 package za.co.absa.spark.commons.test
 
-// Solution based on conversation in scala-collection-compat
-// https://github.com/scala/scala-collection-compat/issues/208
-object JDKCollectionConvertersCompat {
-  private object ScopePre213 {
-    object jdk {
-      type CollectionConverters = Int
-    }
-  }
-  import ScopePre213._
+import scala.jdk.CollectionConverters.IterableHasAsScala
 
-  private object ScopeFor213 {
-    import scala.collection.{JavaConverters => CollectionConverters}
-    object Inner {
-      import scala._
-      import jdk.CollectionConverters
-      val Converters = CollectionConverters
-    }
+trait JavaConvertersWrapper {
+  def asScala[T](item: java.lang.Iterable[T]): Iterable[T] = {
+    item.asScala
   }
-
-  val Converters = ScopeFor213.Inner.Converters
 }
