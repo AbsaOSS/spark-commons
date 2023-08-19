@@ -34,8 +34,8 @@ object Dependencies {
   def sparkCommonsDependencies(sparkVersion: String): Seq[ModuleID] = {
     Seq(
       "za.co.absa.commons"  %% "commons"     % "1.0.0",
-      "za.co.absa"          %% "spark-hofs"  % "0.4.0",
-      "za.co.absa"          %% "spark-hats"  % "0.2.2"
+      "za.co.absa"          %% "spark-hofs"  % "0.5.0",
+      "za.co.absa"          %% "spark-hats"  % "0.3.0"
     ) ++
       sparkDependencies(sparkVersion)
   }

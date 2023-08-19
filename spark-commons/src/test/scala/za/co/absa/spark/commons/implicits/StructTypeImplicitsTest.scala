@@ -158,53 +158,53 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTe
   import spark.implicits._
 
   test("be true for E in D but not vice versa") {
-    val schemaD = spark.read.json(Seq(jsonD).toDS).schema
-    val schemaE = spark.read.json(Seq(jsonE).toDS).schema
+    val schemaD = spark.read.json(Seq(jsonD).toDS()).schema
+    val schemaE = spark.read.json(Seq(jsonE).toDS()).schema
 
     assert(schemaD.isSubset(schemaE))
     assert(!schemaE.isSubset(schemaD))
   }
 
   test("be false for A and B in both directions"){
-    val schemaA = spark.read.json(Seq(jsonA).toDS).schema
-    val schemaB = spark.read.json(Seq(jsonA).toDS).schema
+    val schemaA = spark.read.json(Seq(jsonA).toDS()).schema
+    val schemaB = spark.read.json(Seq(jsonA).toDS()).schema
 
     assert(schemaA.isSubset(schemaB))
     assert(schemaB.isSubset(schemaA))
   }
 
   test("say true for the same schemas") {
-    val dfA1 = spark.read.json(Seq(jsonA).toDS)
-    val dfA2 = spark.read.json(Seq(jsonA).toDS)
+    val dfA1 = spark.read.json(Seq(jsonA).toDS())
+    val dfA2 = spark.read.json(Seq(jsonA).toDS())
 
     assert(dfA1.schema.isEquivalent(dfA2.schema))
   }
 
   test("say false when first utils has an extra field") {
-    val dfA = spark.read.json(Seq(jsonA).toDS)
-    val dfB = spark.read.json(Seq(jsonB).toDS)
+    val dfA = spark.read.json(Seq(jsonA).toDS())
+    val dfB = spark.read.json(Seq(jsonB).toDS())
 
     assert(!dfA.schema.isEquivalent(dfB.schema))
   }
 
   test("say false when second utils has an extra field") {
-    val dfA = spark.read.json(Seq(jsonA).toDS)
-    val dfB = spark.read.json(Seq(jsonB).toDS)
+    val dfA = spark.read.json(Seq(jsonA).toDS())
+    val dfB = spark.read.json(Seq(jsonB).toDS())
 
     assert(!dfB.schema.isEquivalent(dfA.schema))
   }
 
   test("produce a list of differences with path for schemas with different columns") {
-    val schemaA = spark.read.json(Seq(jsonA).toDS).schema
-    val schemaB = spark.read.json(Seq(jsonB).toDS).schema
+    val schemaA = spark.read.json(Seq(jsonA).toDS()).schema
+    val schemaB = spark.read.json(Seq(jsonB).toDS()).schema
 
     assertResult(schemaA.diffSchema(schemaB))(List("key cannot be found in both schemas"))
     assertResult(schemaB.diffSchema(schemaA))(List("legs.conditions.price cannot be found in both schemas"))
   }
 
   test("produce a list of differences with path for schemas with different column types") {
-    val schemaC = spark.read.json(Seq(jsonC).toDS).schema
-    val schemaD = spark.read.json(Seq(jsonD).toDS).schema
+    val schemaC = spark.read.json(Seq(jsonC).toDS()).schema
+    val schemaD = spark.read.json(Seq(jsonD).toDS()).schema
 
     val result = List(
       "key.alfa data type doesn't match (string) vs (long)",
@@ -215,8 +215,8 @@ class StructTypeImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTe
   }
 
   test("produce an empty list for identical schemas") {
-    val schemaA = spark.read.json(Seq(jsonA).toDS).schema
-    val schemaB = spark.read.json(Seq(jsonA).toDS).schema
+    val schemaA = spark.read.json(Seq(jsonA).toDS()).schema
+    val schemaB = spark.read.json(Seq(jsonA).toDS()).schema
 
     assert(schemaA.diffSchema(schemaB).isEmpty)
     assert(schemaB.diffSchema(schemaA).isEmpty)

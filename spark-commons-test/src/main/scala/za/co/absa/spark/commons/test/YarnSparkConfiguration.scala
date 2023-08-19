@@ -21,19 +21,16 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
-import za.co.absa.spark.commons.test.YarnSparkConfiguration._
 
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
 class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends SparkTestConfig {
-
   override def master: String = "yarn"
 
   override def appName: String = super.appName + " - Yarn"
 
   override protected def builder: SparkSession.Builder = {
     super.builder
-      .config(new SparkConf().setAll(getHadoopConfigurationForSpark(confDir)))
+      .config(new SparkConf().setAll(YarnSparkConfiguration.getHadoopConfigurationForSpark(confDir)))
       .config("spark.yarn.jars", dependencies)
       .config("spark.deploy.mode", "client")
   }
@@ -41,17 +38,17 @@ class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends Spark
   protected def dependencies: String = {
     //get a list of all dist jars
     val distJars = FileSystem
-      .get(getHadoopConfiguration(confDir))
+      .get(YarnSparkConfiguration.getHadoopConfiguration(confDir))
       .listStatus(new Path(distJarsDir))
       .map(_.getPath)
-    val localJars = getDepsFromClassPath("absa")
-    val currentJars = getCurrentProjectJars
+    val localJars = YarnSparkConfiguration.getDepsFromClassPath("absa")
+    val currentJars = YarnSparkConfiguration.getCurrentProjectJars
     (distJars ++ localJars ++currentJars).mkString(",")
   }
 
 }
 
-object YarnSparkConfiguration {
+object YarnSparkConfiguration extends JavaConvertersWrapper {
 
   /**
    * Gets a Hadoop configuration object from the specified hadoopConfDir parameter
@@ -73,7 +70,7 @@ object YarnSparkConfiguration {
    * @param hadoopConf Hadoop Configuration object to be converted into Spark configs
    */
   def hadoopConfToSparkMap(hadoopConf: Configuration): Map[String, String] = {
-    hadoopConf.asScala.map(entry => (s"spark.hadoop.${entry.getKey}", entry.getValue)).toMap
+    asScala(hadoopConf).map(entry => (s"spark.hadoop.${entry.getKey}", entry.getValue)).toMap
   }
 
   /**
@@ -88,7 +85,7 @@ object YarnSparkConfiguration {
    */
   def getDepsFromClassPath(inclPattern: String): Seq[String] = {
     val cl = this.getClass.getClassLoader
-    cl.asInstanceOf[java.net.URLClassLoader].getURLs.filter(c => c.toString.contains(inclPattern)).map(_.toString())
+    cl.asInstanceOf[java.net.URLClassLoader].getURLs.toSeq.filter(c => c.toString.contains(inclPattern)).map(_.toString())
   }
 
   /**
@@ -98,6 +95,7 @@ object YarnSparkConfiguration {
     val targetDir = new File(s"${System.getProperty("user.dir")}/target")
     targetDir
       .listFiles()
+      .toSeq
       .filter(f => f.getName.split("\\.").last.toLowerCase() == "jar" && f.getName.contains("original"))
       .map(_.getAbsolutePath)
   }
