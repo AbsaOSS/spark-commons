@@ -17,7 +17,7 @@ ThisBuild / organization := "za.co.absa"
 
 lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.18"
-lazy val scala213 = "2.13.11"
+lazy val scala213 = "2.13.13"
 lazy val spark2   = "2.4.8"
 lazy val spark32   = "3.2.4"
 lazy val spark33   = "3.3.2"
