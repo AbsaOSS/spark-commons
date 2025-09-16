@@ -1,10 +1,10 @@
 ---
-title: Release vX.Y.0
+title: Create a release of vX.Y.0
 name: Release
-about: Release of the library
-labels: 'priority: high'
-
+about: Create a release and release notes
+labels: 'documentation,infrastructure,no RN'
+type: 'Task'
 ---
 
 ## Background
-Release vX.Y.0 of the library.
+Version vX.Y.0 can be released, including its release notes
