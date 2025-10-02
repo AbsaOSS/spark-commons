@@ -66,7 +66,7 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
     commonSettings ++ Seq(
       name := "spark-commons-test",
-      libraryDependencies ++= sparkDependencies(if (scalaVersion.value == scala211) spark2 else spark32),
+      libraryDependencies ++= sparkDependencies(if (scalaVersion.value == scala211) spark2 else spark35),
       Compile / unmanagedSourceDirectories += {
         val sourceDir = (Compile / sourceDirectory).value
         if (scalaVersion.value.startsWith("2.13")) {
