@@ -21,6 +21,7 @@ lazy val scala213 = "2.13.13"
 lazy val spark2   = "2.4.8"
 lazy val spark32   = "3.2.4"
 lazy val spark33   = "3.3.2"
+lazy val spark35   = "3.5.5"
 
 import Dependencies._
 import SparkVersionAxis._
@@ -58,6 +59,7 @@ lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
   .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
+  .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212, scala213))
   .dependsOn(sparkCommonsTest % "test")
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
