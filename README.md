@@ -4,7 +4,7 @@
 [![Build](https://github.com/AbsaOSS/spark-commons/actions/workflows/build.yml/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions/workflows/build.yml)
 [![Release](https://github.com/AbsaOSS/spark-commons/actions/workflows/release.yml/badge.svg)](https://github.com/AbsaOSS/spark-commons/actions/workflows/release.yml)
 
-`spark-commons` is a library offering commonly needed routines, classes and functionality. It's build for Apache Spark of versions 2.4, 3.2.x, 3.3.x, 3.4.x and 3.5.x.
+`spark-commons` is a library offering commonly needed routines, classes and functionality. It's build for Apache Spark of versions 2.4.x, 3.2.x, 3.3.x, 3.4.x and 3.5.x.
 * spark-commons-spark2.4
 * spark-commons-spark3.2
 * spark-commons-spark3.3
