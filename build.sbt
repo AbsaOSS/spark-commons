@@ -19,9 +19,9 @@ lazy val scala211 = "2.11.12"
 lazy val scala212 = "2.12.18"
 lazy val scala213 = "2.13.13"
 lazy val spark2   = "2.4.8"
-lazy val spark32   = "3.2.4"
-lazy val spark33   = "3.3.2"
-lazy val spark35   = "3.5.5"
+lazy val spark32  = "3.2.4"
+lazy val spark33  = "3.3.2"
+lazy val spark35  = "3.5.5"
 
 import Dependencies._
 import SparkVersionAxis._
@@ -48,25 +48,40 @@ lazy val commonJacocoExcludes: Seq[String] = Seq(
 )
 
 lazy val parent = (project in file("."))
-  .aggregate(sparkCommons.projectRefs ++ sparkCommonsTest.projectRefs: _*)
+  .aggregate(
+    sparkCommonsSpark2.projectRefs ++
+      sparkCommonsSpark3.projectRefs ++
+      sparkCommonsTest.projectRefs: _*
+  )
   .settings(
     name := "spark-commons-parent",
     publish / skip := true
   )
 
-lazy val `sparkCommons` = (projectMatrix in file("spark-commons"))
+lazy val sparkCommonsSpark2 = (projectMatrix in file("scala-spark2.4-jvm"))
   .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
+  .settings(
+    Compile / unmanagedSourceDirectories := Seq((Compile / sourceDirectory).value / "main" / "scala")
+  )
+
+lazy val spark3Versions = Seq(spark32, spark33, spark35)
+lazy val sparkCommonsSpark3 = (projectMatrix in file("scala-spark3-jvm"))
+  .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212, scala213))
-  .dependsOn(sparkCommonsTest % "test")
+  .settings(
+    Compile / unmanagedSourceDirectories := Seq((Compile / sourceDirectory).value / "main" / "scala")
+  )
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
     commonSettings ++ Seq(
       name := "spark-commons-test",
-      libraryDependencies ++= sparkDependencies(if (scalaVersion.value == scala211) spark2 else spark35),
+      libraryDependencies ++= sparkDependencies(
+        if (scalaVersion.value == scala211) spark2 else spark35
+      ),
       Compile / unmanagedSourceDirectories += {
         val sourceDir = (Compile / sourceDirectory).value
         if (scalaVersion.value.startsWith("2.13")) {

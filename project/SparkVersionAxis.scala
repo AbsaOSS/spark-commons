@@ -42,7 +42,9 @@ object SparkVersionAxis {
           scalaVersions = Seq(scalaVersion),
           axisValues = Seq(sparkAxis, VirtualAxis.jvm),
           _.settings(
-            moduleName := camelCaseToLowerDashCase(name.value + sparkAxis.directorySuffix),
+            moduleName := camelCaseToLowerDashCase(
+              name.value.replaceAll("(Spark2|Spark3)$", "") + sparkAxis.directorySuffix
+            ),
             libraryDependencies ++= sparkCommonsDependencies(sparkAxis.sparkVersion),
             jacocoReportSettings := jacocoSettings(sparkVersion, scalaVersion),
             jacocoExcludes := jacocoProjectExcludes(sparkVersion, scalaVersion)
