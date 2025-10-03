@@ -21,6 +21,7 @@ lazy val scala213 = "2.13.13"
 lazy val spark2   = "2.4.8"
 lazy val spark32  = "3.2.4"
 lazy val spark33  = "3.3.2"
+lazy val spark34 =  "3.4.4"
 lazy val spark35  = "3.5.5"
 
 import Dependencies._
@@ -65,11 +66,12 @@ lazy val sparkCommonsSpark2 = (projectMatrix in file("scala-spark2.4-jvm"))
     Compile / unmanagedSourceDirectories := Seq((Compile / sourceDirectory).value / "main" / "scala")
   )
 
-lazy val spark3Versions = Seq(spark32, spark33, spark35)
+lazy val spark3Versions = Seq(spark32, spark33, spark34, spark35)
 lazy val sparkCommonsSpark3 = (projectMatrix in file("scala-spark3-jvm"))
   .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
+  .sparkRow(SparkVersionAxis(spark34), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212, scala213))
   .settings(
     Compile / unmanagedSourceDirectories := Seq((Compile / sourceDirectory).value / "main" / "scala")
