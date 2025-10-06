@@ -30,8 +30,11 @@ import Dependencies._
 case class SparkVersionAxis(sparkVersion: String) extends sbt.VirtualAxis.WeakAxis {
   val sparkVersionMinor: String = sparkVersion.split("\\.", 3).take(2).mkString(".")
 
-  override val directorySuffix = if (sparkVersion.startsWith("2")) s"-spark${sparkVersionMinor}" else "-spark3"
+  // we have separate directory for Spark 2.4 (potentially other 2.x in the future)
+  // and a common one for all Spark 3.x versions
+  override val directorySuffix: String = if (sparkVersion.startsWith("2")) s"-spark${sparkVersionMinor}" else "-spark3"
 
+  // must be unique for all Spark 3.x versions in the matrix
   override val idSuffix: String =
     if (sparkVersion.startsWith("2")) directorySuffix.replaceAll("""\W+""", "_")
     else s"-spark${sparkVersion.replaceAll("""\W+""", "_")}"
@@ -52,6 +55,7 @@ object SparkVersionAxis {
         scalaVersions = scalaVersions,
         axisValues = Seq(sparkAxis, VirtualAxis.jvm),
         _.settings(
+          // must be defined to avoid conflicting target paths for individual spark versions' builds
           target := (ThisBuild / baseDirectory).value / "target" / s"${camelCaseToLowerDashCase(name.value)}${sparkAxis.sparkVersion}-jvm-${scalaVersion.value.replaceAll("""\W+""", "_")}",
           moduleName := {
             val baseName = camelCaseToLowerDashCase(name.value)
