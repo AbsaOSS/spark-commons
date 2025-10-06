@@ -58,18 +58,13 @@ lazy val parent = (project in file("."))
     publish / skip := true
   )
 
-lazy val sparkCommons = projectMatrix
+lazy val sparkCommons = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
-  .in(file("scala-spark2.4-jvm"))
   .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
-  .in(file("scala-spark3-jvm"))
   .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
-  .in(file("scala-spark3-jvm"))
   .sparkRow(SparkVersionAxis(spark34), scalaVersions = Seq(scala212, scala213))
-  .in(file("scala-spark3-jvm"))
   .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212, scala213))
-  .in(file("scala-spark3-jvm"))
   .dependsOn(sparkCommonsTest % "test")
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))

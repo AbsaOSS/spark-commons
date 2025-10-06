@@ -20,11 +20,23 @@ import Dependencies._
 import JacocoSetup._
 import com.github.sbt.jacoco.JacocoKeys.{jacocoExcludes, jacocoReportSettings}
 
+import sbt._
+import sbt.Keys._
+import sbt.VirtualAxis._
+import sbt.internal.ProjectMatrix
+import sbtprojectmatrix.ProjectMatrixKeys._
+import Dependencies._
+
 case class SparkVersionAxis(sparkVersion: String) extends sbt.VirtualAxis.WeakAxis {
   val sparkVersionMinor: String = sparkVersion.split("\\.", 3).take(2).mkString(".")
-  override val directorySuffix = s"-spark${sparkVersionMinor}"
-  override val idSuffix: String = directorySuffix.replaceAll("""\W+""", "_")
+
+  override val directorySuffix = if (sparkVersion.startsWith("2")) s"-spark${sparkVersionMinor}" else "-spark3"
+
+  override val idSuffix: String =
+    if (sparkVersion.startsWith("2")) directorySuffix.replaceAll("""\W+""", "_")
+    else s"-spark${sparkVersion.replaceAll("""\W+""", "_")}"
 }
+
 
 object SparkVersionAxis {
   private def camelCaseToLowerDashCase(origName: String): String = {
@@ -33,24 +45,25 @@ object SparkVersionAxis {
       .toLowerCase()
   }
 
-  implicit class ProjectExtension(val projectMatrix: ProjectMatrix) extends AnyVal {
+  implicit class ProjectExtension(val p: ProjectMatrix) extends AnyVal {
 
     def sparkRow(sparkAxis: SparkVersionAxis, scalaVersions: Seq[String], settings: Def.SettingsDefinition*): ProjectMatrix = {
-      val sparkVersion = sparkAxis.sparkVersion
-      scalaVersions.foldLeft(projectMatrix)((currentProjectMatrix, scalaVersion) =>
-        currentProjectMatrix.customRow(
-          scalaVersions = Seq(scalaVersion),
-          axisValues = Seq(sparkAxis, VirtualAxis.jvm),
-          _.settings(
-            moduleName := camelCaseToLowerDashCase(
-              name.value.replaceAll("(Spark2|Spark3)$", "") + sparkAxis.directorySuffix
-            ),
-            libraryDependencies ++= sparkCommonsDependencies(sparkAxis.sparkVersion),
-            jacocoReportSettings := jacocoSettings(sparkVersion, scalaVersion),
-            jacocoExcludes := jacocoProjectExcludes(sparkVersion, scalaVersion)
-          ).settings(settings: _*)
-        )
+      p.customRow(
+        scalaVersions = scalaVersions,
+        axisValues = Seq(sparkAxis, VirtualAxis.jvm),
+        _.settings(
+          target := (ThisBuild / baseDirectory).value / "target" / s"${camelCaseToLowerDashCase(name.value)}${sparkAxis.sparkVersion}-jvm-${scalaVersion.value.replaceAll("""\W+""", "_")}",
+          moduleName := {
+            val baseName = camelCaseToLowerDashCase(name.value)
+            if (sparkAxis.sparkVersion.startsWith("2"))
+              baseName + sparkAxis.directorySuffix
+            else
+              baseName + s"-spark${sparkAxis.sparkVersionMinor}"
+          },
+          libraryDependencies ++= sparkCommonsDependencies(sparkAxis.sparkVersion)
+        ).settings(settings: _*)
       )
     }
+
   }
 }
