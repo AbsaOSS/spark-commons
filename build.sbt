@@ -50,8 +50,7 @@ lazy val commonJacocoExcludes: Seq[String] = Seq(
 
 lazy val parent = (project in file("."))
   .aggregate(
-    sparkCommonsSpark2.projectRefs ++
-      sparkCommonsSpark3.projectRefs ++
+    sparkCommons.projectRefs ++
       sparkCommonsTest.projectRefs: _*
   )
   .settings(
@@ -59,23 +58,14 @@ lazy val parent = (project in file("."))
     publish / skip := true
   )
 
-lazy val sparkCommonsSpark2 = (projectMatrix in file("scala-spark2.4-jvm"))
+lazy val sparkCommons = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
-  .settings(
-    Compile / unmanagedSourceDirectories := Seq((Compile / sourceDirectory).value / "main" / "scala")
-  )
-
-lazy val spark3Versions = Seq(spark32, spark33, spark34, spark35)
-lazy val sparkCommonsSpark3 = (projectMatrix in file("scala-spark3-jvm"))
-  .settings(commonSettings: _*)
   .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark34), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212, scala213))
-  .settings(
-    Compile / unmanagedSourceDirectories := Seq((Compile / sourceDirectory).value / "main" / "scala")
-  )
+  .dependsOn(sparkCommonsTest % "test")
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
