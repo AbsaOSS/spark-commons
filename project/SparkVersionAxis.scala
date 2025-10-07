@@ -29,14 +29,12 @@ import Dependencies._
 
 case class SparkVersionAxis(sparkVersion: String) extends sbt.VirtualAxis.WeakAxis {
   val sparkVersionMinor: String = sparkVersion.split("\\.", 3).take(2).mkString(".")
+  val sparkVersionMajor: String = sparkVersion.split("\\.", 3).take(1)(0)
 
-  // we have separate directory for Spark 2.4 (potentially other 2.x in the future)
-  // and a common one for all Spark 3.x versions
-  override val directorySuffix: String = if (sparkVersion.startsWith("2")) s"-spark${sparkVersionMinor}" else "-spark3"
+  override val directorySuffix: String = s"-spark${sparkVersionMajor}"
 
   // must be unique for all Spark versions for a given Scala version
-  // since we share common folder for all Spark 3.x versions we cannot use directory suffix here
-  override val idSuffix: String = s"-spark${sparkVersion.replaceAll("""\W+""", "_")}"
+  override val idSuffix: String = s"-spark${sparkVersionMinor.replaceAll("""\W+""", "_")}"
 }
 
 
@@ -56,13 +54,7 @@ object SparkVersionAxis {
         _.settings(
           // must be defined to avoid conflicting target paths for individual spark versions' builds
           target := (ThisBuild / baseDirectory).value / "target" / s"${camelCaseToLowerDashCase(name.value)}${sparkAxis.sparkVersion}-jvm-${scalaVersion.value.replaceAll("""\W+""", "_")}",
-          moduleName := {
-            val baseName = camelCaseToLowerDashCase(name.value)
-            if (sparkAxis.sparkVersion.startsWith("2"))
-              baseName + sparkAxis.directorySuffix
-            else
-              baseName + s"-spark${sparkAxis.sparkVersionMinor}"
-          },
+          moduleName := camelCaseToLowerDashCase(name.value + s"-spark${sparkAxis.sparkVersionMinor}"),
           libraryDependencies ++= sparkCommonsDependencies(sparkAxis.sparkVersion)
         ).settings(settings: _*)
       )
