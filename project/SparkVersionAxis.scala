@@ -34,10 +34,9 @@ case class SparkVersionAxis(sparkVersion: String) extends sbt.VirtualAxis.WeakAx
   // and a common one for all Spark 3.x versions
   override val directorySuffix: String = if (sparkVersion.startsWith("2")) s"-spark${sparkVersionMinor}" else "-spark3"
 
-  // must be unique for all Spark 3.x versions in the matrix
-  override val idSuffix: String =
-    if (sparkVersion.startsWith("2")) directorySuffix.replaceAll("""\W+""", "_")
-    else s"-spark${sparkVersion.replaceAll("""\W+""", "_")}"
+  // must be unique for all Spark versions for a given Scala version
+  // since we share common folder for all Spark 3.x versions we cannot use directory suffix here
+  override val idSuffix: String = s"-spark${sparkVersion.replaceAll("""\W+""", "_")}"
 }
 
 
