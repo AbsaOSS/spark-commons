@@ -26,16 +26,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          persist-credentials: false
+
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@32ffa16635ff8f19cc21ea253a987f0fdf29844c
         with:
           java-version: "adopt@1.8"
+
       - name: Build and run tests
         run: sbt jacoco
+
       - name: Add coverage to PR for scala 2.11 and spark 2.4
         id: jacoco211
-        uses: madrapps/jacoco-report@v1.7.2
+        uses: madrapps/jacoco-report@50d3aff4548aa991e6753342d9ba291084e63848
         with:
           paths: ${{ github.workspace }}/spark-commons/spark2.4-jvm-2.11/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -43,13 +48,15 @@ jobs:
           min-coverage-changed-files: 80.0
           title: JaCoCo code coverage report - scala:2.11 - spark:2.4
           update-comment: true
+
       - name: Get the Coverage info
         run: |
           echo "Total coverage ${{ steps.jacoco211.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco211.outputs.coverage-changed-files }}"
+
       - name: Add coverage to PR for scala 2.12 and spark 3.3
         id: jacoco212
-        uses: madrapps/jacoco-report@v1.7.2
+        uses: madrapps/jacoco-report@50d3aff4548aa991e6753342d9ba291084e63848
         with:
           paths: ${{ github.workspace }}/spark-commons/spark3-jvm-2.12/jacoco/report/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -57,19 +64,22 @@ jobs:
           min-coverage-changed-files: 80.0
           title: JaCoCo code coverage report - scala:2.12 - spark:3.3
           update-comment: true
+
       - name: Get the Coverage info
         run: |
           echo "Total coverage ${{ steps.jacoco212.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco212.outputs.coverage-changed-files }}"
+
       - name: Fail PR if changed files coverage is less than 80%
         if: ${{ steps.jacoco211.outputs.coverage-changed-files < 80.0 }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             core.setFailed('Changed files coverage is less than 80%!')
+
       - name: Fail PR if changed files coverage is less than 80%
         if: ${{ steps.jacoco212.outputs.coverage-changed-files < 80.0 }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             core.setFailed('Changed files coverage is less than 80%!')
