@@ -9,7 +9,7 @@ jobs:
     name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e
+      - uses: actions/add-to-project@6ec206b08d8200f002c8231c7f8958ab95128f35
         with:
           project-url: https://github.com/orgs/AbsaOSS/projects/7
           github-token: ${{ secrets.PAT_REPO_PROJECT_DISCUSS }}
