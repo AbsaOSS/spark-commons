@@ -27,7 +27,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: z0al/dependent-issues@950226e7ca8fc43dc209a7febf67c655af3bdb43
+      - uses: z0al/dependent-issues@75d554cd9494b6e1766bc9d08a81c26444ad5c5a
         env:
           # (Required) The token to use to make API calls to GitHub.
           GITHUB_TOKEN: ${{ secrets.PAT_REPO_PROJECT_DISCUSS }}
