@@ -14,19 +14,3 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-
-  # Note: sbt is not supported by Dependabot yet
-  # - package-ecosystem: "sbt"
-  #   directory: "/"
-  #   target-branch: "master"
-  #   schedule:
-  #     interval: "weekly"
-  #     day: "sunday"
-  #   labels:
-  #     - "auto update"
-  #     - "dependencies"
-  #     - "no RN"
-  #   open-pull-requests-limit: 3
-  #   commit-message:
-  #     prefix: "chore"
-  #     include: "scope"
