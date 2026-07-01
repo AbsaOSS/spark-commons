@@ -15,28 +15,53 @@
 
 ThisBuild / organization := "za.co.absa"
 
-lazy val scala211 = "2.11.12"
-lazy val scala212 = "2.12.18"
-lazy val scala213 = "2.13.13"
-lazy val spark2   = "2.4.8"
-lazy val spark32  = "3.2.4"
-lazy val spark33  = "3.3.2"
+lazy val scala212 = "2.12.21"
+lazy val scala213 = "2.13.18"
 lazy val spark34 =  "3.4.4"
 lazy val spark35  = "3.5.5"
+lazy val spark40  = "4.0.2"
+lazy val spark41  = "4.1.2"
 
 import Dependencies._
 import SparkVersionAxis._
 
-ThisBuild / scalaVersion := scala211
-ThisBuild / crossScalaVersions := Seq(scala211, scala212, scala213)
+ThisBuild / scalaVersion := scala213
+ThisBuild / crossScalaVersions := Seq(scala212, scala213)
 
 ThisBuild / versionScheme := Some("early-semver")
 
 lazy val commonSettings = Seq(
   libraryDependencies ++= commonDependencies,
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
-  Test / parallelExecution := false
+  javacOptions ++= Seq("-source", "17", "-target", "17", "-Xlint"),
+  Test / parallelExecution := false,
+  Test / fork := true,
+  Test / javaOptions ++= Seq(
+    "-XX:+IgnoreUnrecognizedVMOptions",
+    "-Xmx2048m",
+    "--add-modules=jdk.incubator.vector",
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.io=ALL-UNNAMED",
+    "--add-opens=java.base/java.net=ALL-UNNAMED",
+    "--add-opens=java.base/java.nio=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+    "--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+    "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.cs=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.action=ALL-UNNAMED",
+    "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED",
+    "--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED",
+    "-Djdk.reflect.useDirectMethodHandle=false",
+    "-Dio.netty.tryReflectionSetAccessible=true",
+    "-Dio.netty.allocator.type=pooled",
+    "-Dio.netty.handler.ssl.defaultEndpointVerificationAlgorithm=NONE",
+    "--enable-native-access=ALL-UNNAMED"
+  )
 )
 
 /**
@@ -60,11 +85,10 @@ lazy val parent = (project in file("."))
 
 lazy val sparkCommons = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
-  .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
-  .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
-  .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
-  .sparkRow(SparkVersionAxis(spark34), scalaVersions = Seq(scala212, scala213))
-  .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212, scala213))
+  .sparkRow(SparkVersionAxis(spark34), scalaVersions = Seq(scala212))
+  .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212))
+  .sparkRow(SparkVersionAxis(spark40), scalaVersions = Seq(scala213))
+  .sparkRow(SparkVersionAxis(spark41), scalaVersions = Seq(scala213))
   .dependsOn(sparkCommonsTest % "test")
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
@@ -72,7 +96,7 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     commonSettings ++ Seq(
       name := "spark-commons-test",
       libraryDependencies ++= sparkDependencies(
-        if (scalaVersion.value == scala211) spark2 else spark35
+        if (scalaVersion.value == scala212) spark35 else spark41
       ),
       Compile / unmanagedSourceDirectories += {
         val sourceDir = (Compile / sourceDirectory).value
@@ -84,4 +108,4 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
       }
     ): _*
   )
-  .jvmPlatform(scalaVersions = Seq(scala211, scala212, scala213))
+  .jvmPlatform(scalaVersions = Seq(scala212, scala213))

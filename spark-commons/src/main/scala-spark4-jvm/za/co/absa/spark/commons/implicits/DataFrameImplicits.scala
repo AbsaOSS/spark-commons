@@ -207,6 +207,12 @@ object DataFrameImplicits {
         df
       }
     }
+
+    def isCached: Boolean = {
+      val classicDf = df.asInstanceOf[classic.Dataset[Row]]
+      df.sparkSession.sharedState.cacheManager.lookupCachedData(classicDf).isDefined
+    }
+
   }
 
 }

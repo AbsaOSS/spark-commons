@@ -17,7 +17,6 @@
 package za.co.absa.spark.commons.errorhandler
 
 import org.apache.spark.sql.catalyst.expressions.{CaseWhen, Expression}
-import org.apache.spark.sql.classic.ColumnConversions
 import org.apache.spark.sql.functions.{expr, when}
 import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.{Column, DataFrame}
