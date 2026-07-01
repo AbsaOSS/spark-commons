@@ -18,7 +18,7 @@ package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.functions.{col, lit, struct}
 import org.apache.spark.sql.types.{ArrayType, NullType, StructType}
-import org.apache.spark.sql.{Column, DataFrame}
+import org.apache.spark.sql.{Column, DataFrame, Row, classic}
 import za.co.absa.spark.commons.adapters.TransformAdapter
 import za.co.absa.spark.commons.implicits.StructTypeImplicits.DataFrameSelector
 
@@ -200,8 +200,8 @@ object DataFrameImplicits {
      * @since 0.3.0
      */
     def cacheIfNotCachedYet(): DataFrame = {
-      val planToCache = df.queryExecution.analyzed
-      if (df.sparkSession.sharedState.cacheManager.lookupCachedData(planToCache).isEmpty) {
+      val classicDf = df.asInstanceOf[classic.Dataset[Row]]
+      if (classicDf.sparkSession.sharedState.cacheManager.lookupCachedData(classicDf).isEmpty) {
         df.cache()
       } else {
         df

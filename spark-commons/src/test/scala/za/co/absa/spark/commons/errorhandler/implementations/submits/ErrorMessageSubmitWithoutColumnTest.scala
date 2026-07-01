@@ -21,6 +21,7 @@ import org.apache.spark.sql.types.StringType
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandler.types.{AdditionalInfo, ColumnOrValueForm, ErrColsAndValues}
 import za.co.absa.spark.commons.sql.functions.null_col
+import za.co.absa.spark.commons.utils.ColUtils
 
 class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
   test("Apply function properly hands over data without additional info") {
@@ -39,7 +40,7 @@ class ErrorMessageSubmitWithoutColumnTest extends AnyFunSuite {
     expectedErrType assertTo result.errType
     expectedErrCode assertTo result.errCode
     expectedErrMsg assertTo result.errMessage
-    result.errColsAndValues.column.expr
+    ColUtils.col2Expr(result.errColsAndValues.column)
     expectedErrValuesCol assertTo result.errColsAndValues
     expectedAdditionalInfo assertTo result.additionalInfo
 

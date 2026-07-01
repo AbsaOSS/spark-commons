@@ -18,7 +18,7 @@ package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.functions.{array, lit, struct}
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{AnalysisException, DataFrame}
+import org.apache.spark.sql.{AnalysisException, DataFrame, Row, classic}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
 
@@ -112,8 +112,8 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
   }
 
   private def isCached(df: DataFrame): Boolean = {
-    val planToCache = df.queryExecution.analyzed
-    df.sparkSession.sharedState.cacheManager.lookupCachedData(planToCache).isDefined
+    val classicDf = df.asInstanceOf[classic.Dataset[Row]]
+    df.sparkSession.sharedState.cacheManager.lookupCachedData(classicDf).isDefined
   }
 
   test("Like show()") {

@@ -20,26 +20,27 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.lit
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.ColumnImplicits.ColumnEnhancements
+import za.co.absa.spark.commons.utils.ColUtils
 
 class ColumnImplicitsTest extends AnyFunSuite {
 
   private val column: Column = lit("abcdefgh")
 
   test("zeroBasedSubstr with startPos") {
-    assertResult("cdefgh")(column.zeroBasedSubstr(2).expr.eval().toString)
-    assertResult("gh")(column.zeroBasedSubstr(-2).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MaxValue).expr.eval().toString)
-    assertResult("abcdefgh")(column.zeroBasedSubstr(Int.MinValue).expr.eval().toString)
+    assertResult("cdefgh")(ColUtils.col2Expr(column.zeroBasedSubstr(2)).eval().toString)
+    assertResult("gh")(ColUtils.col2Expr(column.zeroBasedSubstr(-2)).eval().toString)
+    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MaxValue)).eval().toString)
+    assertResult("abcdefgh")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MinValue)).eval().toString)
   }
 
   test("zeroBasedSubstr with startPos and len") {
-    assertResult("cde")(column.zeroBasedSubstr(2, 3).expr.eval().toString)
-    assertResult("gh")(column.zeroBasedSubstr(-2, 7).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MaxValue, 1).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MaxValue, -3).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(4, -3).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MinValue,2).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MinValue,-3).expr.eval().toString)
+    assertResult("cde")(ColUtils.col2Expr(column.zeroBasedSubstr(2, 3)).eval().toString)
+    assertResult("gh")(ColUtils.col2Expr(column.zeroBasedSubstr(-2, 7)).eval().toString)
+    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MaxValue, 1)).eval().toString)
+    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MaxValue, -3)).eval().toString)
+    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(4, -3)).eval().toString)
+    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MinValue,2)).eval().toString)
+    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MinValue,-3)).eval().toString)
   }
 
 }
