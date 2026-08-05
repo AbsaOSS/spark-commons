@@ -24,8 +24,8 @@ lazy val spark33  = "3.3.2"
 lazy val spark34 =  "3.4.4"
 lazy val spark35  = "3.5.5"
 
-import Dependencies._
-import SparkVersionAxis._
+import Dependencies.*
+import SparkVersionAxis.*
 
 ThisBuild / scalaVersion := scala211
 ThisBuild / crossScalaVersions := Seq(scala211, scala212, scala213)
@@ -36,16 +36,9 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= commonDependencies,
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
-  Test / parallelExecution := false
-)
-
-/**
- * add "za.co.absa.spark.commons.utils.ExplodeTools" to filter a class
- * or "za.co.absa.spark.commons.utils.JsonUtils*" to filter the class and all related objects
- */
-lazy val commonJacocoExcludes: Seq[String] = Seq(
-  "za.co.absa.spark.commons.adapters.CallUdfAdapter",
-  "za.co.absa.spark.commons.adapters.TransformAdapter"
+  Test / parallelExecution := false,
+  jmfReportFile   := Some(target.value / "jmf-report.json"),
+  jmfReportFormat := "json"
 )
 
 lazy val parent = (project in file("."))
@@ -57,6 +50,7 @@ lazy val parent = (project in file("."))
     name := "spark-commons-parent",
     publish / skip := true
   )
+  .enablePlugins(JacocoFilterPlugin)
 
 lazy val sparkCommons = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
@@ -66,6 +60,7 @@ lazy val sparkCommons = (projectMatrix in file("spark-commons"))
   .sparkRow(SparkVersionAxis(spark34), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark35), scalaVersions = Seq(scala212, scala213))
   .dependsOn(sparkCommonsTest % "test")
+  .enablePlugins(JacocoFilterPlugin)
 
 lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
   .settings(
@@ -85,3 +80,4 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212, scala213))
+  .enablePlugins(JacocoFilterPlugin)

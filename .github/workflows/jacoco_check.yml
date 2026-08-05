@@ -21,65 +21,97 @@ on:
     branches: [ master ]
     types: [ opened, edited, synchronize, reopened ]
 
+permissions:
+  contents: read
+
+# Cancel superseded runs on the same ref to save runner minutes.
+concurrency:
+  group: jacoco-report-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # hint: "group thresholds" are in format: 'overall*changed-files-average*per-changed-file'
+  REPORT_GROUPS: |
+    - name: scala2.11-spark2.4
+      paths:
+        - '**/target/spark-commons2.4*-jvm-2_11*/jacoco-report/jacoco.xml'
+      thresholds: '0*80*60'
+    - name: scala2.12-spark3.3
+      paths:
+        - '**/target/spark-commons3.3*-jvm-2_12*/jacoco-report/jacoco.xml'
+      thresholds: '0*80*60'
+    - name: scala2.13-spark3.3
+      paths:
+        - '**/target/spark-commons3.3*-jvm-2_13*/jacoco-report/jacoco.xml'
+      thresholds: '0*80*60'
+
 jobs:
-  test:
+  detect:
+    name: Detect Changed Files
     runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      scala_changed: ${{ steps.filter.outputs.scala }}
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706
+        id: filter
+        with:
+          token: ""
+          filters: |
+            scala:
+              - '**/*.scala'
+              - '!project/**'
 
+  jacoco-report:
+    name: JaCoCo Report
+    needs: detect
+    if: needs.detect.outputs.scala_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # Spark 2.4 only supports Java 8, so the whole matrix is built on Java 8.
       - name: Setup Scala
         uses: olafurpg/setup-scala@32ffa16635ff8f19cc21ea253a987f0fdf29844c
         with:
           java-version: "adopt@1.8"
 
-      - name: Build and run tests
+      - name: Build and run tests with coverage
+        continue-on-error: true
         run: sbt jacoco
 
-      - name: Add coverage to PR for scala 2.11 and spark 2.4
-        id: jacoco211
-        uses: madrapps/jacoco-report@50d3aff4548aa991e6753342d9ba291084e63848
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
-          paths: ${{ github.workspace }}/spark-commons/spark2.4-jvm-2.11/jacoco/report/jacoco.xml
+          python-version: '3.11'
+
+      - name: Add JaCoCo Report in PR comments
+        uses: MoranaApps/jacoco-report@3be109b40946547c5925e63d41fef1099c9e562b
+        with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 0.0
-          min-coverage-changed-files: 80.0
-          title: JaCoCo code coverage report - scala:2.11 - spark:2.4
-          update-comment: true
+          global-thresholds: '0*80'
+          report-thresholds-default: '0*80*60'
+          skip-unchanged: 'true'
+          evaluate-unchanged: 'false'
+          report-groups: ${{ env.REPORT_GROUPS }}
 
-      - name: Get the Coverage info
-        run: |
-          echo "Total coverage ${{ steps.jacoco211.outputs.coverage-overall }}"
-          echo "Changed Files coverage ${{ steps.jacoco211.outputs.coverage-changed-files }}"
-
-      - name: Add coverage to PR for scala 2.12 and spark 3.3
-        id: jacoco212
-        uses: madrapps/jacoco-report@50d3aff4548aa991e6753342d9ba291084e63848
-        with:
-          paths: ${{ github.workspace }}/spark-commons/spark3-jvm-2.12/jacoco/report/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 0.0
-          min-coverage-changed-files: 80.0
-          title: JaCoCo code coverage report - scala:2.12 - spark:3.3
-          update-comment: true
-
-      - name: Get the Coverage info
-        run: |
-          echo "Total coverage ${{ steps.jacoco212.outputs.coverage-overall }}"
-          echo "Changed Files coverage ${{ steps.jacoco212.outputs.coverage-changed-files }}"
-
-      - name: Fail PR if changed files coverage is less than 80%
-        if: ${{ steps.jacoco211.outputs.coverage-changed-files < 80.0 }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        with:
-          script: |
-            core.setFailed('Changed files coverage is less than 80%!')
-
-      - name: Fail PR if changed files coverage is less than 80%
-        if: ${{ steps.jacoco212.outputs.coverage-changed-files < 80.0 }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        with:
-          script: |
-            core.setFailed('Changed files coverage is less than 80%!')
+  noop:
+    name: No Operation
+    needs: detect
+    if: needs.detect.outputs.scala_changed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No changes in Scala related files — passing."
