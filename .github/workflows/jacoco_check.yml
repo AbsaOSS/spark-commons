@@ -31,6 +31,7 @@ concurrency:
 
 env:
   # hint: "group thresholds" are in format: 'overall*changed-files-average*per-changed-file'
+  # one report group per Spark version
   REPORT_GROUPS: |
     - name: scala2.11-spark2.4
       paths:
@@ -39,10 +40,6 @@ env:
     - name: scala2.12-spark3.3
       paths:
         - '**/target/spark-commons3.3*-jvm-2_12*/jacoco-report/jacoco.xml'
-      thresholds: '0*80*60'
-    - name: scala2.13-spark3.3
-      paths:
-        - '**/target/spark-commons3.3*-jvm-2_13*/jacoco-report/jacoco.xml'
       thresholds: '0*80*60'
 
 jobs:
