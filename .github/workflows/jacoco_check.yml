@@ -36,11 +36,11 @@ env:
     - name: scala2.11-spark2.4
       paths:
         - '**/target/spark-commons2.4*-jvm-2_11*/jacoco-report/jacoco.xml'
-      thresholds: '0*80*60'
+      thresholds: '75*80*60'
     - name: scala2.12-spark3.3
       paths:
         - '**/target/spark-commons3.3*-jvm-2_12*/jacoco-report/jacoco.xml'
-      thresholds: '0*80*60'
+      thresholds: '73*80*60'
 
 jobs:
   detect:
@@ -96,11 +96,12 @@ jobs:
           python-version: '3.14'
 
       - name: Add JaCoCo Report in PR comments
-        uses: MoranaApps/jacoco-report@3be109b40946547c5925e63d41fef1099c9e562b
+        uses: MoranaApps/jacoco-report@562ba603c5b95021dbee26e89ae0f834f2dd8b9e
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          global-thresholds: '0*80'
-          report-thresholds-default: '0*80*60'
+          global-thresholds: '71*80'
+          global-overall-scope: 'groups-only'
+          report-thresholds-default: '33*80*60'
           skip-unchanged: 'true'
           evaluate-unchanged: 'false'
           report-groups: ${{ env.REPORT_GROUPS }}

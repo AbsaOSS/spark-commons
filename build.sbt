@@ -36,7 +36,10 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= commonDependencies,
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
-  Test / parallelExecution := false,
+  Test / parallelExecution := false
+)
+
+lazy val jacocoReportSettings = Seq(
   jmfReportFile   := Some(target.value / "jmf-report.json"),
   jmfReportFormat := "json"
 )
@@ -54,6 +57,7 @@ lazy val parent = (project in file("."))
 
 lazy val sparkCommons = (projectMatrix in file("spark-commons"))
   .settings(commonSettings: _*)
+  .settings(jacocoReportSettings: _*)
   .sparkRow(SparkVersionAxis(spark2), scalaVersions = Seq(scala211, scala212))
   .sparkRow(SparkVersionAxis(spark32), scalaVersions = Seq(scala212, scala213))
   .sparkRow(SparkVersionAxis(spark33), scalaVersions = Seq(scala212, scala213))
@@ -80,4 +84,3 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala211, scala212, scala213))
-  .enablePlugins(JacocoFilterPlugin)
