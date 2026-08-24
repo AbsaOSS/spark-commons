@@ -17,8 +17,6 @@ import sbt._
 import sbt.Keys._
 import sbt.internal.ProjectMatrix
 import Dependencies._
-import JacocoSetup._
-import com.github.sbt.jacoco.JacocoKeys.{jacocoExcludes, jacocoReportSettings}
 
 import sbt._
 import sbt.Keys._
