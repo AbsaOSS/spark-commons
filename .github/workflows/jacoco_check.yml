@@ -39,7 +39,7 @@ env:
       thresholds: '73*80*60'
     - name: scala2.13-spark4.1
       paths:
-        - '**/target/spark-commons4.1*-jvm-2_14*/jacoco-report/jacoco.xml'
+        - '**/target/spark-commons4.1*-jvm-2_13*/jacoco-report/jacoco.xml'
       thresholds: '73*80*60'
 
 jobs:
