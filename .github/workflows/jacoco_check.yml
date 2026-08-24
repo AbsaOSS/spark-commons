@@ -33,19 +33,19 @@ env:
   # hint: "group thresholds" are in format: 'overall*changed-files-average*per-changed-file'
   # one report group per Spark version
   REPORT_GROUPS: |
-    - name: scala2.11-spark2.4
-      paths:
-        - '**/target/spark-commons2.4*-jvm-2_11*/jacoco-report/jacoco.xml'
-      thresholds: '75*80*60'
     - name: scala2.12-spark3.3
       paths:
         - '**/target/spark-commons3.3*-jvm-2_12*/jacoco-report/jacoco.xml'
+      thresholds: '73*80*60'
+    - name: scala2.13-spark4.1
+      paths:
+        - '**/target/spark-commons4.1*-jvm-2_14*/jacoco-report/jacoco.xml'
       thresholds: '73*80*60'
 
 jobs:
   detect:
     name: Detect Changed Files
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 2
     outputs:
       scala_changed: ${{ steps.filter.outputs.scala }}
@@ -68,7 +68,7 @@ jobs:
     name: JaCoCo Report
     needs: detect
     if: needs.detect.outputs.scala_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       issues: write
@@ -80,11 +80,11 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      # Spark 2.4 only supports Java 8, so the whole matrix is built on Java 8.
-      - name: Setup Scala
-        uses: olafurpg/setup-scala@32ffa16635ff8f19cc21ea253a987f0fdf29844c
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          java-version: "adopt@1.8"
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Build and run tests with coverage
         continue-on-error: true
