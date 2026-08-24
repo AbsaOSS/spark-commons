@@ -192,7 +192,10 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
     )
 
     val explodeConditionFilter = explodeContext4.getControlFrameworkFilter
+
     val expectedExplodeFilter = "((((true AND (coalesce(legs_conditions_checks_checkNums_idx, 0) = 0)) AND (coalesce(legs_conditions_checks_idx, 0) = 0)) AND (coalesce(legs_conditions_idx, 0) = 0)) AND (coalesce(legs_idx, 0) = 0))"
+    // Spark 4 has a different expression renderer when .toString is used on expression.
+    val expectedExplodeFilterSpark4 = "and(and(and(and(true, =(coalesce(legs_conditions_checks_checkNums_idx, 0), 0)), =(coalesce(legs_conditions_checks_idx, 0), 0)), =(coalesce(legs_conditions_idx, 0), 0)), =(coalesce(legs_idx, 0), 0))"
 
     val restoredDf = ExplodeTools.revertAllExplosions(explodedDf4, explodeContext4)
 
@@ -213,7 +216,7 @@ class ExplosionSuite extends AnyFunSuite with SparkTestBase {
     assertResults(restoredDf, expectedRestoredResults)
 
     // Check the filter generator as well
-    assert(explodeConditionFilter.toString == expectedExplodeFilter)
+    assert(explodeConditionFilter.toString == expectedExplodeFilter || explodeConditionFilter.toString == expectedExplodeFilterSpark4)
   }
 
   test("Test exploding a nested array that is the only element of a struct") {

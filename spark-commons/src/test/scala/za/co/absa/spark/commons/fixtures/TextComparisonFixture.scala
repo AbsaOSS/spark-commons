@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandler.types
+package za.co.absa.spark.commons.fixtures
 
-import org.apache.spark.sql.Column
-import org.scalatest.Assertions
+import org.scalatest.{Assertion, Suite}
 
-case class ColumnOrValueForm[T] (
-                                 column: Column,
-                                 columnNames: Set[String],
-                                 value: Option[T]
-                               ) extends Assertions {
-  def assertTo(columnOrValue: ColumnOrValue[T]): Unit ={
-    assert(column.toString() == columnOrValue.column.toString())
-    assert(columnNames == columnOrValue.columnNames)
-    assert(value == columnOrValue.getValue)
+trait TextComparisonFixture {
+  this: Suite =>
+
+  protected def compareTextVertical(actual: String, expected: String): Unit = {
+    if (actual.replaceAll("[\r\n]", "") != expected.replaceAll("[\r\n]", "")) {
+      fail(s"ACTUAL:\n$actual\nEXPECTED: \n$expected")
+    }
   }
-
 }

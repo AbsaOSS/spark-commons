@@ -20,27 +20,30 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.lit
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.ColumnImplicits.ColumnEnhancements
+import za.co.absa.spark.commons.test.SparkTestBase
 import za.co.absa.spark.commons.utils.ColUtils
 
-class ColumnImplicitsTest extends AnyFunSuite {
+class ColumnImplicitsTest extends AnyFunSuite with SparkTestBase {
 
   private val column: Column = lit("abcdefgh")
 
   test("zeroBasedSubstr with startPos") {
-    assertResult("cdefgh")(ColUtils.col2Expr(column.zeroBasedSubstr(2)).eval().toString)
-    assertResult("gh")(ColUtils.col2Expr(column.zeroBasedSubstr(-2)).eval().toString)
-    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MaxValue)).eval().toString)
-    assertResult("abcdefgh")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MinValue)).eval().toString)
+    assertResult("cdefgh")(evalString(column.zeroBasedSubstr(2)))
+    assertResult("gh")(evalString(column.zeroBasedSubstr(-2)))
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MaxValue)))
+    assertResult("abcdefgh")(evalString(column.zeroBasedSubstr(Int.MinValue)))
   }
 
   test("zeroBasedSubstr with startPos and len") {
-    assertResult("cde")(ColUtils.col2Expr(column.zeroBasedSubstr(2, 3)).eval().toString)
-    assertResult("gh")(ColUtils.col2Expr(column.zeroBasedSubstr(-2, 7)).eval().toString)
-    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MaxValue, 1)).eval().toString)
-    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MaxValue, -3)).eval().toString)
-    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(4, -3)).eval().toString)
-    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MinValue,2)).eval().toString)
-    assertResult("")(ColUtils.col2Expr(column.zeroBasedSubstr(Int.MinValue,-3)).eval().toString)
+    assertResult("cde")(evalString(column.zeroBasedSubstr(2, 3)).toString)
+    assertResult("gh")(evalString(column.zeroBasedSubstr(-2, 7)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MaxValue, 1)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MaxValue, -3)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(4, -3)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MinValue,2)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MinValue,-3)).toString)
   }
 
+  private def evalString(column: Column): String =
+    spark.range(1).select(column.as("value")).head().getString(0)
 }
