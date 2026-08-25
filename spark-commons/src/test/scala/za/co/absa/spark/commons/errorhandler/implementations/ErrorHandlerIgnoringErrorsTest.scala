@@ -20,6 +20,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.errorhandler.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandler.types.{ErrorColumn, ErrorWhen}
 import za.co.absa.spark.commons.test.SparkTestBase
+import za.co.absa.spark.commons.utils.ColUtils
 
 class ErrorHandlerIgnoringErrorsTest extends AnyFunSuite with SparkTestBase {
   import spark.implicits._
@@ -66,7 +67,7 @@ class ErrorHandlerIgnoringErrorsTest extends AnyFunSuite with SparkTestBase {
       "Test error 1", 1, "This is a test error", Some(errColName))
 
     val testDf = emptyDf.withColumn(errColName, errorColumn.column)
-    val expectedType = testDf.col(errColName).expr.dataType
+    val expectedType = ColUtils.col2Expr(testDf.col(errColName)).dataType
     val expectedValue = testDf.schema.fields
     val actualType = ErrorHandlerIgnoringErrors.errorColumnType
 

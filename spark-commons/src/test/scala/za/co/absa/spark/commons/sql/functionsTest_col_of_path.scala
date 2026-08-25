@@ -16,7 +16,7 @@
 
 package za.co.absa.spark.commons.sql
 
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, get, lit}
 import functions.col_of_path
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.test.SparkTestBase
@@ -56,8 +56,6 @@ class functionsTest_col_of_path extends AnyFunSuite with SparkTestBase {
   }
 
   test("col_of_path - evaluate from data with array") {
-
-
     val a1 = Array(Node("One"), Node("Two", Option(SubNode("TwentyOne", 68))), Node("Three"))
     val a2 = Array(Node("Alpha"), Node("Beta", Option(SubNode("BetaOne", 42))))
     val sourceDF = Seq(
@@ -68,7 +66,9 @@ class functionsTest_col_of_path extends AnyFunSuite with SparkTestBase {
     val resultDF = sourceDF
       .withColumn("new1", col_of_path("ar[0].name"))
       .withColumn("new2", col_of_path("ar[1].subNode.value"))
-      .withColumn("new3", col_of_path("ar[2]"))
+      // ANSI mode (default since Spark 4) fails on out-of-bounds array index,
+      // `get` tolerates it and returns NULL instead
+      .withColumn("new3", get(col_of_path("ar"), lit(2)))
       .select("id", "new1", "new2", "new3")
 
     val expected = Seq(

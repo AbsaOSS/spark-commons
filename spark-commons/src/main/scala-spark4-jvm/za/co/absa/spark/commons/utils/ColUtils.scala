@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandler.types
+package za.co.absa.spark.commons.utils
 
 import org.apache.spark.sql.Column
-import org.scalatest.Assertions
+import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.classic.ColumnConversions
 
-case class ColumnOrValueForm[T] (
-                                 column: Column,
-                                 columnNames: Set[String],
-                                 value: Option[T]
-                               ) extends Assertions {
-  def assertTo(columnOrValue: ColumnOrValue[T]): Unit ={
-    assert(column.toString() == columnOrValue.column.toString())
-    assert(columnNames == columnOrValue.columnNames)
-    assert(value == columnOrValue.getValue)
+object ColUtils {
+  def col2Expr(c: Column): Expression = {
+    ColumnConversions.expression(c)
+  }
+
+  def expr2Col(e: Expression): Column = {
+    conversionFunctionE2C(e)
+  }
+
+  private val conversionFunctionE2C = {
+    val clazz = Class.forName("org.apache.spark.sql.classic.ExpressionUtils$")
+    val instance = clazz.getField("MODULE$").get(null)
+    val method = clazz.getMethod("column", classOf[Expression])
+    (expr: Expression) => method.invoke(instance, expr).asInstanceOf[Column]
   }
 
 }

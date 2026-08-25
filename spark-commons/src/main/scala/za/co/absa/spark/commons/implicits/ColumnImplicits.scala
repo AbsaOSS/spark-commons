@@ -53,7 +53,14 @@ object ColumnImplicits {
      * @return column with requested substring
      */
     def zeroBasedSubstr(startPos: Int, len: Int): Column = {
-      if (startPos >= 0) {
+      // Need to check for min int explicitly, otherwise Spark 4 generates integer overflow
+      if (startPos == Int.MinValue) {
+        if (len == Int.MinValue) {
+          column
+        } else {
+          lit("")
+        }
+      } else if (startPos >= 0) {
         column.substr(startPos + 1, len)
       } else {
         val startPosColumn = greatest(length(column) + startPos + 1, lit(1))
