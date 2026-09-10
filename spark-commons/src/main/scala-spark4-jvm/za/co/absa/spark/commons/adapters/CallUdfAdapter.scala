@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.errorhandler.types
+package za.co.absa.spark.commons.adapters
 
 import org.apache.spark.sql.Column
-import org.scalatest.Assertions
+import org.apache.spark.sql.functions.{call_udf => sparkCallUdf}
 
-case class ColumnOrValueForm[T] (
-                                 column: Column,
-                                 columnNames: Set[String],
-                                 value: Option[T]
-                               ) extends Assertions {
-  def assertTo(columnOrValue: ColumnOrValue[T]): Unit ={
-    assert(column.toString() == columnOrValue.column.toString())
-    assert(columnNames == columnOrValue.columnNames)
-    assert(value == columnOrValue.getValue)
-  }
-
+trait CallUdfAdapter {
+  def call_udf(udfName: String, cols: Column*): Column = sparkCallUdf(udfName, cols:_*)
 }

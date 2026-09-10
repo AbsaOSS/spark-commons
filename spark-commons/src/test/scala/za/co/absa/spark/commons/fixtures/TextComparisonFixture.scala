@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package za.co.absa.spark.commons.adapters
+package za.co.absa.spark.commons.fixtures
 
-import org.apache.spark.sql.Column
-import za.co.absa.spark.hofs.{transform => hofsTransform}
+import org.scalatest.{Assertion, Suite}
 
-trait TransformAdapter {
-  /**
-   * For Spark versions prior 3.0.0, delegates to {{{hofs.transform()}}}
-   */
-  def transform: (Column, Column => Column) => Column = hofsTransform
+trait TextComparisonFixture {
+  this: Suite =>
+
+  protected def compareTextVertical(actual: String, expected: String): Unit = {
+    if (actual.replaceAll("[\r\n]", "") != expected.replaceAll("[\r\n]", "")) {
+      fail(s"ACTUAL:\n$actual\nEXPECTED: \n$expected")
+    }
+  }
 }

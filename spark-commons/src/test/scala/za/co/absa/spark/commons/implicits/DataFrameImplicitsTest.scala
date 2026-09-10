@@ -20,9 +20,10 @@ import org.apache.spark.sql.functions.{array, lit, struct}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{AnalysisException, DataFrame}
 import org.scalatest.funsuite.AnyFunSuite
+import za.co.absa.spark.commons.fixtures.TextComparisonFixture
 import za.co.absa.spark.commons.test.SparkTestBase
 
-class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTestData {
+class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTestData with TextComparisonFixture {
   import spark.implicits._
 
   private val columnName = "data"
@@ -112,8 +113,8 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
   }
 
   private def isCached(df: DataFrame): Boolean = {
-    val planToCache = df.queryExecution.analyzed
-    df.sparkSession.sharedState.cacheManager.lookupCachedData(planToCache).isDefined
+    val ench = new DataFrameImplicits.DataFrameEnhancements(df)
+    ench.isCached
   }
 
   test("Like show()") {
@@ -122,7 +123,7 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     val cellWidth = 20
     val expected = inputDataToString(cellWidth, leftAlign)
 
-    assert(result == expected)
+    compareTextVertical(result, expected)
   }
 
   test("Like show(false)") {
@@ -131,7 +132,7 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     val cellWidth = 25
     val expected = inputDataToString(cellWidth, leftAlign)
 
-    assert(result == expected)
+    compareTextVertical(result, expected)
   }
 
   test("Like show(3, true)") {
@@ -140,7 +141,7 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     val cellWidth = 20
     val expected = inputDataToString(cellWidth, leftAlign, Option(3))
 
-    assert(result == expected)
+    compareTextVertical(result, expected)
   }
 
   test("Like show(30, false)") {
@@ -149,7 +150,7 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     val cellWidth = 25
     val expected = inputDataToString(cellWidth, leftAlign, Option(30))
 
-    assert(result == expected)
+    compareTextVertical(result, expected)
   }
 
 
@@ -159,7 +160,7 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     val cellWidth = 10
     val expected = inputDataToString(cellWidth, leftAlign, Option(10))
 
-    assert(result == expected)
+    compareTextVertical(result, expected)
   }
 
   test("Like show(50, 50, false)") {
@@ -168,7 +169,7 @@ class DataFrameImplicitsTest extends AnyFunSuite with SparkTestBase with JsonTes
     val cellWidth = 25
     val expected = inputDataToString(cellWidth, leftAlign, Option(50))
 
-    assert(result == expected)
+    compareTextVertical(result, expected)
   }
 
   test("Test withColumnIfNotExist() when the column does not exist") {

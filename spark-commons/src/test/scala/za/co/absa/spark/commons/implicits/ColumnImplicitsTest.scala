@@ -17,29 +17,94 @@
 package za.co.absa.spark.commons.implicits
 
 import org.apache.spark.sql.Column
-import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.functions.{col, lit}
 import org.scalatest.funsuite.AnyFunSuite
 import za.co.absa.spark.commons.implicits.ColumnImplicits.ColumnEnhancements
+import za.co.absa.spark.commons.test.SparkTestBase
+import za.co.absa.spark.commons.utils.ColUtils
 
-class ColumnImplicitsTest extends AnyFunSuite {
+class ColumnImplicitsTest extends AnyFunSuite with SparkTestBase {
 
   private val column: Column = lit("abcdefgh")
 
   test("zeroBasedSubstr with startPos") {
-    assertResult("cdefgh")(column.zeroBasedSubstr(2).expr.eval().toString)
-    assertResult("gh")(column.zeroBasedSubstr(-2).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MaxValue).expr.eval().toString)
-    assertResult("abcdefgh")(column.zeroBasedSubstr(Int.MinValue).expr.eval().toString)
+    assertResult("cdefgh")(evalString(column.zeroBasedSubstr(2)))
+    assertResult("gh")(evalString(column.zeroBasedSubstr(-2)))
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MaxValue)))
+    assertResult("abcdefgh")(evalString(column.zeroBasedSubstr(Int.MinValue)))
   }
 
   test("zeroBasedSubstr with startPos and len") {
-    assertResult("cde")(column.zeroBasedSubstr(2, 3).expr.eval().toString)
-    assertResult("gh")(column.zeroBasedSubstr(-2, 7).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MaxValue, 1).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MaxValue, -3).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(4, -3).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MinValue,2).expr.eval().toString)
-    assertResult("")(column.zeroBasedSubstr(Int.MinValue,-3).expr.eval().toString)
+    assertResult("cde")(evalString(column.zeroBasedSubstr(2, 3)).toString)
+    assertResult("gh")(evalString(column.zeroBasedSubstr(-2, 7)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MaxValue, 1)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MaxValue, -3)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(4, -3)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MinValue,2)).toString)
+    assertResult("")(evalString(column.zeroBasedSubstr(Int.MinValue,-3)).toString)
   }
 
+  private def evalString(column: Column): String =
+    spark.range(1).select(column.as("value")).head().getString(0)
+
+  private def evalBoolean(column: Column): Boolean =
+    spark.range(1).select(column.as("value")).head().getBoolean(0)
+
+  private def evalIsNull(column: Column): Boolean = {
+    val row = spark.range(1).select(column.as("value")).head()
+    row.isNullAt(0)
+  }
+
+  test("isInfinite returns true for positive infinity") {
+    assertResult(true)(evalBoolean(lit(Double.PositiveInfinity).isInfinite))
+  }
+
+  test("isInfinite returns true for negative infinity") {
+    assertResult(true)(evalBoolean(lit(Double.NegativeInfinity).isInfinite))
+  }
+
+  test("isInfinite returns false for finite values") {
+    assertResult(false)(evalBoolean(lit(0.0).isInfinite))
+    assertResult(false)(evalBoolean(lit(1.5).isInfinite))
+    assertResult(false)(evalBoolean(lit(Double.MaxValue).isInfinite))
+    assertResult(false)(evalBoolean(lit(Double.MinValue).isInfinite))
+  }
+
+  test("isInfinite returns false for zero") {
+    assertResult(false)(evalBoolean(lit(0.0).isInfinite))
+    assertResult(false)(evalBoolean(lit(-0.0).isInfinite))
+  }
+
+  test("isInfinite with DataFrame column") {
+    import spark.implicits._
+    val df = Seq(
+      (Double.PositiveInfinity, "pos_inf"),
+      (Double.NegativeInfinity, "neg_inf"),
+      (1.0, "finite"),
+      (0.0, "zero")
+    ).toDF("value", "label")
+
+    val resultDf = df.withColumn("is_inf", col("value").isInfinite)
+
+    assertResult(true)(resultDf.filter("label = 'pos_inf'").select("is_inf").head().getBoolean(0))
+    assertResult(true)(resultDf.filter("label = 'neg_inf'").select("is_inf").head().getBoolean(0))
+    assertResult(false)(resultDf.filter("label = 'finite'").select("is_inf").head().getBoolean(0))
+    assertResult(false)(resultDf.filter("label = 'zero'").select("is_inf").head().getBoolean(0))
+  }
+
+  test("zeroBasedSubstr with empty string") {
+    assertResult("")(evalString(lit("").zeroBasedSubstr(0)))
+    assertResult("")(evalString(lit("").zeroBasedSubstr(0, 5)))
+    assertResult("")(evalString(lit("").zeroBasedSubstr(-1)))
+  }
+
+  test("zeroBasedSubstr with null input") {
+    assert(evalIsNull(lit(null: String).zeroBasedSubstr(0)))
+    assert(evalIsNull(lit(null: String).zeroBasedSubstr(0, 5)))
+    assert(evalIsNull(lit(null: String).zeroBasedSubstr(-1)))
+  }
+
+  test("zeroBasedSubstr with zero length") {
+    assertResult("")(evalString(column.zeroBasedSubstr(0, 0)))
+  }
 }

@@ -17,11 +17,12 @@
 package za.co.absa.spark.commons.errorhandler
 
 import org.apache.spark.sql.catalyst.expressions.{CaseWhen, Expression}
-import org.apache.spark.sql.functions.when
+import org.apache.spark.sql.functions.{expr, when}
 import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.{Column, DataFrame}
 import za.co.absa.spark.commons.errorhandler.implementations.submits.{ErrorMessageSubmitOnColumn, ErrorMessageSubmitWithoutColumn}
 import za.co.absa.spark.commons.errorhandler.types._
+import za.co.absa.spark.commons.utils.ColUtils.{col2Expr, expr2Col}
 
 /**
  * The basic class of error handler component. Every library that wants to use the component during Spark data
@@ -87,8 +88,8 @@ trait ErrorHandler {
       when(errorWhen.when, transformErrorSubmitToColumn(errorWhen.errorMessageSubmit))
     }
     def errorWhenSeqToCol(errorsWhen: Seq[ErrorWhen]): Column = {
-      val branches: Seq[(Expression, Expression)] = errorsWhen.map(errorWhen => (errorWhen.when.expr, transformErrorSubmitToColumn(errorWhen.errorMessageSubmit).expr))
-      new Column(CaseWhen(branches))
+      val branches: Seq[(Expression, Expression)] = errorsWhen.map(errorWhen => (col2Expr(errorWhen.when), col2Expr(transformErrorSubmitToColumn(errorWhen.errorMessageSubmit))))
+      expr2Col(CaseWhen(branches))
     }
 
     val errorsByColumn = errorsWhen.groupBy(_.errorMessageSubmit.errColsAndValues.columnNames)
