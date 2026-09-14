@@ -33,9 +33,9 @@ env:
   # hint: "group thresholds" are in format: 'overall*changed-files-average*per-changed-file'
   # one report group per Spark version
   REPORT_GROUPS: |
-    - name: scala2.12-spark3.3
+    - name: scala2.12-spark3.5
       paths:
-        - '**/target/spark-commons3.3*-jvm-2_12*/jacoco-report/jacoco.xml'
+        - '**/target/spark-commons3.5*-jvm-2_12*/jacoco-report/jacoco.xml'
       thresholds: '73*80*60'
     - name: scala2.13-spark4.1
       paths:
