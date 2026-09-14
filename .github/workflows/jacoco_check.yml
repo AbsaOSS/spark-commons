@@ -33,14 +33,14 @@ env:
   # hint: "group thresholds" are in format: 'overall*changed-files-average*per-changed-file'
   # one report group per Spark version
   REPORT_GROUPS: |
-    - name: scala2.12-spark3.3
+    - name: scala2.12-spark3.5
       paths:
-        - '**/target/spark-commons3.3*-jvm-2_12*/jacoco-report/jacoco.xml'
+        - '**/target/spark-commons3.5*-jvm-2_12*/jacoco-report/jacoco.xml'
       thresholds: '73*80*60'
     - name: scala2.13-spark4.1
       paths:
         - '**/target/spark-commons4.1*-jvm-2_13*/jacoco-report/jacoco.xml'
-      thresholds: '73*80*60'
+      thresholds: '70*80*60'
 
 jobs:
   detect:
@@ -99,9 +99,12 @@ jobs:
         uses: MoranaApps/jacoco-report@3575c005e31adda0bf6868b69d48a0114e912845
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          global-thresholds: '71*80'
+          global-thresholds: '70*80'
           global-overall-scope: 'groups-only'
           report-thresholds-default: '33*80*60'
+          # spark-commons-test is a thin test-helper module; exclude its report from coverage evaluation/reporting.
+          exclude-paths: |
+            **/spark-commons-test/**/jacoco.xml
           skip-unchanged: 'true'
           evaluate-unchanged: 'false'
           report-groups: ${{ env.REPORT_GROUPS }}

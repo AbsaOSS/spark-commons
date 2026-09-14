@@ -38,7 +38,7 @@ object DataFrameImplicits {
     }
 
     /**
-     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset#show():Unit* spark.Dataset.show()]] displays them
+     * Get the string representation of the data in the format as [[org.apache.spark.sql.Dataset#show():Unit* spark.Dataset.show()]] displays them.
      *
      * @return  The string representation of the data in the DataFrame
      * @since 0.2.0
