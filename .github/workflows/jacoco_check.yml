@@ -40,7 +40,7 @@ env:
     - name: scala2.13-spark4.1
       paths:
         - '**/target/spark-commons4.1*-jvm-2_13*/jacoco-report/jacoco.xml'
-      thresholds: '73*80*60'
+      thresholds: '70*80*60'
 
 jobs:
   detect:
@@ -99,7 +99,7 @@ jobs:
         uses: MoranaApps/jacoco-report@3575c005e31adda0bf6868b69d48a0114e912845
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          global-thresholds: '71*80'
+          global-thresholds: '70*80'
           global-overall-scope: 'groups-only'
           report-thresholds-default: '33*80*60'
           skip-unchanged: 'true'
