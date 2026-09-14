@@ -50,7 +50,7 @@ object ArrayTypeImplicits {
 
 
     /**
-     * Finds all differences of two ArrayTypes and returns their paths.
+     * Finds all differences of two ArrayTypes and returns their paths
      *
      * @param array2 The second array to compare
      * @param parent Parent path. This is used for the accumulation of differences and their print out
