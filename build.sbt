@@ -108,3 +108,4 @@ lazy val sparkCommonsTest = (projectMatrix in file("spark-commons-test"))
     ): _*
   )
   .jvmPlatform(scalaVersions = Seq(scala212, scala213))
+  .enablePlugins(JacocoFilterPlugin)

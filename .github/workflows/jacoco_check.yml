@@ -102,6 +102,9 @@ jobs:
           global-thresholds: '70*80'
           global-overall-scope: 'groups-only'
           report-thresholds-default: '33*80*60'
+          # spark-commons-test is a thin test-helper module; exclude its report from coverage evaluation/reporting.
+          exclude-paths: |
+            **/spark-commons-test/**/jacoco.xml
           skip-unchanged: 'true'
           evaluate-unchanged: 'false'
           report-groups: ${{ env.REPORT_GROUPS }}
