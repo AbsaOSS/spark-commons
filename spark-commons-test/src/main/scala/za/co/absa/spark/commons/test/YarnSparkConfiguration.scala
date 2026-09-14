@@ -36,7 +36,7 @@ class YarnSparkConfiguration(confDir: String, distJarsDir: String) extends Spark
   }
 
   protected def dependencies: String = {
-    //get a list of all dist jars
+    // get a list of all dist jars
     val distJars = FileSystem
       .get(YarnSparkConfiguration.getHadoopConfiguration(confDir))
       .listStatus(new Path(distJarsDir))
